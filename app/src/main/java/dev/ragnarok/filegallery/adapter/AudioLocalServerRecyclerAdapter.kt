@@ -21,10 +21,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.textfield.TextInputEditText
 import com.squareup.picasso3.Transformation
-import dev.ragnarok.filegallery.Constants
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
+import dev.ragnarok.filegallery.*
 import dev.ragnarok.filegallery.Includes.networkInterfaces
-import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.api.interfaces.ILocalServerApi
 import dev.ragnarok.filegallery.media.music.MusicPlaybackController
 import dev.ragnarok.filegallery.media.music.PlayerStatus
@@ -42,7 +40,6 @@ import dev.ragnarok.filegallery.settings.CurrentTheme.getColorSecondary
 import dev.ragnarok.filegallery.settings.Settings.get
 import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.DownloadWorkUtils.doDownloadAudio
-import dev.ragnarok.filegallery.util.RxUtils
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.view.WeakViewAnimatorAdapter
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
@@ -82,8 +79,8 @@ class AudioLocalServerRecyclerAdapter(
         }
     }
 
-    private fun getBitrate(url: String, size: Int) {
-        if (Utils.isEmpty(url)) {
+    private fun getBitrate(url: String?, size: Int) {
+        if (url.isNullOrEmpty()) {
             return
         }
         audioListDisposable = doBitrate(url).fromIOToMain()
@@ -114,7 +111,7 @@ class AudioLocalServerRecyclerAdapter(
 
     private fun updateAudioStatus(holder: AudioHolder, audio: Audio) {
         if (audio != currAudio) {
-            holder.visual.setImageResource(if (Utils.isEmpty(audio.url)) R.drawable.audio_died else R.drawable.song)
+            holder.visual.setImageResource(if (audio.url.isNullOrEmpty()) R.drawable.audio_died else R.drawable.song)
             holder.play_cover.clearColorFilter()
             return
         }
@@ -246,7 +243,7 @@ class AudioLocalServerRecyclerAdapter(
                         )
                         AudioLocalServerOption.update_time_item_audio -> {
                             val hash = parseLocalServerURL(audio.url)
-                            if (Utils.isEmpty(hash)) {
+                            if (hash.isNullOrEmpty()) {
                                 return
                             }
                             audioListDisposable = mAudioInteractor.update_time(hash)
@@ -260,7 +257,7 @@ class AudioLocalServerRecyclerAdapter(
                         }
                         AudioLocalServerOption.edit_item_audio -> {
                             val hash2 = parseLocalServerURL(audio.url)
-                            if (Utils.isEmpty(hash2)) {
+                            if (hash2.isNullOrEmpty()) {
                                 return
                             }
                             audioListDisposable = mAudioInteractor.get_file_name(hash2)
@@ -310,7 +307,7 @@ class AudioLocalServerRecyclerAdapter(
                             .setCancelable(true)
                             .setPositiveButton(R.string.button_yes) { _: DialogInterface?, _: Int ->
                                 val hash1 = parseLocalServerURL(audio.url)
-                                if (Utils.isEmpty(hash1)) {
+                                if (hash1.isNullOrEmpty()) {
                                     return@setPositiveButton
                                 }
                                 audioListDisposable = mAudioInteractor.delete_media(hash1)
@@ -363,7 +360,7 @@ class AudioLocalServerRecyclerAdapter(
         }
         updateDownloadState(holder, audio)
         updateAudioStatus(holder, audio)
-        if (!Utils.isEmpty(audio.thumb_image)) {
+        if (audio.thumb_image.nonNullNoEmpty()) {
             ResourcesCompat.getDrawable(
                 mContext.resources,
                 audioCoverSimple,
@@ -392,8 +389,7 @@ class AudioLocalServerRecyclerAdapter(
         holder.Track.setOnLongClickListener { v: View? ->
             audio.downloadIndicator = true
             updateDownloadState(holder, audio)
-            val ret = doDownloadAudio(mContext, audio, false)
-            when (ret) {
+            when (doDownloadAudio(mContext, audio, false)) {
                 0 -> {
                     CreateCustomToast(mContext).showToastBottom(R.string.saved_audio)
                 }
@@ -434,7 +430,7 @@ class AudioLocalServerRecyclerAdapter(
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         mPlayerDisposable = MusicPlaybackController.observeServiceBinding()
-            .compose(RxUtils.applyObservableIOToMainSchedulers())
+            .toMainThread()
             .subscribe { status: Int -> onServiceBindEvent(status) }
     }
 

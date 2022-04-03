@@ -1,12 +1,13 @@
 package dev.ragnarok.filegallery.mvp.presenter
 
 import android.os.Bundle
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
 import dev.ragnarok.filegallery.Includes.networkInterfaces
 import dev.ragnarok.filegallery.api.interfaces.ILocalServerApi
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.model.Video
 import dev.ragnarok.filegallery.mvp.presenter.base.RxSupportPresenter
 import dev.ragnarok.filegallery.mvp.view.IVideosLocalServerView
+import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.util.FindAt
 import dev.ragnarok.filegallery.util.Utils
 import io.reactivex.rxjava3.core.Single
@@ -102,7 +103,7 @@ class VideosLocalServerPresenter(savedInstanceState: Bundle?) :
     }
 
     fun fireScrollToEnd(): Boolean {
-        if (!endOfContent && Utils.nonEmpty(videos) && actualDataReceived && !actualDataLoading) {
+        if (!endOfContent && videos.nonNullNoEmpty() && actualDataReceived && !actualDataLoading) {
             if (search_at.isSearchMode()) {
                 search(false)
             } else {
@@ -126,7 +127,7 @@ class VideosLocalServerPresenter(savedInstanceState: Bundle?) :
             .subscribe({
                 onSearched(
                     FindAt(
-                        search_at.getQuery()!!,
+                        search_at.getQuery() ?: return@subscribe,
                         search_at.getOffset() + SEARCH_COUNT,
                         it.size < SEARCH_COUNT
                     ), it
@@ -143,7 +144,7 @@ class VideosLocalServerPresenter(savedInstanceState: Bundle?) :
             videos.addAll(data)
             view?.notifyListChanged()
         } else {
-            if (Utils.nonEmpty(data)) {
+            if (data.nonNullNoEmpty()) {
                 val startSize = videos.size
                 videos.addAll(data)
                 view?.notifyDataAdded(
@@ -173,7 +174,7 @@ class VideosLocalServerPresenter(savedInstanceState: Bundle?) :
         val query = q?.trim { it <= ' ' }
         if (!search_at.do_compare(query)) {
             actualDataLoading = false
-            if (Utils.isEmpty(query)) {
+            if (query.isNullOrEmpty()) {
                 actualDataDisposable.dispose()
                 fireRefresh(false)
             } else {

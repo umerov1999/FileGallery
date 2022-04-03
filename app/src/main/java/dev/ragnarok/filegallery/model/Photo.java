@@ -31,7 +31,7 @@ public class Photo implements Parcelable, ParcelNative.ParcelableNative {
     private String text;
     private long date;
     private boolean isGif;
-    private boolean isDownload;
+    private boolean isLocal;
 
     public Photo() {
 
@@ -44,7 +44,7 @@ public class Photo implements Parcelable, ParcelNative.ParcelableNative {
         preview_url = in.readString();
         text = in.readString();
         date = in.readLong();
-        isDownload = in.readBoolean();
+        isLocal = in.readBoolean();
         isGif = in.readBoolean();
     }
 
@@ -55,7 +55,7 @@ public class Photo implements Parcelable, ParcelNative.ParcelableNative {
         preview_url = in.readString();
         text = in.readString();
         date = in.readLong();
-        isDownload = in.readByte() != 0;
+        isLocal = in.readByte() != 0;
         isGif = in.readByte() != 0;
     }
 
@@ -68,12 +68,12 @@ public class Photo implements Parcelable, ParcelNative.ParcelableNative {
         return this;
     }
 
-    public boolean isDownload() {
-        return isDownload;
+    public boolean inLocal() {
+        return isLocal;
     }
 
-    public Photo setDownload(boolean download) {
-        isDownload = download;
+    public Photo setLocal(boolean local) {
+        isLocal = local;
         return this;
     }
 
@@ -144,7 +144,7 @@ public class Photo implements Parcelable, ParcelNative.ParcelableNative {
         parcel.writeString(preview_url);
         parcel.writeString(text);
         parcel.writeLong(date);
-        parcel.writeByte((byte) (isDownload ? 1 : 0));
+        parcel.writeByte((byte) (isLocal ? 1 : 0));
         parcel.writeByte((byte) (isGif ? 1 : 0));
     }
 
@@ -172,7 +172,7 @@ public class Photo implements Parcelable, ParcelNative.ParcelableNative {
         parcel.writeString(preview_url);
         parcel.writeString(text);
         parcel.writeLong(date);
-        parcel.writeBoolean(isDownload);
+        parcel.writeBoolean(isLocal);
         parcel.writeBoolean(isGif);
     }
 }

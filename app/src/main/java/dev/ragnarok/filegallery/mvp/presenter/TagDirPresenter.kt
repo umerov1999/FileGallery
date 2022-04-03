@@ -1,9 +1,9 @@
 package dev.ragnarok.filegallery.mvp.presenter
 
 import android.os.Bundle
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
 import dev.ragnarok.filegallery.Includes
 import dev.ragnarok.filegallery.db.interfaces.ISearchRequestHelperStorage
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.model.Audio
 import dev.ragnarok.filegallery.model.FileType
 import dev.ragnarok.filegallery.model.Photo
@@ -14,7 +14,6 @@ import dev.ragnarok.filegallery.module.parcel.ParcelNative
 import dev.ragnarok.filegallery.mvp.presenter.base.RxSupportPresenter
 import dev.ragnarok.filegallery.mvp.view.ITagDirView
 import dev.ragnarok.filegallery.util.Objects
-import dev.ragnarok.filegallery.util.Utils
 import java.util.*
 
 class TagDirPresenter(private val owner_id: Int, savedInstanceState: Bundle?) :
@@ -35,7 +34,7 @@ class TagDirPresenter(private val owner_id: Int, savedInstanceState: Bundle?) :
         if (Objects.safeEquals(query, this.q)) {
             return
         }
-        q = if (Utils.isEmpty(query)) {
+        q = if (query.isNullOrEmpty()) {
             null
         } else {
             query
@@ -46,7 +45,7 @@ class TagDirPresenter(private val owner_id: Int, savedInstanceState: Bundle?) :
         } else {
             tagDirDataSearch.clear()
             for (i in tagDirData) {
-                if (Utils.isEmpty(i.name)) {
+                if (i.name.isNullOrEmpty()) {
                     continue
                 }
                 if (i.name.lowercase(Locale.getDefault())
@@ -117,6 +116,7 @@ class TagDirPresenter(private val owner_id: Int, savedInstanceState: Bundle?) :
                 photo.ownerId = i.filePathHash
                 photo.photo_url = "file://" + i.path
                 photo.preview_url = "thumb_file://" + i.path
+                photo.setLocal(true)
                 photo.isGif =
                     i.type == FileType.video || i.name.toString().endsWith("gif", true)
                 photo.text = i.name

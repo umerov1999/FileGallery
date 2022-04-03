@@ -10,7 +10,7 @@
 Требуется:
   1) Android Studio Arctic Fox (2020.3.1) или выше. Kotlin 1.6.*
   2) Android SDK 31
-  3) Android NDK 23.1.7779620
+  3) Android NDK 24.0.8215888
   
 <b>Компиляция:</b>
 

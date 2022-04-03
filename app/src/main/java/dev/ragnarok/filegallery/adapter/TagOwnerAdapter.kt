@@ -13,8 +13,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.model.tags.TagOwner
+import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.picasso.transforms.RoundTransformation
-import dev.ragnarok.filegallery.util.Utils
 
 
 class TagOwnerAdapter(private var data: List<TagOwner>, private val context: Context) :
@@ -102,7 +102,7 @@ class TagOwnerAdapter(private var data: List<TagOwner>, private val context: Con
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val item = data[position]
-        if (Utils.isEmpty(item.name)) holder.tvTitle.visibility = View.GONE else {
+        if (item.name.isNullOrEmpty()) holder.tvTitle.visibility = View.GONE else {
             holder.tvTitle.visibility = View.VISIBLE
             holder.tvTitle.text = item.name
         }
@@ -111,7 +111,7 @@ class TagOwnerAdapter(private var data: List<TagOwner>, private val context: Con
             clickListener?.onTagOwnerClick(holder.bindingAdapterPosition, item)
         }
 
-        if (!Utils.isEmpty(item.name)) {
+        if (item.name.nonNullNoEmpty()) {
             var name: String = item.name
             if (name.length > 2) name = name.substring(0, 2)
             name = name.trim { it <= ' ' }
@@ -166,7 +166,7 @@ class TagOwnerAdapter(private var data: List<TagOwner>, private val context: Con
         val tvBackgroundImage: ImageView = root.findViewById(R.id.tag_background)
 
         override fun onCreateContextMenu(menu: ContextMenu, v: View, menuInfo: ContextMenuInfo?) {
-            val position = recyclerView!!.getChildAdapterPosition(v)
+            val position = recyclerView?.getChildAdapterPosition(v) ?: 0
             val owner = data[position]
             menu.setHeaderTitle(owner.name)
             menu.add(0, v.id, 0, R.string.rename).setOnMenuItemClickListener {

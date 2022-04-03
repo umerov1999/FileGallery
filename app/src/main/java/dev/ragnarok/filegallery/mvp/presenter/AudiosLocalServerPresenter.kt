@@ -2,13 +2,14 @@ package dev.ragnarok.filegallery.mvp.presenter
 
 import android.content.Context
 import android.os.Bundle
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
 import dev.ragnarok.filegallery.Includes.networkInterfaces
 import dev.ragnarok.filegallery.api.interfaces.ILocalServerApi
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.media.music.MusicPlaybackService.Companion.startForPlayList
 import dev.ragnarok.filegallery.model.Audio
 import dev.ragnarok.filegallery.mvp.presenter.base.RxSupportPresenter
 import dev.ragnarok.filegallery.mvp.view.IAudiosLocalServerView
+import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.place.PlaceFactory.getPlayerPlace
 import dev.ragnarok.filegallery.settings.Settings.get
 import dev.ragnarok.filegallery.util.FindAt
@@ -126,7 +127,7 @@ class AudiosLocalServerPresenter(savedInstanceState: Bundle?) :
     }
 
     fun fireScrollToEnd(): Boolean {
-        if (!endOfContent && Utils.nonEmpty(audios) && actualDataReceived && !actualDataLoading) {
+        if (!endOfContent && audios.nonNullNoEmpty() && actualDataReceived && !actualDataLoading) {
             if (search_at.isSearchMode()) {
                 search(false)
             } else {
@@ -155,7 +156,7 @@ class AudiosLocalServerPresenter(savedInstanceState: Bundle?) :
             .subscribe({
                 onSearched(
                     FindAt(
-                        search_at.getQuery()!!,
+                        search_at.getQuery() ?: return@subscribe,
                         search_at.getOffset() + SEARCH_COUNT,
                         it.size < SEARCH_COUNT
                     ), it
@@ -172,7 +173,7 @@ class AudiosLocalServerPresenter(savedInstanceState: Bundle?) :
             audios.addAll(data)
             view?.notifyListChanged()
         } else {
-            if (Utils.nonEmpty(data)) {
+            if (data.nonNullNoEmpty()) {
                 val startSize = audios.size
                 audios.addAll(data)
                 view?.notifyDataAdded(
@@ -202,7 +203,7 @@ class AudiosLocalServerPresenter(savedInstanceState: Bundle?) :
         val query = q?.trim { it <= ' ' }
         if (!search_at.do_compare(query)) {
             actualDataLoading = false
-            if (Utils.isEmpty(query)) {
+            if (query.isNullOrEmpty()) {
                 actualDataDisposable.dispose()
                 fireRefresh(false)
             } else {
@@ -212,7 +213,7 @@ class AudiosLocalServerPresenter(savedInstanceState: Bundle?) :
     }
 
     fun getAudioPos(audio: Audio?): Int {
-        if (!Utils.isEmpty(audios) && audio != null) {
+        if (audios.nonNullNoEmpty() && audio != null) {
             for ((pos, i) in audios.withIndex()) {
                 if (i.id == audio.id && i.ownerId == audio.ownerId) {
                     i.isAnimationNow = true

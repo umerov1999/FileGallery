@@ -10,7 +10,6 @@ import dev.ragnarok.filegallery.activity.slidr.widget.SliderPanel.OnPanelSlideLi
 import dev.ragnarok.filegallery.settings.CurrentTheme.getNavigationBarColor
 import dev.ragnarok.filegallery.settings.CurrentTheme.getStatusBarColor
 import dev.ragnarok.filegallery.settings.CurrentTheme.getStatusBarNonColored
-import dev.ragnarok.filegallery.util.Objects
 import dev.ragnarok.filegallery.util.Utils
 
 internal open class ColorPanelSlideListener(
@@ -60,7 +59,7 @@ internal open class ColorPanelSlideListener(
                     navigationBarNonColored
                 ) as Int
                 val w = activity.window
-                if (Objects.nonNull(w)) {
+                if (w != null) {
                     w.statusBarColor = statusColor
                     w.navigationBarColor = navigationColor
                     val invertIcons = !isDark(statusColor)

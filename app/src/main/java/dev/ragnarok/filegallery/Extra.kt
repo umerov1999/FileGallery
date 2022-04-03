@@ -2,7 +2,6 @@ package dev.ragnarok.filegallery
 
 object Extra {
     const val PATH = "path"
-    const val PROPS = "props"
     const val AUDIOS = "audios"
     const val POSITION = "position"
     const val SHUFFLE_MODE = "shuffle_mode"
@@ -12,4 +11,7 @@ object Extra {
     const val PTR = "ptr"
     const val NAME = "name"
     const val OWNER_ID = "owner_id"
+    const val EXT = "ext"
+    const val HIDE_TITLE = "hide_tittle"
+    const val TITLE = "tittle"
 }

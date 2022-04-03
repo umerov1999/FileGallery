@@ -67,7 +67,7 @@ abstract class BaseMvpBottomSheetDialogFragment<P : AbsPresenter<V>, V : IMvpVie
                 ).setBackgroundTint(Color.parseColor("#eeff0000"))
                     .setAction(R.string.more_info) {
                         val Text = StringBuilder()
-                        for (stackTraceElement in throwable!!.stackTrace) {
+                        for (stackTraceElement in (throwable ?: return@setAction).stackTrace) {
                             Text.append("    ")
                             Text.append(stackTraceElement)
                             Text.append("\r\n")

@@ -7,6 +7,7 @@ import android.util.AttributeSet
 import androidx.annotation.RawRes
 import androidx.appcompat.widget.AppCompatImageView
 import dev.ragnarok.filegallery.R
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.module.GalleryNative
 import dev.ragnarok.filegallery.module.rlottie.RLottieDrawable
 import dev.ragnarok.filegallery.util.RxUtils
@@ -37,7 +38,7 @@ class RLottieImageView @JvmOverloads constructor(context: Context, attrs: Attrib
         if (layerColors == null) {
             layerColors = HashMap()
         }
-        layerColors!![layer] = color
+        (layerColors ?: return)[layer] = color
         animatedDrawable?.setLayerColor(layer, color)
     }
 
@@ -88,7 +89,7 @@ class RLottieImageView @JvmOverloads constructor(context: Context, attrs: Attrib
                 return@SingleOnSubscribe
             }
             u.onSuccess(true)
-        } as SingleOnSubscribe<Boolean>).compose(RxUtils.applySingleComputationToMainSchedulers())
+        }).fromIOToMain()
             .subscribe(
                 { u: Boolean ->
                     if (u) {
@@ -103,7 +104,7 @@ class RLottieImageView @JvmOverloads constructor(context: Context, attrs: Attrib
         animatedDrawable?.setAutoRepeat(if (autoRepeat) 1 else 0)
         if (layerColors != null) {
             animatedDrawable?.beginApplyLayerColors()
-            for ((key, value) in layerColors!!) {
+            for ((key, value) in layerColors ?: return) {
                 animatedDrawable?.setLayerColor(key, value)
             }
             animatedDrawable?.commitApplyLayerColors()

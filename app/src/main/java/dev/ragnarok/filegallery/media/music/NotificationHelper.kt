@@ -197,6 +197,7 @@ class NotificationHelper(private val mService: MusicPlaybackService) {
         const val NOTIFICATION_DOWNLOADING = 74
         const val NOTIFICATION_DOWNLOAD = 75
         const val NOTIFICATION_DOWNLOAD_MANAGER = 76
+        const val NOTIFICATION_DOWNLOADING_GROUP = 77
     }
 
     init {

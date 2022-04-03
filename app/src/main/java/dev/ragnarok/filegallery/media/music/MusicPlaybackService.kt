@@ -28,9 +28,9 @@ import com.google.android.exoplayer2.upstream.RawResourceDataSource
 import com.squareup.picasso3.BitmapTarget
 import com.squareup.picasso3.Picasso.LoadedFrom
 import dev.ragnarok.filegallery.Constants
-import dev.ragnarok.filegallery.Extensions.Companion.insertAfter
 import dev.ragnarok.filegallery.Extra
 import dev.ragnarok.filegallery.R
+import dev.ragnarok.filegallery.insertAfter
 import dev.ragnarok.filegallery.media.exo.ExoUtil
 import dev.ragnarok.filegallery.model.Audio
 import dev.ragnarok.filegallery.picasso.PicassoInstance
@@ -369,7 +369,7 @@ class MusicPlaybackService : Service() {
     private fun playCurrentTrack(UpdateMeta: Boolean) {
         synchronized(this) {
             Logger.d(TAG, "playCurrentTrack, mPlayListLen: " + Utils.safeCountOf(mPlayList))
-            if (Utils.safeIsEmpty(mPlayList)) {
+            if (mPlayList.isNullOrEmpty()) {
                 return
             }
             stop(false)
@@ -448,7 +448,7 @@ class MusicPlaybackService : Service() {
 
     private fun fetchCoverAndUpdateMetadata() {
         updateMetadata()
-        if (coverBitmap != null || Utils.isEmpty(albumCover)) {
+        if (coverBitmap != null || albumCover.isNullOrEmpty()) {
             return
         }
         PicassoInstance.with()
@@ -708,7 +708,7 @@ class MusicPlaybackService : Service() {
     fun canPlayAfterCurrent(audio: Audio): Boolean {
         synchronized(this) {
             val current = currentTrackNotSyncPos
-            if (Utils.isEmpty(mPlayList) || current == -1 || mPlayList?.get(current) == audio) {
+            if (mPlayList.isNullOrEmpty() || current == -1 || mPlayList?.get(current) == audio) {
                 return false
             }
             return true
@@ -718,7 +718,7 @@ class MusicPlaybackService : Service() {
     fun playAfterCurrent(audio: Audio) {
         synchronized(this) {
             val current = currentTrackNotSyncPos
-            if (Utils.isEmpty(mPlayList) || current == -1 || mPlayList?.get(current) == audio) {
+            if (mPlayList.isNullOrEmpty() || current == -1 || mPlayList?.get(current) == audio) {
                 return
             }
             mPlayList?.insertAfter(current, audio)
@@ -935,9 +935,9 @@ class MusicPlaybackService : Service() {
                 "file:///android_asset/audio_error.ogg"
             )
             val mediaSource: MediaSource =
-                if (url.contains("file://") || url.contains("content://") || url.contains(
+                if (url?.contains("file://") == true || url?.contains("content://") == true || url?.contains(
                         RawResourceDataSource.RAW_RESOURCE_SCHEME
-                    )
+                    ) == true
                 ) {
                     ProgressiveMediaSource.Factory(factoryLocal)
                         .createMediaSource(makeMediaItem(url))
@@ -1258,7 +1258,7 @@ class MusicPlaybackService : Service() {
             position: Int,
             forceShuffle: Boolean
         ) {
-            if (Utils.isEmpty(audios)) {
+            if (audios.isNullOrEmpty()) {
                 return
             }
             Logger.d(TAG, "startForPlayList, count: " + audios.size + ", position: " + position)

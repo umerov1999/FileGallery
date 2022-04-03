@@ -62,7 +62,7 @@ class ThemeFragment : AbsMvpFragment<ThemePresenter, IThemeView>(), IThemeView,
     }
 
     override fun onClick(index: Int, value: ThemeValue?) {
-        if (value!!.disabled) {
+        if ((value ?: return).disabled) {
             return
         }
         get().main().setMainTheme(value.id)

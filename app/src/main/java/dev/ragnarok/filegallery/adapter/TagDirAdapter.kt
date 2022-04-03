@@ -23,7 +23,7 @@ import dev.ragnarok.filegallery.module.GalleryNative
 import dev.ragnarok.filegallery.picasso.PicassoInstance
 import dev.ragnarok.filegallery.settings.CurrentTheme
 import dev.ragnarok.filegallery.settings.Settings
-import dev.ragnarok.filegallery.util.RxUtils
+import dev.ragnarok.filegallery.toMainThread
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import io.reactivex.rxjava3.disposables.Disposable
@@ -121,7 +121,7 @@ class TagDirAdapter(context: Context, private var data: List<TagDir>) :
             if (item.isSelected) {
                 holder.current.visibility = View.VISIBLE
                 holder.current.fromRes(
-                    R.raw.donater_fire,
+                    R.raw.select_fire,
                     Utils.dp(100f),
                     Utils.dp(100f),
                     intArrayOf(0xFF812E, colorPrimary),
@@ -196,7 +196,7 @@ class TagDirAdapter(context: Context, private var data: List<TagDir>) :
             if (item.isSelected) {
                 holder.current.visibility = View.VISIBLE
                 holder.current.fromRes(
-                    R.raw.donater_fire,
+                    R.raw.select_fire,
                     Utils.dp(100f),
                     Utils.dp(100f),
                     intArrayOf(0xFF812E, colorPrimary),
@@ -236,7 +236,7 @@ class TagDirAdapter(context: Context, private var data: List<TagDir>) :
         super.onAttachedToRecyclerView(recyclerView)
         this.recyclerView = recyclerView
         mPlayerDisposable = MusicPlaybackController.observeServiceBinding()
-            .compose(RxUtils.applyObservableIOToMainSchedulers())
+            .toMainThread()
             .subscribe { status: Int ->
                 onServiceBindEvent(
                     status
@@ -271,7 +271,7 @@ class TagDirAdapter(context: Context, private var data: List<TagDir>) :
             v: View,
             menuInfo: ContextMenu.ContextMenuInfo?
         ) {
-            val position: Int = recyclerView!!.getChildAdapterPosition(v)
+            val position: Int = recyclerView?.getChildAdapterPosition(v) ?: 0
             val dir: TagDir = data[position]
             menu.setHeaderTitle(dir.name)
 
@@ -300,7 +300,7 @@ class TagDirAdapter(context: Context, private var data: List<TagDir>) :
             v: View,
             menuInfo: ContextMenu.ContextMenuInfo?
         ) {
-            val position: Int = recyclerView!!.getChildAdapterPosition(v)
+            val position: Int = recyclerView?.getChildAdapterPosition(v) ?: 0
             val dir: TagDir = data[position]
             menu.setHeaderTitle(dir.name)
 

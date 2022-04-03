@@ -16,9 +16,9 @@ import android.widget.TextView.OnEditorActionListener
 import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
 import dev.ragnarok.filegallery.Includes.stores
 import dev.ragnarok.filegallery.R
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.listener.TextWatcherAdapter
 import dev.ragnarok.filegallery.util.Logger
 import dev.ragnarok.filegallery.util.RxUtils
@@ -148,10 +148,10 @@ class MySearchView : LinearLayout {
     }
 
     private fun resolveCloseButton() {
-        val empty = TextUtils.isEmpty(mQuery)
+        val empty = mQuery.isNullOrEmpty()
         Logger.d(TAG, "resolveCloseButton, empty: $empty")
         mButtonClear?.visibility =
-            if (TextUtils.isEmpty(mQuery)) GONE else VISIBLE
+            if (mQuery.isNullOrEmpty()) GONE else VISIBLE
     }
 
     override fun onSaveInstanceState(): Parcelable {

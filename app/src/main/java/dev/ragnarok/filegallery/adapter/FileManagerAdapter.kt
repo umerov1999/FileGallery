@@ -19,8 +19,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso3.Callback
 import com.squareup.picasso3.Picasso
 import dev.ragnarok.filegallery.Constants
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
 import dev.ragnarok.filegallery.R
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.media.music.MusicPlaybackController
 import dev.ragnarok.filegallery.media.music.PlayerStatus
 import dev.ragnarok.filegallery.modalbottomsheetdialogfragment.ModalBottomSheetDialogFragment
@@ -35,8 +35,8 @@ import dev.ragnarok.filegallery.picasso.PicassoInstance
 import dev.ragnarok.filegallery.place.PlaceFactory.getPlayerPlace
 import dev.ragnarok.filegallery.settings.CurrentTheme
 import dev.ragnarok.filegallery.settings.Settings
+import dev.ragnarok.filegallery.toMainThread
 import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
-import dev.ragnarok.filegallery.util.RxUtils
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import io.reactivex.rxjava3.core.Single
@@ -61,7 +61,7 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         mPlayerDisposable = MusicPlaybackController.observeServiceBinding()
-            .compose(RxUtils.applyObservableIOToMainSchedulers())
+            .toMainThread()
             .subscribe { status: Int ->
                 onServiceBindEvent(
                     status
@@ -190,8 +190,8 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
         }
     }
 
-    private fun getLocalBitrate(url: String) {
-        if (Utils.isEmpty(url)) {
+    private fun getLocalBitrate(url: String?) {
+        if (url.isNullOrEmpty()) {
             return
         }
         audioListDisposable = doLocalBitrate(url).fromIOToMain()
@@ -360,7 +360,7 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
             if (item.isSelected) {
                 holder.current.visibility = View.VISIBLE
                 holder.current.fromRes(
-                    R.raw.donater_fire,
+                    R.raw.select_fire,
                     Utils.dp(100f),
                     Utils.dp(100f),
                     intArrayOf(0xFF812E, colorPrimary),
@@ -538,7 +538,7 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
             if (item.isSelected) {
                 holder.current.visibility = View.VISIBLE
                 holder.current.fromRes(
-                    R.raw.donater_fire,
+                    R.raw.select_fire,
                     Utils.dp(100f),
                     Utils.dp(100f),
                     intArrayOf(0xFF812E, colorPrimary),

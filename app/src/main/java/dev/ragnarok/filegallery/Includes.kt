@@ -13,27 +13,22 @@ import io.reactivex.rxjava3.core.Scheduler
 
 object Includes {
 
-    @JvmStatic
     val networkInterfaces: INetworker by lazy {
         Networker(settings.main())
     }
 
-    @JvmStatic
     val stores: IStorages by lazy {
         AppStorages(instance)
     }
 
-    @JvmStatic
     val settings: ISettings by lazy {
         SettingsImpl.getInstance(instance)
     }
 
-    @JvmStatic
     fun provideMainThreadScheduler(): Scheduler {
         return AndroidSchedulers.mainThread()
     }
 
-    @JvmStatic
     fun provideApplicationContext(): Context {
         return instance
     }

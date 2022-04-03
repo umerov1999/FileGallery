@@ -20,6 +20,7 @@ import dev.ragnarok.filegallery.listener.EndlessRecyclerOnScrollListener
 import dev.ragnarok.filegallery.listener.PicassoPauseOnScrollListener
 import dev.ragnarok.filegallery.model.Photo
 import dev.ragnarok.filegallery.mvp.core.IPresenterFactory
+import dev.ragnarok.filegallery.mvp.core.PresenterAction
 import dev.ragnarok.filegallery.mvp.presenter.PhotosLocalServerPresenter
 import dev.ragnarok.filegallery.mvp.view.IPhotosLocalServerView
 import dev.ragnarok.filegallery.place.PlaceFactory.getPhotoLocalServerPlace
@@ -33,13 +34,21 @@ class PhotosLocalServerFragment :
     private val requestPhotoUpdate = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK && result.data != null && result.data!!
+        if (result.resultCode == Activity.RESULT_OK && result.data != null && (result.data
+                ?: return@registerForActivityResult)
                 .extras != null
         ) {
-            presenter?.updateInfo(
-                result.data!!.extras!!.getInt(Extra.POSITION), result.data!!
-                    .extras!!.getLong(Extra.PTR)
-            )
+            postPresenterReceive(object :
+                PresenterAction<PhotosLocalServerPresenter, IPhotosLocalServerView> {
+                override fun call(presenter: PhotosLocalServerPresenter) {
+                    presenter.updateInfo(
+                        ((result.data ?: return).extras ?: return).getInt(Extra.POSITION),
+                        ((result.data
+                            ?: return)
+                            .extras ?: return).getLong(Extra.PTR)
+                    )
+                }
+            })
         }
     }
     private var mSwipeRefreshLayout: SwipeRefreshLayout? = null

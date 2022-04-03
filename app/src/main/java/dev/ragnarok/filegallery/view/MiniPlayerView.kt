@@ -19,13 +19,13 @@ import com.squareup.picasso3.Transformation
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.media.music.MusicPlaybackController
 import dev.ragnarok.filegallery.media.music.PlayerStatus
+import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.picasso.PicassoInstance.Companion.with
 import dev.ragnarok.filegallery.picasso.transforms.PolyTransformation
 import dev.ragnarok.filegallery.picasso.transforms.RoundTransformation
 import dev.ragnarok.filegallery.place.PlaceFactory
 import dev.ragnarok.filegallery.settings.Settings
-import dev.ragnarok.filegallery.util.Objects
-import dev.ragnarok.filegallery.util.RxUtils
+import dev.ragnarok.filegallery.toMainThread
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import io.reactivex.rxjava3.disposables.Disposable
@@ -118,14 +118,12 @@ class MiniPlayerView : FrameLayout, CustomSeekBar.CustomSeekBarListener {
         ) R.drawable.audio_button else R.drawable.audio_button_material
 
     private fun updatePlaybackControls() {
-        if (Objects.nonNull(playCover)) {
-            if (MusicPlaybackController.isPlaying) {
-                Utils.doWavesLottie(visual, true)
-                playCover.setColorFilter(Color.parseColor("#44000000"))
-            } else {
-                Utils.doWavesLottie(visual, false)
-                playCover.clearColorFilter()
-            }
+        if (MusicPlaybackController.isPlaying) {
+            Utils.doWavesLottie(visual, true)
+            playCover.setColorFilter(Color.parseColor("#44000000"))
+        } else {
+            Utils.doWavesLottie(visual, false)
+            playCover.clearColorFilter()
         }
     }
 
@@ -168,19 +166,17 @@ class MiniPlayerView : FrameLayout, CustomSeekBar.CustomSeekBarListener {
             artist,
             " "
         ) + " - " + Utils.firstNonEmptyString(trackName, " ")
-        if (Objects.nonNull(playCover)) {
-            val audio = MusicPlaybackController.currentAudio
-            val placeholder = AppCompatResources.getDrawable(context, audioCoverSimple)
-            if (audio != null && placeholder != null && !Utils.isEmpty(audio.thumb_image)) {
-                with()
-                    .load(audio.thumb_image)
-                    .placeholder(placeholder)
-                    .transform(transformCover())
-                    .into(playCover)
-            } else {
-                with().cancelRequest(playCover)
-                playCover.setImageResource(audioCoverSimple)
-            }
+        val audio = MusicPlaybackController.currentAudio
+        val placeholder = AppCompatResources.getDrawable(context, audioCoverSimple)
+        if (audio != null && placeholder != null && audio.thumb_image.nonNullNoEmpty()) {
+            with()
+                .load(audio.thumb_image)
+                .placeholder(placeholder)
+                .transform(transformCover())
+                .into(playCover)
+        } else {
+            with().cancelRequest(playCover)
+            playCover.setImageResource(audioCoverSimple)
         }
         //queueNextRefresh(1);
     }
@@ -227,7 +223,7 @@ class MiniPlayerView : FrameLayout, CustomSeekBar.CustomSeekBarListener {
         val next = refreshCurrentTime()
         queueNextRefresh(next)
         mPlayerDisposable = MusicPlaybackController.observeServiceBinding()
-            .compose(RxUtils.applyObservableIOToMainSchedulers())
+            .toMainThread()
             .subscribe { status: Int -> onServiceBindEvent(status) }
     }
 

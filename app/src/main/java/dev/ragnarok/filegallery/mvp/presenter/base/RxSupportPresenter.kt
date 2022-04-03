@@ -20,8 +20,7 @@ abstract class RxSupportPresenter<V : IMvpView>(savedInstanceState: Bundle?) :
     AbsPresenter<V>(savedInstanceState) {
     private var instanceId = 0
     private val compositeDisposable = CompositeDisposable()
-    var viewCreationCount = 0
-        private set
+    private var viewCreationCount = 0
 
     public override fun onGuiCreated(viewHost: V) {
         viewCreationCount++
@@ -42,11 +41,11 @@ abstract class RxSupportPresenter<V : IMvpView>(savedInstanceState: Bundle?) :
         compositeDisposable.add(disposable)
     }
 
-    protected fun showError(view: IErrorView?, throwable: Throwable) {
+    protected fun showError(view: IErrorView?, throwable: Throwable?) {
         view ?: return
         val lThrowable = Utils.getCauseIfRuntime(throwable)
         if (BuildConfig.DEBUG) {
-            lThrowable.printStackTrace()
+            lThrowable?.printStackTrace()
         }
         if (get().main().isDeveloper_mode()) {
             view.showThrowable(lThrowable)

@@ -3,13 +3,17 @@ package dev.ragnarok.filegallery.picasso
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import androidx.core.net.toFile
+import androidx.exifinterface.media.ExifInterface
 import com.squareup.picasso3.BitmapUtils
 import com.squareup.picasso3.Picasso
 import com.squareup.picasso3.Request
 import com.squareup.picasso3.RequestHandler
+import com.yalantis.ucrop.util.BitmapLoadUtils.getExifOrientation
+import dev.ragnarok.filegallery.Constants
 import dev.ragnarok.filegallery.Includes
 import dev.ragnarok.filegallery.fragment.FileManagerFragment.Companion.isExtension
 import dev.ragnarok.filegallery.module.GalleryNative
@@ -92,6 +96,14 @@ class PicassoMediaMetadataHandler(val context: Context) : RequestHandler() {
         }
     }
 
+    internal fun getExifRotation(orientation: Int) =
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90, ExifInterface.ORIENTATION_TRANSPOSE -> 90
+            ExifInterface.ORIENTATION_ROTATE_180, ExifInterface.ORIENTATION_FLIP_VERTICAL -> 180
+            ExifInterface.ORIENTATION_ROTATE_270, ExifInterface.ORIENTATION_TRANSVERSE -> 270
+            else -> 0
+        }
+
     private fun work(requestUri: Uri, dir: File, request: Request, callback: Callback) {
         if (dir.exists()) {
             if (dir.length() <= 0) {
@@ -168,7 +180,23 @@ class PicassoMediaMetadataHandler(val context: Context) : RequestHandler() {
                     callback.onError(Throwable("Thumb work error"))
                     return
                 }
+                var exifOrientation = 0
+                try {
+                    exifOrientation = getExifRotation(getExifOrientation(context, requestUri))
+                } catch (e: Exception) {
+                    if (Constants.IS_DEBUG) {
+                        e.printStackTrace()
+                    }
+                }
                 target = CoverSafeResize.checkBitmap(target)
+                if (exifOrientation > 0) {
+                    val matrix = Matrix()
+                    matrix.postRotate(exifOrientation.toFloat())
+                    target = Bitmap.createBitmap(
+                        target, 0, 0,
+                        target.width, target.height, matrix, true
+                    )
+                }
                 val fOutputStream = FileOutputStream(dir)
                 target.compress(
                     if (Utils.hasR()) Bitmap.CompressFormat.WEBP_LOSSY else Bitmap.CompressFormat.JPEG,

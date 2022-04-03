@@ -20,7 +20,7 @@ object Constants {
         Build.VERSION.RELEASE,
         Build.VERSION.SDK_INT,
         Build.SUPPORTED_ABIS[0],
-        Utils.getDeviceName(),
+        Utils.deviceName,
         "ru"
     )
     const val AUDIO_PLAYER_SERVICE_IDLE = 300000

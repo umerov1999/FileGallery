@@ -8,7 +8,7 @@ import com.google.gson.JsonParser
 import de.maxr1998.modernpreferences.PreferenceScreen
 import dev.ragnarok.filegallery.Includes
 import dev.ragnarok.filegallery.model.tags.TagFull
-import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.nonNullNoEmpty
 
 class SettingsBackup {
     private val settings: Array<SettingCollector> = arrayOf(
@@ -63,7 +63,7 @@ class SettingsBackup {
             }
         }
         val yu = Includes.stores.searchQueriesStore().getTagFull().blockingGet()
-        if (!Utils.isEmpty(yu)) {
+        if (yu.nonNullNoEmpty()) {
             has = true
             ret.addProperty("tags", Gson().toJson(yu))
         }
@@ -84,7 +84,7 @@ class SettingsBackup {
         for (i in JsonParser.parseString(yu).asJsonArray) {
             jp.add(Gson().fromJson(i, TagFull::class.java))
         }
-        if (!Utils.isEmpty(jp)) {
+        if (jp.nonNullNoEmpty()) {
             Includes.stores.searchQueriesStore().putTagFull(jp).blockingAwait()
         }
     }
@@ -136,7 +136,7 @@ class SettingsBackup {
                 SettingTypes.TYPE_STRING -> temp.addProperty("value", pref.getString(name, ""))
                 SettingTypes.TYPE_STRING_SET -> {
                     val u = JsonArray()
-                    val prSet = pref.getStringSet(name, HashSet(0))!!
+                    val prSet = pref.getStringSet(name, HashSet(0)) ?: return null
                     if (prSet.isEmpty()) {
                         return null
                     }

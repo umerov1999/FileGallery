@@ -16,7 +16,7 @@ interface ISearchRequestHelperStorage {
     fun clearFilesAll()
     fun deleteTagOwner(ownerId: Int): Completable
     fun deleteTagDir(sourceId: Int): Completable
-    fun insertTagOwner(name: String): Single<TagOwner>
+    fun insertTagOwner(name: String?): Single<TagOwner>
     fun insertTagDir(ownerId: Int, item: FileItem): Completable
     fun getTagDirs(ownerId: Int): Single<List<TagDir>>
     fun getAllTagDirs(): Single<List<TagDir>>
@@ -25,6 +25,6 @@ interface ISearchRequestHelperStorage {
     fun putTagFull(pp: List<TagFull>): Completable
     fun getFiles(parent: String): Single<List<FileItem>>
     fun insertFiles(parent: String, files: List<FileItem>): Completable
-    fun updateNameTagOwner(id: Int, name: String): Completable
+    fun updateNameTagOwner(id: Int, name: String?): Completable
     fun deleteTagDirByPath(path: String): Completable
 }

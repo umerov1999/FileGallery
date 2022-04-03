@@ -13,15 +13,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import dev.ragnarok.filegallery.Constants
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
 import dev.ragnarok.filegallery.Includes.networkInterfaces
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.api.interfaces.ILocalServerApi
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.modalbottomsheetdialogfragment.ModalBottomSheetDialogFragment
 import dev.ragnarok.filegallery.modalbottomsheetdialogfragment.Option
 import dev.ragnarok.filegallery.modalbottomsheetdialogfragment.OptionRequest
 import dev.ragnarok.filegallery.model.Video
 import dev.ragnarok.filegallery.model.menu.options.VideoLocalServerOption
+import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.picasso.PicassoInstance.Companion.with
 import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.DownloadWorkUtils.doDownloadVideo
@@ -48,7 +49,7 @@ class LocalServerVideosAdapter(private val context: Context, private var data: L
         holder.description.text = video.description
         holder.videoLenght.text = Utils.BytesToSize(video.duration.toLong())
         val photoUrl = video.image
-        if (Utils.nonEmpty(photoUrl)) {
+        if (photoUrl.nonNullNoEmpty()) {
             with()
                 .load(photoUrl)
                 .tag(Constants.PICASSO_TAG)
@@ -124,7 +125,7 @@ class LocalServerVideosAdapter(private val context: Context, private var data: L
                             }
                             VideoLocalServerOption.update_time_item_video -> {
                                 val hash = parseLocalServerURL(video.link)
-                                if (Utils.isEmpty(hash)) {
+                                if (hash.isNullOrEmpty()) {
                                     return
                                 }
                                 listDisposable = mVideoInteractor.update_time(hash)
@@ -141,7 +142,7 @@ class LocalServerVideosAdapter(private val context: Context, private var data: L
                             }
                             VideoLocalServerOption.edit_item_video -> {
                                 val hash2 = parseLocalServerURL(video.link)
-                                if (Utils.isEmpty(hash2)) {
+                                if (hash2.isNullOrEmpty()) {
                                     return
                                 }
                                 listDisposable = mVideoInteractor.get_file_name(hash2)
@@ -190,7 +191,7 @@ class LocalServerVideosAdapter(private val context: Context, private var data: L
                                 .setCancelable(true)
                                 .setPositiveButton(R.string.button_yes) { _: DialogInterface?, _: Int ->
                                     val hash1 = parseLocalServerURL(video.link)
-                                    if (Utils.isEmpty(hash1)) {
+                                    if (hash1.isNullOrEmpty()) {
                                         return@setPositiveButton
                                     }
                                     listDisposable = mVideoInteractor.delete_media(hash1)

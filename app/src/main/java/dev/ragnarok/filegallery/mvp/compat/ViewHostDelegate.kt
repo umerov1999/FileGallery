@@ -79,7 +79,7 @@ class ViewHostDelegate<P : IPresenter<V>, V : IMvpView> {
         }
 
         viewCreated = true
-        presenter?.createView(viewReference.get()!!)
+        presenter?.createView(viewReference.get() ?: return)
     }
 
     fun onDestroyView() {
@@ -121,7 +121,7 @@ class ViewHostDelegate<P : IPresenter<V>, V : IMvpView> {
     fun onSaveInstanceState(outState: Bundle) {
         presenter?.run {
             lastKnownPresenterState = Bundle()
-            saveState(lastKnownPresenterState!!)
+            saveState(lastKnownPresenterState ?: return@run)
         }
 
         outState.putBundle(SAVE_PRESENTER_STATE, lastKnownPresenterState)

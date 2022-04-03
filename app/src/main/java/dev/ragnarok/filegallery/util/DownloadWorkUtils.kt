@@ -19,6 +19,7 @@ import dev.ragnarok.filegallery.media.music.MusicPlaybackController
 import dev.ragnarok.filegallery.media.music.NotificationHelper
 import dev.ragnarok.filegallery.model.Audio
 import dev.ragnarok.filegallery.model.Video
+import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.settings.theme.ThemesController
 import okhttp3.Request
@@ -48,6 +49,8 @@ object DownloadWorkUtils {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(fin)
             .setOngoing(!fin)
+            .setCategory(if (fin) NotificationCompat.CATEGORY_EVENT else NotificationCompat.CATEGORY_PROGRESS)
+            .setGroup(if (fin) "DOWNLOADING_OPERATION" else null)
             .setOnlyAlertOnce(true)
     }
 
@@ -99,7 +102,6 @@ object DownloadWorkUtils {
         return filename_temp
     }
 
-    @JvmStatic
     fun makeLegalFilename(filename: String, extension: String?): String {
         var result = makeLegalFilenameFull(filename)
         if (result.length > 90) result = result.substring(0, 90).trim { it <= ' ' }
@@ -108,7 +110,6 @@ object DownloadWorkUtils {
         return "$result.$extension"
     }
 
-    @JvmStatic
     fun makeLegalFilenameFromArg(filename: String?, extension: String?): String? {
         filename ?: return null
         var result = makeLegalFilenameFull(filename)
@@ -118,11 +119,10 @@ object DownloadWorkUtils {
         return "$result.$extension"
     }
 
-    private fun optString(value: String): String {
-        return if (Utils.isEmpty(value)) "" else value
+    private fun optString(value: String?): String {
+        return if (value.isNullOrEmpty()) "" else value
     }
 
-    @JvmStatic
     fun CheckDirectory(Path: String): Boolean {
         val dir_final = File(Path)
         return if (!dir_final.isDirectory) {
@@ -137,8 +137,8 @@ object DownloadWorkUtils {
         downloadRequest.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
         downloadRequest.setDescription(file.buildFilename())
         downloadRequest.setDestinationUri(Uri.fromFile(File(file.build())))
-        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        downloadManager.enqueue(downloadRequest)
+        val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager?
+        downloadManager?.enqueue(downloadRequest)
     }
 
     private fun toDefaultInternalDownloader(context: Context, url: String, file: DownloadInfo) {
@@ -197,7 +197,6 @@ object DownloadWorkUtils {
         return MusicPlaybackController.tracksExist.isExistAllAudio(audioName)
     }
 
-    @JvmStatic
     fun doDownloadVideo(context: Context, video: Video, url: String, Res: String) {
         val result_filename = DownloadInfo(
             makeLegalFilename(
@@ -221,7 +220,6 @@ object DownloadWorkUtils {
         }
     }
 
-    @JvmStatic
     fun doDownloadPhoto(context: Context, url: String, dir: String, file: String) {
         val result_filename = DownloadInfo(file, dir, "jpg")
         if (default_file_exist(context, result_filename)) {
@@ -239,13 +237,12 @@ object DownloadWorkUtils {
         }
     }
 
-    @JvmStatic
     fun doDownloadAudio(
         context: Context,
         audio: Audio,
         Force: Boolean,
     ): Int {
-        if (!Utils.isEmpty(audio.url) && (audio.url.contains("file://") || audio.url.contains("content://")))
+        if (audio.url.nonNullNoEmpty() && (audio.url.contains("file://") || audio.url.contains("content://")))
             return 2
 
         val result_filename = DownloadInfo(
@@ -277,7 +274,7 @@ object DownloadWorkUtils {
         return 0
     }
 
-    open class DefaultDownloadWorker(context: Context, workerParams: WorkerParameters) :
+    open class DefaultDownloadWorker(val context: Context, workerParams: WorkerParameters) :
         Worker(context, workerParams) {
         protected fun show_notification(
             notification: NotificationCompat.Builder,
@@ -287,12 +284,37 @@ object DownloadWorkUtils {
             if (cancel_id != null) {
                 mNotifyManager.cancel(getId().toString(), cancel_id)
             }
+            if (id == NotificationHelper.NOTIFICATION_DOWNLOAD) {
+                createGroupNotification()
+            }
             mNotifyManager.notify(getId().toString(), id, notification.build())
+        }
+
+        private fun createGroupNotification() {
+            if (!Utils.hasNougat()) {
+                return
+            }
+            val notificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager?
+                    ?: return
+            val barNotifications = notificationManager.activeNotifications
+            for (notification in barNotifications) {
+                if (notification.id == NotificationHelper.NOTIFICATION_DOWNLOADING_GROUP) {
+                    return
+                }
+            }
+            mNotifyManager.notify(
+                NotificationHelper.NOTIFICATION_DOWNLOADING_GROUP,
+                NotificationCompat.Builder(context, AppNotificationChannels.DOWNLOAD_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.save)
+                    .setCategory(NotificationCompat.CATEGORY_EVENT)
+                    .setGroup("DOWNLOADING_OPERATION").setGroupSummary(true).build()
+            )
         }
 
         @Suppress("DEPRECATION")
         protected fun doDownload(
-            url: String,
+            url: String?,
             file_v: DownloadInfo,
             UseMediaScanner: Boolean
         ): Boolean {
@@ -315,7 +337,7 @@ object DownloadWorkUtils {
             val file = file_v.build()
             try {
                 FileOutputStream(file).use { output ->
-                    if (Utils.isEmpty(url)) throw Exception(applicationContext.getString(R.string.null_image_link))
+                    if (url.isNullOrEmpty()) throw Exception(applicationContext.getString(R.string.null_image_link))
                     val builder = Utils.createOkHttp(60)
                     val request: Request = Request.Builder()
                         .url(url)
@@ -327,17 +349,17 @@ object DownloadWorkUtils {
                                     " " + response.message
                         )
                     }
-                    val bfr = response.body!!.byteStream()
+                    val bfr = (response.body ?: return@use).byteStream()
                     val input = BufferedInputStream(bfr)
                     val data = ByteArray(80 * 1024)
                     var bufferLength: Int
                     var downloadedSize = 0L
                     var cntlength = response.header("Content-Length")
-                    if (Utils.isEmpty(cntlength)) {
+                    if (cntlength.isNullOrEmpty()) {
                         cntlength = response.header("Compressed-Content-Length")
                     }
                     var totalSize = 1L
-                    if (!Utils.isEmpty(cntlength)) totalSize = cntlength!!.toLong()
+                    if (cntlength.nonNullNoEmpty()) totalSize = cntlength.toLong()
                     while (input.read(data).also { bufferLength = it } != -1) {
                         if (isStopped) {
                             output.flush()
@@ -397,10 +419,12 @@ object DownloadWorkUtils {
                     file_v.setFile(file_v.file + "." + file_v.ext)
                     result.renameTo(File(file_v.setExt("error").build()))
                 }
-                Utils.inMainThread {
-                    CustomToast.CreateCustomToast(applicationContext)
-                        .showToastError(R.string.error_with_message, e.localizedMessage)
-                }
+                Utils.inMainThread(object : Utils.SafeCall {
+                    override fun call() {
+                        CustomToast.CreateCustomToast(applicationContext)
+                            .showToastError(R.string.error_with_message, e.localizedMessage)
+                    }
+                })
                 return false
             }
             return true
@@ -477,10 +501,12 @@ object DownloadWorkUtils {
                     NotificationHelper.NOTIFICATION_DOWNLOAD,
                     NotificationHelper.NOTIFICATION_DOWNLOADING
                 )
-                Utils.inMainThread {
-                    CustomToast.CreateCustomToast(applicationContext)
-                        .showToastBottom(R.string.saved)
-                }
+                Utils.inMainThread(object : Utils.SafeCall {
+                    override fun call() {
+                        CustomToast.CreateCustomToast(applicationContext)
+                            .showToastBottom(R.string.saved)
+                    }
+                })
             }
             return if (ret) Result.success() else Result.failure()
         }
@@ -500,7 +526,7 @@ object DownloadWorkUtils {
             )
             val audio = Gson().fromJson(inputData.getString(ExtraDwn.URL)!!, Audio::class.java)
 
-            if (Utils.isEmpty(audio.url)) {
+            if (audio.url.isNullOrEmpty()) {
                 return Result.failure()
             }
 
@@ -543,10 +569,12 @@ object DownloadWorkUtils {
                     NotificationHelper.NOTIFICATION_DOWNLOADING
                 )
                 MusicPlaybackController.tracksExist.addAudio(file_v.buildFilename())
-                Utils.inMainThread {
-                    CustomToast.CreateCustomToast(applicationContext)
-                        .showToastBottom(R.string.saved)
-                }
+                Utils.inMainThread(object : Utils.SafeCall {
+                    override fun call() {
+                        CustomToast.CreateCustomToast(applicationContext)
+                            .showToastBottom(R.string.saved)
+                    }
+                })
             }
             return if (ret) Result.success() else Result.failure()
         }

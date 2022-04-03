@@ -3,10 +3,7 @@ package dev.ragnarok.filegallery.db.impl
 import android.content.ContentValues
 import android.content.Context
 import android.provider.BaseColumns
-import dev.ragnarok.filegallery.Extensions.Companion.getBoolean
-import dev.ragnarok.filegallery.Extensions.Companion.getInt
-import dev.ragnarok.filegallery.Extensions.Companion.getLong
-import dev.ragnarok.filegallery.Extensions.Companion.getString
+import dev.ragnarok.filegallery.*
 import dev.ragnarok.filegallery.db.SearchRequestHelper
 import dev.ragnarok.filegallery.db.column.FilesColumns
 import dev.ragnarok.filegallery.db.column.SearchRequestColumns
@@ -19,7 +16,6 @@ import dev.ragnarok.filegallery.model.FileType
 import dev.ragnarok.filegallery.model.tags.TagDir
 import dev.ragnarok.filegallery.model.tags.TagFull
 import dev.ragnarok.filegallery.model.tags.TagOwner
-import dev.ragnarok.filegallery.util.Utils
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.CompletableEmitter
 import io.reactivex.rxjava3.core.Single
@@ -44,7 +40,7 @@ class SearchRequestHelperStorage internal constructor(context: Context) :
             val data: MutableList<String> = ArrayList(cursor.count)
             cursor.use {
                 while (it.moveToNext()) {
-                    data.add(it.getString(SearchRequestColumns.QUERY)!!)
+                    data.add(it.getString(SearchRequestColumns.QUERY) ?: return@use)
                 }
             }
             data
@@ -56,7 +52,7 @@ class SearchRequestHelperStorage internal constructor(context: Context) :
             return Completable.complete()
         }
         val queryClean = query.trim { it <= ' ' }
-        return if (Utils.isEmpty(queryClean)) {
+        return if (queryClean.isEmpty()) {
             Completable.complete()
         } else Completable.create { emitter: CompletableEmitter ->
             val db = helper().writableDatabase
@@ -214,9 +210,9 @@ class SearchRequestHelperStorage internal constructor(context: Context) :
         db.delete(TagOwnerColumns.TABLENAME, null, null)
     }
 
-    override fun insertTagOwner(name: String): Single<TagOwner> {
+    override fun insertTagOwner(name: String?): Single<TagOwner> {
         return Single.create { emitter: SingleEmitter<TagOwner> ->
-            if (Utils.isEmpty(name) || Utils.isEmpty(name.trim { it <= ' ' })) {
+            if (name.trimmedIsNullOrEmpty()) {
                 emitter.onError(Throwable("require name not null!!!"))
             } else {
                 val nameClean = name.trim { it <= ' ' }
@@ -258,9 +254,9 @@ class SearchRequestHelperStorage internal constructor(context: Context) :
         }
     }
 
-    override fun updateNameTagOwner(id: Int, name: String): Completable {
+    override fun updateNameTagOwner(id: Int, name: String?): Completable {
         return Completable.create { iti ->
-            if (Utils.isEmpty(name) || Utils.isEmpty(name.trim { it <= ' ' })) {
+            if (name.trimmedIsNullOrEmpty()) {
                 iti.onError(Throwable("require name not null!!!"))
             } else {
                 val nameClean = name.trim { it <= ' ' }
@@ -307,7 +303,7 @@ class SearchRequestHelperStorage internal constructor(context: Context) :
     }
 
     override fun insertTagDir(ownerId: Int, item: FileItem): Completable {
-        return if (Utils.isEmpty(item.file_name) || Utils.isEmpty(item.file_path)) {
+        return if (item.file_name.isNullOrEmpty() || item.file_path.isNullOrEmpty()) {
             Completable.complete()
         } else Completable.create { emitter: CompletableEmitter ->
             val db = helper().writableDatabase

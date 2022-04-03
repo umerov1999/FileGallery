@@ -65,7 +65,7 @@ abstract class NoMainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         val fm = supportFragmentManager
-        val front = supportFragmentManager.findFragmentById(
+        val front = fm.findFragmentById(
             mainContainerViewId
         )
         if (front is BackPressCallback) {

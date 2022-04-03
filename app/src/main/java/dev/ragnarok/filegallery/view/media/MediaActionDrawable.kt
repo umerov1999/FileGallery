@@ -104,7 +104,10 @@ class MediaActionDrawable : Drawable() {
         paint.strokeWidth = Utils.dpf2(if (isMini) 2f else 3f)
     }
 
-    @Deprecated("Deprecated in Java")
+    @Deprecated(
+        "Deprecated in Java",
+        ReplaceWith("PixelFormat.TRANSLUCENT", "android.graphics.PixelFormat")
+    )
     override fun getOpacity(): Int {
         return PixelFormat.TRANSPARENT
     }

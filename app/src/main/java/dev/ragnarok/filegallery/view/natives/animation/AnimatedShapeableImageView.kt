@@ -8,6 +8,7 @@ import androidx.annotation.RawRes
 import com.google.android.material.imageview.ShapeableImageView
 import dev.ragnarok.filegallery.Constants
 import dev.ragnarok.filegallery.R
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.module.GalleryNative
 import dev.ragnarok.filegallery.module.animation.AnimatedFileDrawable
 import dev.ragnarok.filegallery.util.RxUtils
@@ -104,7 +105,7 @@ class AnimatedShapeableImageView @JvmOverloads constructor(
                 return@SingleOnSubscribe
             }
             u.onSuccess(true)
-        } as SingleOnSubscribe<Boolean>).compose(RxUtils.applySingleComputationToMainSchedulers())
+        }).fromIOToMain()
             .subscribe(
                 { u: Boolean ->
                     if (u) {
@@ -138,7 +139,7 @@ class AnimatedShapeableImageView @JvmOverloads constructor(
                 return@SingleOnSubscribe
             }
             u.onSuccess(true)
-        } as SingleOnSubscribe<Boolean>).compose(RxUtils.applySingleComputationToMainSchedulers())
+        }).fromIOToMain()
             .subscribe(
                 { u: Boolean ->
                     if (u) {

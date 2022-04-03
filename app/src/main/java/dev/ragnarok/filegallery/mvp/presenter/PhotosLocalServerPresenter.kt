@@ -1,14 +1,15 @@
 package dev.ragnarok.filegallery.mvp.presenter
 
 import android.os.Bundle
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
 import dev.ragnarok.filegallery.Includes.networkInterfaces
 import dev.ragnarok.filegallery.api.interfaces.ILocalServerApi
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.model.Photo
 import dev.ragnarok.filegallery.module.parcel.ParcelFlags
 import dev.ragnarok.filegallery.module.parcel.ParcelNative
 import dev.ragnarok.filegallery.mvp.presenter.base.RxSupportPresenter
 import dev.ragnarok.filegallery.mvp.view.IPhotosLocalServerView
+import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.util.FindAt
 import dev.ragnarok.filegallery.util.Utils
 import io.reactivex.rxjava3.core.Single
@@ -104,7 +105,7 @@ class PhotosLocalServerPresenter(savedInstanceState: Bundle?) :
     }
 
     fun fireScrollToEnd(): Boolean {
-        if (!endOfContent && Utils.nonEmpty(photos) && actualDataReceived && !actualDataLoading) {
+        if (!endOfContent && photos.nonNullNoEmpty() && actualDataReceived && !actualDataLoading) {
             if (search_at.isSearchMode()) {
                 search(false)
             } else {
@@ -128,7 +129,7 @@ class PhotosLocalServerPresenter(savedInstanceState: Bundle?) :
             .subscribe({
                 onSearched(
                     FindAt(
-                        search_at.getQuery()!!,
+                        search_at.getQuery() ?: return@subscribe,
                         search_at.getOffset() + SEARCH_COUNT,
                         it.size < SEARCH_COUNT
                     ), it
@@ -145,7 +146,7 @@ class PhotosLocalServerPresenter(savedInstanceState: Bundle?) :
             photos.addAll(data)
             view?.notifyListChanged()
         } else {
-            if (Utils.nonEmpty(data)) {
+            if (data.nonNullNoEmpty()) {
                 val startSize = photos.size
                 photos.addAll(data)
                 view?.notifyDataAdded(
@@ -175,7 +176,7 @@ class PhotosLocalServerPresenter(savedInstanceState: Bundle?) :
         val query = q?.trim { it <= ' ' }
         if (!search_at.do_compare(query)) {
             actualDataLoading = false
-            if (Utils.isEmpty(query)) {
+            if (query.isNullOrEmpty()) {
                 actualDataDisposable.dispose()
                 fireRefresh(false)
             } else {

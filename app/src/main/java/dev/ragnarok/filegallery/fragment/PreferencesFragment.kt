@@ -1,5 +1,6 @@
 package dev.ragnarok.filegallery.fragment
 
+import android.app.Activity
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
@@ -14,6 +15,8 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.DialogFragment
@@ -34,15 +37,11 @@ import de.maxr1998.modernpreferences.PreferencesAdapter
 import de.maxr1998.modernpreferences.PreferencesExtra
 import de.maxr1998.modernpreferences.helpers.*
 import de.maxr1998.modernpreferences.preferences.CustomTextPreference
-import dev.ragnarok.filegallery.BuildConfig
-import dev.ragnarok.filegallery.Includes
+import dev.ragnarok.filegallery.*
 import dev.ragnarok.filegallery.Includes.provideApplicationContext
-import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.activity.ActivityFeatures
 import dev.ragnarok.filegallery.activity.ActivityUtils
-import dev.ragnarok.filegallery.filepicker.model.DialogConfigs
-import dev.ragnarok.filegallery.filepicker.model.DialogProperties
-import dev.ragnarok.filegallery.filepicker.view.FilePickerDialog
+import dev.ragnarok.filegallery.activity.FileManagerActivity
 import dev.ragnarok.filegallery.listener.BackPressCallback
 import dev.ragnarok.filegallery.listener.CanBackPressedCallback
 import dev.ragnarok.filegallery.listener.OnSectionResumeCallback
@@ -66,15 +65,121 @@ import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import java.io.*
 import java.nio.charset.StandardCharsets
 
-
 class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScreenChangeListener,
     BackPressCallback, CanBackPressedCallback {
     private var preferencesView: RecyclerView? = null
     private var layoutManager: LinearLayoutManager? = null
     private var searchView: MySearchView? = null
     override val keyInstanceState: String = "root_preferences"
-    private val REQUEST_EXPORT_SETTINGS = "export_settings"
-    private val REQUEST_IMPORT_SETTINGS = "import_settings"
+
+    private val musicDir = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            PreferenceScreen.getPreferences(requireActivity())
+                .edit().putString(
+                    "music_dir",
+                    result.data?.getStringExtra(Extra.PATH)
+                ).apply()
+            preferencesAdapter?.applyToPreference("music_dir") { ss -> (ss as CustomTextPreference).reload() }
+        }
+    }
+
+
+    private val photoDir = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            PreferenceScreen.getPreferences(requireActivity())
+                .edit().putString(
+                    "photo_dir",
+                    result.data?.getStringExtra(Extra.PATH)
+                ).apply()
+            preferencesAdapter?.applyToPreference("photo_dir") { ss -> (ss as CustomTextPreference).reload() }
+        }
+    }
+
+    private val videoDir = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            PreferenceScreen.getPreferences(requireActivity())
+                .edit().putString(
+                    "video_dir",
+                    result.data?.getStringExtra(Extra.PATH)
+                ).apply()
+            preferencesAdapter?.applyToPreference("video_dir") { ss -> (ss as CustomTextPreference).reload() }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private val exportSettings = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            try {
+                val file = File(
+                    result.data?.getStringExtra(Extra.PATH),
+                    "file_gallery_settings_backup.json"
+                )
+                val bytes =
+                    GsonBuilder().setPrettyPrinting().create().toJson(SettingsBackup().doBackup())
+                        .toByteArray(
+                            StandardCharsets.UTF_8
+                        )
+                val out = FileOutputStream(file)
+                out.write(bytes)
+                out.flush()
+                provideApplicationContext().sendBroadcast(
+                    Intent(
+                        Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
+                        Uri.fromFile(file)
+                    )
+                )
+                CreateCustomToast(requireActivity()).showToast(
+                    R.string.success,
+                    file.absolutePath
+                )
+
+            } catch (e: Exception) {
+                CreateCustomToast(requireActivity())
+                    .showToastError(e.localizedMessage)
+            }
+        }
+    }
+
+    private val importSettings = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+            try {
+                val jbld = StringBuilder()
+                val file =
+                    File(
+                        result.data?.getStringExtra(Extra.PATH) ?: return@registerForActivityResult
+                    )
+                if (file.exists()) {
+                    val dataFromServerStream = FileInputStream(file)
+                    val d = BufferedReader(
+                        InputStreamReader(
+                            dataFromServerStream,
+                            StandardCharsets.UTF_8
+                        )
+                    )
+                    while (d.ready()) jbld.append(d.readLine())
+                    d.close()
+                    val obj =
+                        JsonParser.parseString(jbld.toString()).asJsonObject
+                    SettingsBackup().doRestore(obj)
+                }
+                CreateCustomToast(requireActivity())
+                    .showToast(R.string.success)
+            } catch (e: Exception) {
+                CreateCustomToast(requireActivity())
+                    .showToastError(e.localizedMessage)
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -105,10 +210,10 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
             it.setOnBackButtonClickListener(
                 object : MySearchView.OnBackButtonClickListener {
                     override fun onBackButtonClick() {
-                        if (!Utils.isEmpty(it.text) && !Utils.isEmpty(it.text?.trim())) {
+                        if (it.text.nonNullNoEmpty() && it.text?.trimmedNonNullNoEmpty() == true) {
                             preferencesAdapter?.findPreferences(
                                 requireActivity(),
-                                it.text!!.toString(),
+                                (it.text ?: return).toString(),
                                 root
                             )
                         }
@@ -117,8 +222,8 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
             )
             it.setOnQueryTextListener(object : MySearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
-                    if (!Utils.isEmpty(query) && !Utils.isEmpty(query?.trim())) {
-                        preferencesAdapter?.findPreferences(requireActivity(), query!!, root)
+                    if (query.nonNullNoEmpty() && query.trimmedNonNullNoEmpty()) {
+                        preferencesAdapter?.findPreferences(requireActivity(), query, root)
                     }
                     return true
                 }
@@ -139,109 +244,6 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
         return canGoBack()
     }
 
-    @Suppress("DEPRECATION")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        parentFragmentManager.setFragmentResultListener(
-            FILE_REQUEST_MUSIC_DIR,
-            this@PreferencesFragment
-        ) { _: String?, result: Bundle ->
-            PreferenceScreen.getPreferences(requireActivity())
-                .edit().putString(
-                    "music_dir",
-                    result.getStringArray(FilePickerDialog.RESULT_VALUE)!![0]
-                ).apply()
-            preferencesAdapter?.applyToPreference("music_dir") { ss -> (ss as CustomTextPreference).reload() }
-
-        }
-        parentFragmentManager.setFragmentResultListener(
-            FILE_REQUEST_PHOTO_DIR,
-            this@PreferencesFragment
-        ) { _: String?, result: Bundle ->
-            PreferenceScreen.getPreferences(requireActivity())
-                .edit().putString(
-                    "photo_dir",
-                    result.getStringArray(FilePickerDialog.RESULT_VALUE)!![0]
-                ).apply()
-            preferencesAdapter?.applyToPreference("photo_dir") { ss -> (ss as CustomTextPreference).reload() }
-
-        }
-        parentFragmentManager.setFragmentResultListener(
-            FILE_REQUEST_VIDEO_DIR,
-            this@PreferencesFragment
-        ) { _: String?, result: Bundle ->
-            PreferenceScreen.getPreferences(requireActivity())
-                .edit().putString(
-                    "video_dir",
-                    result.getStringArray(FilePickerDialog.RESULT_VALUE)!![0]
-                ).apply()
-            preferencesAdapter?.applyToPreference("video_dir") { ss -> (ss as CustomTextPreference).reload() }
-
-        }
-
-        parentFragmentManager.setFragmentResultListener(
-            REQUEST_EXPORT_SETTINGS, this
-        ) { _: String?, result: Bundle ->
-            try {
-                val file = File(
-                    result.getStringArray(FilePickerDialog.RESULT_VALUE)!![0],
-                    "file_gallery_settings_backup.json"
-                )
-                val bytes =
-                    GsonBuilder().setPrettyPrinting().create().toJson(SettingsBackup().doBackup())
-                        .toByteArray(
-                            StandardCharsets.UTF_8
-                        )
-                val out = FileOutputStream(file)
-                out.write(bytes)
-                out.flush()
-                provideApplicationContext().sendBroadcast(
-                    Intent(
-                        Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,
-                        Uri.fromFile(file)
-                    )
-                )
-                CreateCustomToast(requireActivity()).showToast(
-                    R.string.success,
-                    file.absolutePath
-                )
-
-            } catch (e: Exception) {
-                CreateCustomToast(requireActivity())
-                    .showToastError(e.localizedMessage)
-            }
-        }
-
-        parentFragmentManager.setFragmentResultListener(
-            REQUEST_IMPORT_SETTINGS, this
-        ) { _: String?, result: Bundle ->
-            try {
-                val jbld = StringBuilder()
-                val file =
-                    File(result.getStringArray(FilePickerDialog.RESULT_VALUE)!![0])
-                if (file.exists()) {
-                    val dataFromServerStream = FileInputStream(file)
-                    val d = BufferedReader(
-                        InputStreamReader(
-                            dataFromServerStream,
-                            StandardCharsets.UTF_8
-                        )
-                    )
-                    while (d.ready()) jbld.append(d.readLine())
-                    d.close()
-                    val obj =
-                        JsonParser.parseString(jbld.toString()).asJsonObject
-                    SettingsBackup().doRestore(obj)
-                }
-                CreateCustomToast(requireActivity())
-                    .showToast(R.string.success)
-            } catch (e: Exception) {
-                CreateCustomToast(requireActivity())
-                    .showToastError(e.localizedMessage)
-            }
-        }
-    }
-
     override fun beforeScreenChange(screen: PreferenceScreen): Boolean {
         preferencesView?.let { preferencesAdapter?.stopObserveScrollPosition(it) }
         return true
@@ -255,7 +257,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
         preferencesView?.let { preferencesAdapter?.restoreAndObserveScrollPosition(it) }
         val actionBar = ActivityUtils.supportToolbarFor(this)
         if (actionBar != null) {
-            if (screen.key == "root" || Utils.isEmpty(screen.title) && screen.titleRes == DEFAULT_RES_ID) {
+            if (screen.key == "root" || screen.title.isEmpty() && screen.titleRes == DEFAULT_RES_ID) {
                 actionBar.setTitle(R.string.settings)
             } else if (screen.titleRes != DEFAULT_RES_ID) {
                 actionBar.setTitle(screen.titleRes)
@@ -470,20 +472,13 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 titleRes = R.string.music_dir
                 iconRes = R.drawable.dir_song
                 onClick {
-                    val properties = DialogProperties()
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE
-                    properties.selection_type = DialogConfigs.DIR_SELECT
-                    properties.root = Environment.getExternalStorageDirectory().absolutePath
-                    properties.error_dir =
-                        Environment.getExternalStorageDirectory().absolutePath
-                    properties.offset =
-                        Settings.get().main().getMusicDir()
-                    properties.extensions = null
-                    properties.show_hidden_files = true
-                    properties.tittle = R.string.music_dir
-                    properties.request = FILE_REQUEST_MUSIC_DIR
-                    FilePickerDialog.newInstance(properties)
-                        .show(parentFragmentManager, "music_dir")
+                    musicDir.launch(
+                        FileManagerActivity.makeFileManager(
+                            requireActivity(),
+                            Environment.getExternalStorageDirectory().absolutePath,
+                            "dirs"
+                        )
+                    )
                     true
                 }
             }
@@ -492,20 +487,13 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 titleRes = R.string.photo_dir
                 iconRes = R.drawable.dir_photo
                 onClick {
-                    val properties = DialogProperties()
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE
-                    properties.selection_type = DialogConfigs.DIR_SELECT
-                    properties.root = Environment.getExternalStorageDirectory().absolutePath
-                    properties.error_dir =
-                        Environment.getExternalStorageDirectory().absolutePath
-                    properties.offset =
-                        Settings.get().main().getPhotoDir()
-                    properties.extensions = null
-                    properties.show_hidden_files = true
-                    properties.tittle = R.string.photo_dir
-                    properties.request = FILE_REQUEST_PHOTO_DIR
-                    FilePickerDialog.newInstance(properties)
-                        .show(parentFragmentManager, "photo_dir")
+                    photoDir.launch(
+                        FileManagerActivity.makeFileManager(
+                            requireActivity(),
+                            Environment.getExternalStorageDirectory().absolutePath,
+                            "dirs"
+                        )
+                    )
                     true
                 }
             }
@@ -514,20 +502,13 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 titleRes = R.string.video_dir
                 iconRes = R.drawable.dir_video
                 onClick {
-                    val properties = DialogProperties()
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE
-                    properties.selection_type = DialogConfigs.DIR_SELECT
-                    properties.root = Environment.getExternalStorageDirectory().absolutePath
-                    properties.error_dir =
-                        Environment.getExternalStorageDirectory().absolutePath
-                    properties.offset =
-                        Settings.get().main().getVideoDir()
-                    properties.extensions = null
-                    properties.show_hidden_files = true
-                    properties.tittle = R.string.video_dir
-                    properties.request = FILE_REQUEST_VIDEO_DIR
-                    FilePickerDialog.newInstance(properties)
-                        .show(parentFragmentManager, "video_dir")
+                    videoDir.launch(
+                        FileManagerActivity.makeFileManager(
+                            requireActivity(),
+                            Environment.getExternalStorageDirectory().absolutePath,
+                            "dirs"
+                        )
+                    )
                     true
                 }
             }
@@ -665,36 +646,26 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
             pref("export_settings") {
                 titleRes = R.string.export_settings
                 onClick {
-                    val properties = DialogProperties()
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE
-                    properties.selection_type = DialogConfigs.DIR_SELECT
-                    properties.root = Environment.getExternalStorageDirectory().absolutePath
-                    properties.error_dir = Environment.getExternalStorageDirectory().absolutePath
-                    properties.offset = Environment.getExternalStorageDirectory().absolutePath
-                    properties.extensions = null
-                    properties.show_hidden_files = true
-                    properties.tittle = R.string.export_settings
-                    properties.request = REQUEST_EXPORT_SETTINGS
-                    FilePickerDialog.newInstance(properties)
-                        .show(parentFragmentManager, "ExportSettings")
+                    exportSettings.launch(
+                        FileManagerActivity.makeFileManager(
+                            requireActivity(),
+                            Environment.getExternalStorageDirectory().absolutePath,
+                            "dirs"
+                        )
+                    )
                     true
                 }
             }
             pref("import_settings") {
                 titleRes = R.string.import_settings
                 onClick {
-                    val properties = DialogProperties()
-                    properties.selection_mode = DialogConfigs.SINGLE_MODE
-                    properties.selection_type = DialogConfigs.FILE_SELECT
-                    properties.root = Environment.getExternalStorageDirectory().absolutePath
-                    properties.error_dir = Environment.getExternalStorageDirectory().absolutePath
-                    properties.offset = Environment.getExternalStorageDirectory().absolutePath
-                    properties.extensions = arrayOf("json")
-                    properties.show_hidden_files = true
-                    properties.tittle = R.string.import_settings
-                    properties.request = REQUEST_IMPORT_SETTINGS
-                    FilePickerDialog.newInstance(properties)
-                        .show(parentFragmentManager, "ImportSettings")
+                    importSettings.launch(
+                        FileManagerActivity.makeFileManager(
+                            requireActivity(),
+                            Environment.getExternalStorageDirectory().absolutePath,
+                            "json"
+                        )
+                    )
                     true
                 }
             }
@@ -736,7 +707,8 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
         super.onResume()
         val actionBar = ActivityUtils.supportToolbarFor(this)
         if (actionBar != null) {
-            if (preferencesAdapter?.currentScreen?.key == "root" || Utils.isEmpty(preferencesAdapter?.currentScreen?.title) && (preferencesAdapter?.currentScreen?.titleRes == DEFAULT_RES_ID || preferencesAdapter?.currentScreen?.titleRes == 0)) {
+            if (preferencesAdapter?.currentScreen?.key == "root" || preferencesAdapter?.currentScreen?.title.isNullOrEmpty() && (preferencesAdapter?.currentScreen?.titleRes == DEFAULT_RES_ID || preferencesAdapter?.currentScreen?.titleRes == 0)
+            ) {
                 actionBar.setTitle(R.string.settings)
             } else if (preferencesAdapter?.currentScreen?.titleRes != DEFAULT_RES_ID && preferencesAdapter?.currentScreen?.titleRes != 0) {
                 preferencesAdapter?.currentScreen?.titleRes?.let { actionBar.setTitle(it) }
@@ -880,7 +852,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                     val enabledVal = enabled.isChecked
                     val urlVal = url.editableText.toString()
                     val passVal = password.editableText.toString()
-                    if (enabledVal && (Utils.isEmpty(urlVal) || Utils.isEmpty(passVal))) {
+                    if (enabledVal && (urlVal.isEmpty() || passVal.isEmpty())) {
                         return@setPositiveButton
                     }
                     val srv = LocalServerSettings()
@@ -1100,11 +1072,6 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
         private const val KEY_APP_THEME = "app_theme"
         private const val KEY_NIGHT_SWITCH = "night_switch"
 
-        private const val FILE_REQUEST_MUSIC_DIR = "file_request_music_dir"
-        private const val FILE_REQUEST_PHOTO_DIR = "file_request_photo_dir"
-        private const val FILE_REQUEST_VIDEO_DIR = "file_request_video_dir"
-
-        @JvmStatic
         fun cleanCache(context: Context, notify: Boolean) {
             try {
                 clear_cache()
@@ -1139,7 +1106,6 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
             }
         }
 
-        @JvmStatic
         fun cleanUICache(context: Context, notify: Boolean) {
             try {
                 var cache = File(context.cacheDir, "lottie_cache/rendered")

@@ -34,7 +34,6 @@ import dev.ragnarok.filegallery.settings.CurrentTheme.getStatusBarNonColored
 import dev.ragnarok.filegallery.settings.Settings.get
 import dev.ragnarok.filegallery.settings.theme.ThemesController.currentStyle
 import dev.ragnarok.filegallery.util.Logger
-import dev.ragnarok.filegallery.util.Objects
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.view.AlternativeAspectRatioFrameLayout
 import dev.ragnarok.filegallery.view.VideoControllerView
@@ -103,7 +102,7 @@ class VideoPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback,
             toolbar.setNavigationIcon(R.drawable.arrow_left)
             toolbar.setNavigationOnClickListener { finish() }
         }
-        if (Objects.isNull(savedInstanceState)) {
+        if (savedInstanceState == null) {
             handleIntent(intent, false)
         }
         mControllerView = VideoControllerView(this)
@@ -144,7 +143,11 @@ class VideoPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback,
 
     private fun createPlayer(): IVideoPlayer {
         val url = video?.link
-        return ExoVideoPlayer(this, url) { mControllerView?.updatePausePlay() }
+        return ExoVideoPlayer(this, url, object : IVideoPlayer.IUpdatePlayListener {
+            override fun onPlayChanged(isPause: Boolean) {
+                mControllerView?.updatePausePlay()
+            }
+        })
     }
 
     @Suppress("DEPRECATION")
@@ -282,17 +285,17 @@ class VideoPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback,
 
     @Suppress("DEPRECATION")
     private fun hasPipPermission(): Boolean {
-        val appsOps = getSystemService(APP_OPS_SERVICE) as AppOpsManager
+        val appsOps = getSystemService(APP_OPS_SERVICE) as AppOpsManager?
         return when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
-                appsOps.unsafeCheckOpNoThrow(
+                appsOps?.unsafeCheckOpNoThrow(
                     AppOpsManager.OPSTR_PICTURE_IN_PICTURE,
                     Process.myUid(),
                     packageName
                 ) == AppOpsManager.MODE_ALLOWED
             }
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
-                appsOps.checkOpNoThrow(
+                appsOps?.checkOpNoThrow(
                     AppOpsManager.OPSTR_PICTURE_IN_PICTURE,
                     Process.myUid(),
                     packageName
@@ -328,8 +331,8 @@ class VideoPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback,
         }
     }
 
-    override fun onVideoSizeChanged(player: IVideoPlayer, size: VideoSize) {
-        Frame?.setAspectRatio(size.width, size.height)
+    override fun onVideoSizeChanged(player: IVideoPlayer, size: VideoSize?) {
+        Frame?.setAspectRatio(size?.width ?: 0, size?.height ?: 0)
     }
 
     @Suppress("DEPRECATION")

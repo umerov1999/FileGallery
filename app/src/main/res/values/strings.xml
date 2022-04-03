@@ -14,6 +14,8 @@
     <string name="button_ok">OK</string>
     <string name="button_yes">Да</string>
     <string name="button_cancel">Отмена</string>
+    <string name="button_copy">Копировать</string>
+    <string name="button_open">Открыть</string>
     <string name="not_permitted">Разрешения не предоставлены! Функция не доступна</string>
     <string name="click_back_to_exit">Нажмите еще раз для выхода</string>
     <string name="success">Успех</string>
@@ -69,11 +71,6 @@
     <string name="enabled">Включен</string>
     <string name="enabled_audio_local_sync">Синхронизировать скачанные</string>
     <string name="rotating_player_cover">Вращать обложку плеера</string>
-    <string name="choose_button_label">Выбрать</string>
-    <string name="label_parent_directory">Родительский каталог</string>
-    <string name="label_parent_dir" translatable="false">..</string>
-    <string name="last_edit">Модификация: %1$s, %2$s</string>
-    <string name="error_dir_access">Каталог недоступен</string>
     <string name="audio_channel">FileGallery-Плеер</string>
     <string name="downloading">Скачивание"</string>
     <string name="saved_audio">Скачивание трека…</string>
@@ -123,9 +120,6 @@
     <string name="reverse_time">От старых к новым</string>
     <string name="null_audio">Нет проигрываемых аудио</string>
     <string name="audio_not_found">Аудио не найдено в списке</string>
-    <string name="formatted_date_today">Сегодня в %1$s</string>
-    <string name="formatted_date_tomorrow">Завтра в %1$s</string>
-    <string name="formatted_date_yesterday">Вчера в %1$s</string>
     <string name="formatted_date_tomorrow_clean">завтра в %1$s</string>
     <string name="formatted_date_yesterday_clean">вчера в %1$s</string>
     <string name="local_server_audio">Аудио</string>
@@ -159,6 +153,10 @@
     <string name="tag_count_c">%1$d меток</string>
     <string name="success_add">Успешно добавлено %1$s в %2$s</string>
     <string name="rename">Переименовать</string>
+    <string name="qr">QR код</string>
+    <string name="detect_qr">Распознать QR</string>
+    <string name="select_file">Выбор %1$s</string>
+    <string name="select_folder">Выбор директории</string>
 
     <string-array name="night_mode_values" translatable="false">
         <item>1</item>

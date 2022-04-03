@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.imageview.ShapeableImageView
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.model.Photo
+import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.picasso.PicassoInstance
 import dev.ragnarok.filegallery.settings.CurrentTheme
 import dev.ragnarok.filegallery.util.Utils
@@ -71,7 +72,7 @@ class ImageListAdapter : RecyclerView.Adapter<ImageListAdapter.ImageVewHolder>()
 
         fun bind(pData: Photo, position: Int) {
             val previewUrl: String? = pData.preview_url
-            if (!Utils.isEmpty(previewUrl)) {
+            if (previewUrl.nonNullNoEmpty()) {
                 item_image_iv?.let {
                     PicassoInstance.with()
                         .load(previewUrl)

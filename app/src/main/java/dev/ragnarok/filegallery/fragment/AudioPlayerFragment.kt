@@ -25,28 +25,26 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso3.BitmapTarget
-import com.squareup.picasso3.Callback
 import com.squareup.picasso3.Picasso
-import dev.ragnarok.filegallery.Extensions.Companion.toMainThread
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.materialpopupmenu.MaterialPopupMenuBuilder
 import dev.ragnarok.filegallery.media.music.MusicPlaybackController
 import dev.ragnarok.filegallery.media.music.PlayerStatus
 import dev.ragnarok.filegallery.model.Audio
 import dev.ragnarok.filegallery.module.GalleryNative
+import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.picasso.PicassoInstance
 import dev.ragnarok.filegallery.picasso.transforms.BlurTransformation
 import dev.ragnarok.filegallery.settings.CurrentTheme
 import dev.ragnarok.filegallery.settings.Settings
+import dev.ragnarok.filegallery.toMainThread
 import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.DownloadWorkUtils.TrackIsDownloaded
 import dev.ragnarok.filegallery.util.DownloadWorkUtils.doDownloadAudio
 import dev.ragnarok.filegallery.util.Utils
-import dev.ragnarok.filegallery.util.Utils.isEmpty
 import dev.ragnarok.filegallery.view.CustomSeekBar
 import dev.ragnarok.filegallery.view.media.*
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieShapeableImageView
-import dev.ragnarok.filegallery.view.pager.WeakPicassoLoadCallback
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -152,7 +150,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
         return dialog
     }
 
-    private fun onServiceBindEvent(status: Int) {
+    private fun onServiceBindEvent(@PlayerStatus status: Int) {
         when (status) {
             PlayerStatus.UPDATE_TRACK_INFO -> {
                 updatePlaybackControls()
@@ -225,14 +223,14 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
                     iconColor = CurrentTheme.getColorSecondary(requireActivity())
                     callback = {
                         val clipboard =
-                            requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            requireActivity().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
                         var Artist =
                             if (MusicPlaybackController.albumName != null) MusicPlaybackController.albumName else ""
                         if (MusicPlaybackController.albumName != null) Artist += " (" + MusicPlaybackController.albumName + ")"
                         val Name =
                             if (MusicPlaybackController.trackName != null) MusicPlaybackController.trackName else ""
                         val clip = ClipData.newPlainText("response", "$Artist - $Name")
-                        clipboard.setPrimaryClip(clip)
+                        clipboard?.setPrimaryClip(clip)
                         CreateCustomToast(requireActivity()).showToast(R.string.copied_to_clipboard)
                     }
                 }
@@ -284,8 +282,8 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
         ivVolumePlus = root.findViewById(R.id.volume_plus)
         ivVolumePlus?.setOnClickListener {
             val audio =
-                requireActivity().getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            audio.setStreamVolume(
+                requireActivity().getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+            audio?.setStreamVolume(
                 AudioManager.STREAM_MUSIC,
                 audio.getStreamVolume(AudioManager.STREAM_MUSIC) + 1,
                 0
@@ -294,8 +292,8 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
         ivVolumeMinus = root.findViewById(R.id.volume_minus)
         ivVolumeMinus?.setOnClickListener {
             val audio =
-                requireActivity().getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            audio.setStreamVolume(
+                requireActivity().getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+            audio?.setStreamVolume(
                 AudioManager.STREAM_MUSIC,
                 audio.getStreamVolume(AudioManager.STREAM_MUSIC) - 1,
                 0
@@ -401,7 +399,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
         override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom) {
             if (isAdded) {
                 ivBackground?.let {
-                    FadeAnimDrawable.setBitmap(
+                    AudioPlayerBackgroundDrawable.setBitmap(
                         it,
                         bitmap,
                         MusicPlaybackController.isPlaying,
@@ -465,7 +463,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
                 TrackIsDownloaded(current) -> {
                     ivSave?.setImageResource(R.drawable.succ)
                 }
-                isEmpty(current.url) -> {
+                current.url.isNullOrEmpty() -> {
                     ivSave?.setImageResource(R.drawable.audio_died)
                 }
                 else -> ivSave?.setImageResource(R.drawable.save)
@@ -527,6 +525,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
     }
 
     private val isEqualizerAvailable: Boolean
+        @SuppressLint("QueryPermissionsNeeded")
         get() {
             val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
             val manager = requireActivity().packageManager
@@ -706,9 +705,47 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
 
     }
 
-    private inner class CoverViewHolder(view: View) : RecyclerView.ViewHolder(view), Callback {
+    private inner class CoverViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val ivCover: RLottieShapeableImageView = view.findViewById(R.id.cover)
-        val mPicassoLoadCallback = WeakPicassoLoadCallback(this)
+
+        val holderTarget = object : BitmapTarget {
+            override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom) {
+                if (isAdded) {
+                    ivCover.scaleType = ImageView.ScaleType.FIT_START
+                    AudioPlayerCoverDrawable.setBitmap(ivCover, bitmap)
+                }
+            }
+
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+            }
+
+            override fun onBitmapFailed(e: Exception, errorDrawable: Drawable?) {
+                if (isAdded) {
+                    ivCover.scaleType = ImageView.ScaleType.CENTER
+                    if (GalleryNative.isNativeLoaded()) {
+                        ivCover.fromRes(
+                            R.raw.auidio_no_cover,
+                            450,
+                            450,
+                            intArrayOf(
+                                0x333333,
+                                CurrentTheme.getColorSurface(requireActivity()),
+                                0x777777,
+                                CurrentTheme.getColorOnSurface(requireActivity())
+                            )
+                        )
+                        ivCover.playAnimation()
+                    } else {
+                        ivCover.setImageResource(R.drawable.itunes)
+                        ivCover.drawable?.setTint(
+                            CurrentTheme.getColorOnSurface(
+                                requireActivity()
+                            )
+                        )
+                    }
+                }
+            }
+        }
 
         fun bind(audioTrack: Audio) {
             val coverUrl = audioTrack.thumb_image
@@ -716,9 +753,9 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
                 PicassoInstance.with()
                     .load(coverUrl)
                     .tag(PLAYER_TAG)
-                    .into(ivCover, mPicassoLoadCallback)
+                    .into(holderTarget)
             } else {
-                PicassoInstance.with().cancelRequest(ivCover)
+                PicassoInstance.with().cancelRequest(holderTarget)
                 ivCover.scaleType = ImageView.ScaleType.CENTER
                 if (GalleryNative.isNativeLoaded()) {
                     ivCover.fromRes(
@@ -739,35 +776,6 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
                 }
             }
         }
-
-        override fun onSuccess() {
-            ivCover.scaleType = ImageView.ScaleType.FIT_START
-        }
-
-        override fun onError(t: Throwable) {
-            ivCover.scaleType = ImageView.ScaleType.CENTER
-            if (GalleryNative.isNativeLoaded()) {
-                ivCover.fromRes(
-                    R.raw.auidio_no_cover,
-                    450,
-                    450,
-                    intArrayOf(
-                        0x333333,
-                        CurrentTheme.getColorSurface(requireActivity()),
-                        0x777777,
-                        CurrentTheme.getColorOnSurface(requireActivity())
-                    )
-                )
-                ivCover.playAnimation()
-            } else {
-                ivCover.setImageResource(R.drawable.itunes)
-                ivCover.drawable?.setTint(
-                    CurrentTheme.getColorOnSurface(
-                        requireActivity()
-                    )
-                )
-            }
-        }
     }
 
     private inner class CoverAdapter : RecyclerView.Adapter<CoverViewHolder>() {
@@ -784,10 +792,8 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
         @SuppressLint("NotifyDataSetChanged")
         fun updateAudios(audios: List<Audio>?) {
             mAudios.clear()
-            if (!isEmpty(audios)) {
-                if (audios != null) {
-                    mAudios.addAll(audios)
-                }
+            if (audios.nonNullNoEmpty()) {
+                mAudios.addAll(audios)
             }
             notifyDataSetChanged()
         }

@@ -11,7 +11,6 @@ import dev.ragnarok.filegallery.model.PlayerCoverBackgroundSettings
 import dev.ragnarok.filegallery.model.SlidrSettings
 import dev.ragnarok.filegallery.settings.ISettings.IMainSettings
 import dev.ragnarok.filegallery.settings.theme.ThemeOverlay
-import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.view.pager.Transformers_Types
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
@@ -81,7 +80,7 @@ internal class MainSettings(context: Context) : IMainSettings {
     @Suppress("DEPRECATION")
     override fun getMusicDir(): String {
         var ret = PreferenceScreen.getPreferences(app).getString("music_dir", null)
-        if (Utils.isEmpty(ret) || !File(ret!!).exists()) {
+        if (ret.isNullOrEmpty() || !File(ret).exists()) {
             ret =
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC).absolutePath
             PreferenceScreen.getPreferences(app).edit().putString("music_dir", ret).apply()
@@ -92,7 +91,7 @@ internal class MainSettings(context: Context) : IMainSettings {
     @Suppress("DEPRECATION")
     override fun getPhotoDir(): String {
         var ret = PreferenceScreen.getPreferences(app).getString("photo_dir", null)
-        if (Utils.isEmpty(ret) || !File(ret!!).exists()) {
+        if (ret.isNullOrEmpty() || !File(ret).exists()) {
             ret =
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + "/Fenrir"
             PreferenceScreen.getPreferences(app).edit().putString("photo_dir", ret).apply()
@@ -103,7 +102,7 @@ internal class MainSettings(context: Context) : IMainSettings {
     @Suppress("DEPRECATION")
     override fun getVideoDir(): String {
         var ret = PreferenceScreen.getPreferences(app).getString("video_dir", null)
-        if (Utils.isEmpty(ret) || !File(ret!!).exists()) {
+        if (ret.isNullOrEmpty() || !File(ret).exists()) {
             ret =
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES).absolutePath + "/Fenrir"
             PreferenceScreen.getPreferences(app).edit().putString("video_dir", ret).apply()

@@ -24,6 +24,7 @@ import dev.ragnarok.filegallery.model.Video
 import dev.ragnarok.filegallery.model.tags.TagDir
 import dev.ragnarok.filegallery.mvp.compat.AbsMvpFragment
 import dev.ragnarok.filegallery.mvp.core.IPresenterFactory
+import dev.ragnarok.filegallery.mvp.core.PresenterAction
 import dev.ragnarok.filegallery.mvp.presenter.TagDirPresenter
 import dev.ragnarok.filegallery.mvp.view.ITagDirView
 import dev.ragnarok.filegallery.place.PlaceFactory
@@ -76,10 +77,17 @@ class TagDirFragment : AbsMvpFragment<TagDirPresenter, ITagDirView>(), ITagDirVi
     private val requestPhotoUpdate = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK && result.data != null && result.data!!
+        if (result.resultCode == Activity.RESULT_OK && result.data != null && (result.data
+                ?: return@registerForActivityResult)
                 .extras != null
         ) {
-            presenter?.scrollTo(result.data!!.extras!!.getString(Extra.PATH)!!)
+            postPresenterReceive(object : PresenterAction<TagDirPresenter, ITagDirView> {
+                override fun call(presenter: TagDirPresenter) {
+                    presenter.scrollTo(
+                        ((result.data ?: return).extras ?: return).getString(Extra.PATH) ?: return
+                    )
+                }
+            })
         }
     }
 

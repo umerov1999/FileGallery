@@ -3,9 +3,9 @@ package dev.ragnarok.filegallery.mvp.presenter
 import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
 import dev.ragnarok.filegallery.Includes
 import dev.ragnarok.filegallery.R
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.model.*
 import dev.ragnarok.filegallery.model.tags.TagOwner
 import dev.ragnarok.filegallery.module.parcel.ParcelFlags
@@ -14,7 +14,6 @@ import dev.ragnarok.filegallery.mvp.presenter.base.RxSupportPresenter
 import dev.ragnarok.filegallery.mvp.view.IFileManagerView
 import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.util.Objects.safeEquals
-import dev.ragnarok.filegallery.util.Utils
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import java.io.File
@@ -94,7 +93,7 @@ class FileManagerPresenter(
         if (safeEquals(query, this.q) && !global) {
             return
         }
-        q = if (Utils.isEmpty(query)) {
+        q = if (query.isNullOrEmpty()) {
             null
         } else {
             query
@@ -108,7 +107,7 @@ class FileManagerPresenter(
             fileListSearch.clear()
             if (!global) {
                 for (i in fileList) {
-                    if (Utils.isEmpty(i.file_name)) {
+                    if (i.file_name.isNullOrEmpty()) {
                         continue
                     }
                     if (i.file_name.lowercase(Locale.getDefault())
@@ -119,7 +118,7 @@ class FileManagerPresenter(
                 }
                 view?.resolveEmptyText(fileListSearch.isEmpty())
                 view?.displayData(fileListSearch)
-                view?.updatePathString(q!!)
+                view?.updatePathString(q ?: return)
             } else {
                 isLoading = true
                 view?.resolveEmptyText(false)
@@ -131,7 +130,7 @@ class FileManagerPresenter(
                     view?.resolveEmptyText(fileListSearch.isEmpty())
                     view?.resolveLoading(isLoading)
                     view?.displayData(fileListSearch)
-                    view?.updatePathString(q!!)
+                    view?.updatePathString(q ?: return@subscribe)
                 }, {
                     view?.onError(it)
                     isLoading = false
@@ -443,7 +442,8 @@ class FileManagerPresenter(
                 )
             } else {
                 appendDisposable(
-                    Includes.stores.searchQueriesStore().insertTagDir(selectedOwner!!.id, item)
+                    Includes.stores.searchQueriesStore()
+                        .insertTagDir((selectedOwner ?: return).id, item)
                         .fromIOToMain().subscribe({
                             item.checkTag()
                             val list = if (q == null) fileList else fileListSearch
@@ -473,6 +473,7 @@ class FileManagerPresenter(
                 photo.date = i.modification
                 photo.photo_url = "file://" + i.file_path
                 photo.preview_url = "thumb_file://" + i.file_path
+                photo.setLocal(true)
                 photo.isGif =
                     i.type == FileType.video || i.file_name.toString().endsWith("gif", true)
                 photo.text = i.file_name

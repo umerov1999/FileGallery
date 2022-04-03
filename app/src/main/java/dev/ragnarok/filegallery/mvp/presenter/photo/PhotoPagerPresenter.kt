@@ -1,19 +1,39 @@
 package dev.ragnarok.filegallery.mvp.presenter.photo
 
-import android.content.Context
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.*
+import android.content.pm.ResolveInfo
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.nfc.FormatException
+import android.os.Build
 import android.os.Bundle
+import androidx.browser.customtabs.CustomTabColorSchemeParams
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.browser.customtabs.CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION
 import androidx.core.net.toFile
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.squareup.picasso3.BitmapTarget
+import com.squareup.picasso3.Picasso
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.model.Photo
+import dev.ragnarok.filegallery.model.Video
 import dev.ragnarok.filegallery.mvp.presenter.base.RxSupportPresenter
 import dev.ragnarok.filegallery.mvp.view.IPhotoPagerView
+import dev.ragnarok.filegallery.nonNullNoEmpty
+import dev.ragnarok.filegallery.picasso.PicassoInstance
+import dev.ragnarok.filegallery.settings.CurrentTheme.getColorPrimary
+import dev.ragnarok.filegallery.settings.CurrentTheme.getColorSecondary
 import dev.ragnarok.filegallery.settings.Settings.get
 import dev.ragnarok.filegallery.util.AssertUtils
+import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.DownloadWorkUtils.doDownloadPhoto
-import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.qr.*
 import java.io.File
 import java.util.*
+
 
 open class PhotoPagerPresenter internal constructor(
     initialData: ArrayList<Photo>,
@@ -91,13 +111,29 @@ open class PhotoPagerPresenter internal constructor(
         resolveToolbarTitleSubtitleView()
     }
 
-    fun fireSaveOnDriveClick() {
+    fun fireSaveOnDriveClick(): Boolean {
+        if (!get().main().isDownload_photo_tap()) {
+            return true
+        }
+        if (current.isGif && !current.photo_url.endsWith("gif", true)) {
+            val v = Video()
+            v.id = current.id
+            v.ownerId = current.ownerId
+            v.date = current.date
+            v.title = current.text
+            v.link = current.photo_url
+            view?.displayVideo(v)
+            return false
+        }
+        if (current.inLocal()) {
+            return true
+        }
         val dir = File(get().main().getPhotoDir())
         if (!dir.isDirectory) {
             val created = dir.mkdirs()
             if (!created) {
                 view?.showError("Can't create directory $dir")
-                return
+                return false
             }
         } else dir.setLastModified(Calendar.getInstance().time.time)
         val photo = current
@@ -107,6 +143,108 @@ open class PhotoPagerPresenter internal constructor(
             path = path.substring(0, ndx)
         }
         DownloadResult(path, dir, photo)
+        return false
+    }
+
+    private fun decodeFromBitmap(gen: Bitmap?): String? {
+        if (gen == null) {
+            return "error"
+        }
+        var generatedQRCode: Bitmap? = gen
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && generatedQRCode?.config == Bitmap.Config.HARDWARE) {
+            generatedQRCode = generatedQRCode.copy(Bitmap.Config.ARGB_8888, true)
+        }
+        if (generatedQRCode == null) {
+            return "error"
+        }
+        val width: Int = generatedQRCode.width
+        val height: Int = generatedQRCode.height
+        val pixels = IntArray(width * height)
+        generatedQRCode.getPixels(pixels, 0, width, 0, 0, width, height)
+        val source = RGBLuminanceSource(width, height, pixels)
+        val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
+        val reader = QRCodeReader()
+        val result: Result = try {
+            reader.decode(binaryBitmap)
+        } catch (e: NotFoundException) {
+            return e.localizedMessage
+        } catch (e: ChecksumException) {
+            return e.localizedMessage
+        } catch (e: FormatException) {
+            return e.localizedMessage
+        }
+        return result.text
+    }
+
+    @SuppressLint("QueryPermissionsNeeded")
+    private fun getCustomTabsPackages(context: Context): ArrayList<ResolveInfo> {
+        val pm = context.packageManager
+        val activityIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.example.com"))
+        val resolvedActivityList = pm.queryIntentActivities(activityIntent, 0)
+        val packagesSupportingCustomTabs: ArrayList<ResolveInfo> = ArrayList()
+        for (info in resolvedActivityList) {
+            val serviceIntent = Intent()
+            serviceIntent.action = ACTION_CUSTOM_TABS_CONNECTION
+            serviceIntent.setPackage(info.activityInfo.packageName)
+            if (pm.resolveService(serviceIntent, 0) != null) {
+                packagesSupportingCustomTabs.add(info)
+            }
+        }
+        return packagesSupportingCustomTabs
+    }
+
+    private fun openLinkInBrowser(context: Context, url: String?) {
+        val intentBuilder = CustomTabsIntent.Builder()
+        intentBuilder.setDefaultColorSchemeParams(
+            CustomTabColorSchemeParams.Builder()
+                .setToolbarColor(getColorPrimary(context)).setSecondaryToolbarColor(
+                    getColorSecondary(
+                        context
+                    )
+                ).build()
+        )
+        val customTabsIntent: CustomTabsIntent = intentBuilder.build()
+        getCustomTabsPackages(context)
+        if (getCustomTabsPackages(context).isNotEmpty()) {
+            customTabsIntent.intent.setPackage(getCustomTabsPackages(context)[0].resolvePackageName)
+        }
+        try {
+            customTabsIntent.launchUrl(context, Uri.parse(url))
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun fireDetectQRClick(context: Activity) {
+        PicassoInstance.with().load(current.photo_url)
+            .into(object : BitmapTarget {
+                override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom) {
+                    val data = decodeFromBitmap(bitmap)
+                    MaterialAlertDialogBuilder(context)
+                        .setIcon(R.drawable.qr_code)
+                        .setMessage(data)
+                        .setTitle(getString(R.string.qr))
+                        .setPositiveButton(R.string.button_open) { _: DialogInterface?, _: Int ->
+                            openLinkInBrowser(context, data)
+                        }
+                        .setNeutralButton(R.string.button_copy) { _: DialogInterface?, _: Int ->
+                            val clipboard = context.getSystemService(
+                                Context.CLIPBOARD_SERVICE
+                            ) as ClipboardManager?
+                            val clip = ClipData.newPlainText("response", data)
+                            clipboard?.setPrimaryClip(clip)
+                            CreateCustomToast(context).showToast(R.string.copied_to_clipboard)
+                        }
+                        .setCancelable(true)
+                        .show()
+                }
+
+                override fun onBitmapFailed(e: Exception, errorDrawable: Drawable?) {
+                    CreateCustomToast(context).showToastError(e.localizedMessage)
+                }
+
+                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+            })
     }
 
     private fun DownloadResult(Prefix: String?, diru: File, photo: Photo) {
@@ -131,7 +269,7 @@ open class PhotoPagerPresenter internal constructor(
     }
 
     private fun hasPhotos(): Boolean {
-        return !Utils.safeIsEmpty(mPhotos)
+        return mPhotos.nonNullNoEmpty()
     }
 
     fun firePhotoTap() {

@@ -104,7 +104,7 @@ class TagOwnerBottomSheet : AbsMvpBottomSheetDialogFragment<TagOwnerPresenter, I
     override fun onTagOwnerClick(index: Int, owner: TagOwner) {
         presenter?.addDir(
             owner,
-            requireArguments().getParcelable(Extra.PATH)!!,
+            requireArguments().getParcelable(Extra.PATH) ?: return,
         )
     }
 

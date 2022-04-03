@@ -1,7 +1,9 @@
 package dev.ragnarok.filegallery.activity
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.graphics.Color
@@ -24,9 +26,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.fragment.*
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.listener.*
 import dev.ragnarok.filegallery.media.music.MusicPlaybackController
 import dev.ragnarok.filegallery.media.music.MusicPlaybackController.ServiceToken
@@ -44,6 +46,7 @@ import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.settings.theme.ThemesController.currentStyle
 import dev.ragnarok.filegallery.settings.theme.ThemesController.nextRandom
 import dev.ragnarok.filegallery.util.AppPerms
+import dev.ragnarok.filegallery.util.AppPerms.requestPermissionsResultAbs
 import dev.ragnarok.filegallery.util.Logger
 import dev.ragnarok.filegallery.util.RxUtils
 import dev.ragnarok.filegallery.util.Utils
@@ -66,16 +69,13 @@ class MainActivity : AppCompatActivity(), OnSectionResumeCallback, AppStyleable,
     private var mAudioPlayServiceToken: ServiceToken? = null
     private val TAG = "MainActivity_LOG"
     private val mCompositeDisposable = CompositeDisposable()
-    private val requestReadWritePermission = AppPerms.requestReadWritePermissionsResult(
-        this,
-        object : AppPerms.onPermissionsResult {
-            override fun granted() {
-                handleIntent(null, true)
-            }
-
-            override fun not_granted() {
-                finish()
-            }
+    private val requestReadWritePermission = requestPermissionsResultAbs(
+        arrayOf(
+            Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
+        ), {
+            handleIntent(null, true)
+        }, {
+            finish()
         })
 
     private val mOnBackStackChangedListener =
@@ -125,6 +125,10 @@ class MainActivity : AppCompatActivity(), OnSectionResumeCallback, AppStyleable,
                     }
                 })
         }
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(Utils.updateActivityContext(newBase))
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -182,7 +186,7 @@ class MainActivity : AppCompatActivity(), OnSectionResumeCallback, AppStyleable,
     override fun onSectionResume(@SectionItem section: Int) {
         mCurrentFrontSection = section
         mBottomNavigation?.menu ?: return
-        for (i in mBottomNavigation?.menu!!.iterator()) {
+        for (i in (mBottomNavigation?.menu ?: return).iterator()) {
             i.isChecked = false
         }
 
@@ -290,10 +294,12 @@ class MainActivity : AppCompatActivity(), OnSectionResumeCallback, AppStyleable,
                 AudioPlayerFragment().show(supportFragmentManager, "audio_player")
             }
             Place.PHOTO_LOCAL, Place.PHOTO_LOCAL_SERVER -> {
-                place.launchActivityForResult(
-                    this,
-                    PhotoPagerActivity.newInstance(this, place.type, args)
-                )
+                PhotoPagerActivity.newInstance(this, place.type, args)?.let {
+                    place.launchActivityForResult(
+                        this,
+                        it
+                    )
+                }
             }
             Place.VIDEO_PLAYER -> {
                 val intent = Intent(this, VideoPlayerActivity::class.java)

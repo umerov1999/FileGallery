@@ -20,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.squareup.picasso3.Callback
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
+import com.squareup.picasso3.Rotatable
 import dev.ragnarok.filegallery.Extra
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.activity.slidr.Slidr
@@ -29,8 +29,10 @@ import dev.ragnarok.filegallery.activity.slidr.model.SlidrListener
 import dev.ragnarok.filegallery.activity.slidr.model.SlidrPosition
 import dev.ragnarok.filegallery.adapter.horizontal.ImageListAdapter
 import dev.ragnarok.filegallery.fragment.AudioPlayerFragment
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.listener.AppStyleable
 import dev.ragnarok.filegallery.model.Photo
+import dev.ragnarok.filegallery.model.Video
 import dev.ragnarok.filegallery.mvp.core.IPresenterFactory
 import dev.ragnarok.filegallery.mvp.presenter.photo.PhotoAlbumPagerPresenter
 import dev.ragnarok.filegallery.mvp.presenter.photo.PhotoPagerPresenter
@@ -38,6 +40,7 @@ import dev.ragnarok.filegallery.mvp.presenter.photo.TmpGalleryPagerPresenter
 import dev.ragnarok.filegallery.mvp.view.IPhotoPagerView
 import dev.ragnarok.filegallery.picasso.PicassoInstance
 import dev.ragnarok.filegallery.place.Place
+import dev.ragnarok.filegallery.place.PlaceFactory
 import dev.ragnarok.filegallery.place.PlaceProvider
 import dev.ragnarok.filegallery.settings.CurrentTheme
 import dev.ragnarok.filegallery.settings.Settings
@@ -51,6 +54,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.*
 import java.util.concurrent.TimeUnit
+
 
 class PhotoPagerActivity : BaseMvpActivity<PhotoPagerPresenter, IPhotoPagerView>(), IPhotoPagerView,
     PlaceProvider, AppStyleable {
@@ -75,8 +79,14 @@ class PhotoPagerActivity : BaseMvpActivity<PhotoPagerPresenter, IPhotoPagerView>
             return args
         }
 
+        var mLastBackPressedTime: Long = 0
+
         @JvmStatic
-        fun newInstance(context: Context, placeType: Int, args: Bundle?): Intent {
+        fun newInstance(context: Context, placeType: Int, args: Bundle?): Intent? {
+            if (mLastBackPressedTime + 1000 > System.currentTimeMillis()) {
+                return null
+            }
+            mLastBackPressedTime = System.currentTimeMillis()
             val ph = Intent(context, PhotoPagerActivity::class.java)
             val targetArgs = Bundle()
             targetArgs.putAll(args)
@@ -195,11 +205,17 @@ class PhotoPagerActivity : BaseMvpActivity<PhotoPagerPresenter, IPhotoPagerView>
     }
 
     override fun openPlace(place: Place) {
+        val args: Bundle = place.prepareArguments()
         when (place.type) {
             Place.AUDIO_PLAYER -> {
                 val player = supportFragmentManager.findFragmentByTag("audio_player")
                 if (player is AudioPlayerFragment) player.dismiss()
                 AudioPlayerFragment().show(supportFragmentManager, "audio_player")
+            }
+            Place.VIDEO_PLAYER -> {
+                val intent = Intent(this, VideoPlayerActivity::class.java)
+                intent.putExtras(args)
+                startActivity(intent)
             }
         }
     }
@@ -220,6 +236,7 @@ class PhotoPagerActivity : BaseMvpActivity<PhotoPagerPresenter, IPhotoPagerView>
                 presenter?.fireSaveOnDriveClick()
                 return true
             }
+            R.id.detect_qr -> presenter?.fireDetectQRClick(this)
         }
         return super.onOptionsItemSelected(item)
     }
@@ -338,6 +355,10 @@ class PhotoPagerActivity : BaseMvpActivity<PhotoPagerPresenter, IPhotoPagerView>
         overridePendingTransition(0, 0)
     }
 
+    override fun displayVideo(video: Video) {
+        PlaceFactory.getInternalPlayerPlace(video).tryOpenWith(this)
+    }
+
     @Suppress("DEPRECATION")
     override fun setStatusbarColored(colored: Boolean, invertIcons: Boolean) {
         val statusbarNonColored = CurrentTheme.getStatusBarNonColored(this)
@@ -449,7 +470,7 @@ class PhotoPagerActivity : BaseMvpActivity<PhotoPagerPresenter, IPhotoPagerView>
         }
 
         private fun loadImage(image: Photo) {
-            if (Utils.isEmpty(image.photo_url)) {
+            if (image.photo_url.isNullOrEmpty()) {
                 PicassoInstance.with().cancelRequest(photo)
                 CreateCustomToast(this@PhotoPagerActivity).showToastError(R.string.empty_url)
                 return
@@ -510,11 +531,18 @@ class PhotoPagerActivity : BaseMvpActivity<PhotoPagerPresenter, IPhotoPagerView>
                 LayoutInflater.from(container.context)
                     .inflate(R.layout.content_photo_page, container, false)
             )
-            if (Settings.get().main().isDownload_photo_tap()) {
-                ret.photo.setOnLongClickListener {
-                    presenter?.fireSaveOnDriveClick()
-                    true
+            ret.photo.setOnLongClickListener {
+                val o = presenter?.fireSaveOnDriveClick()
+                if (o == true && ret.photo.drawable is Rotatable) {
+                    var rot = (ret.photo.drawable as Rotatable).getRotation() + 45f
+                    if (rot >= 360f) {
+                        rot = 0f
+                    }
+                    (ret.photo.drawable as Rotatable).rotate(rot)
+                    ret.photo.fitImageToView()
+                    ret.photo.invalidate()
                 }
+                true
             }
             ret.photo.setOnTouchListener { view: View, event: MotionEvent ->
                 if (event.pointerCount >= 2 || view.canScrollHorizontally(1) && view.canScrollHorizontally(

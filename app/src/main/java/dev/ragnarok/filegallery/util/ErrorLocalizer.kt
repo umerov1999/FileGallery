@@ -2,11 +2,11 @@ package dev.ragnarok.filegallery.util
 
 import android.content.Context
 import dev.ragnarok.filegallery.R
+import dev.ragnarok.filegallery.nonNullNoEmpty
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 object ErrorLocalizer {
-    @JvmStatic
     fun localizeThrowable(context: Context, throwable: Throwable?): String {
         throwable ?: return "null"
         if (throwable is SocketTimeoutException) {
@@ -15,6 +15,6 @@ object ErrorLocalizer {
         if (throwable is UnknownHostException) {
             return context.getString(R.string.error_unknown_host)
         }
-        return if (Utils.nonEmpty(throwable.message)) throwable.message!! else throwable.toString()
+        return if (throwable.message.nonNullNoEmpty()) throwable.message!! else throwable.toString()
     }
 }

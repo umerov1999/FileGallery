@@ -8,7 +8,6 @@ import dev.ragnarok.filegallery.view.media.PathAnimator
 
 
 object CurrentTheme {
-    @JvmStatic
     val playPauseAnimator = createPathAnimator()
     private fun createPathAnimator(): PathAnimator {
         val animator = PathAnimator(0.293f, -26f, -28f, 1.0f)
@@ -43,7 +42,6 @@ object CurrentTheme {
         return animator
     }
 
-    @JvmStatic
     fun getColorPrimary(context: Context): Int {
         return getColorFromAttrs(
             com.google.android.material.R.attr.colorPrimary,
@@ -72,7 +70,6 @@ object CurrentTheme {
         )
     }
 
-    @JvmStatic
     fun getColorSurface(context: Context): Int {
         return getColorFromAttrs(
             com.google.android.material.R.attr.colorSurface,
@@ -101,17 +98,14 @@ object CurrentTheme {
         )
     }
 
-    @JvmStatic
     fun getStatusBarColor(context: Context): Int {
         return getColorFromAttrs(android.R.attr.statusBarColor, context, "#000000")
     }
 
-    @JvmStatic
     fun getNavigationBarColor(context: Context): Int {
         return getColorFromAttrs(android.R.attr.navigationBarColor, context, "#000000")
     }
 
-    @JvmStatic
     fun getColorSecondary(context: Context): Int {
         return getColorFromAttrs(
             com.google.android.material.R.attr.colorSecondary,
@@ -120,7 +114,6 @@ object CurrentTheme {
         )
     }
 
-    @JvmStatic
     fun getStatusBarNonColored(context: Context): Int {
         return getColorFromAttrs(R.attr.statusbarNonColoredColor, context, "#000000")
     }

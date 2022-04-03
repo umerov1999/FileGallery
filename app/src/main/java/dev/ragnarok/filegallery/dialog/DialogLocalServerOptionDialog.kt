@@ -52,7 +52,6 @@ class DialogLocalServerOptionDialog : BottomSheetDialogFragment() {
     }
 
     companion object {
-        @JvmStatic
         fun newInstance(
             isDiscography: Boolean,
             isReverse: Boolean,

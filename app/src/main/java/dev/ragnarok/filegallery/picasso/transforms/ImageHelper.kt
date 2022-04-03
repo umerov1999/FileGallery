@@ -4,7 +4,6 @@ import android.graphics.*
 import android.os.Build
 
 object ImageHelper {
-    @JvmStatic
     fun getRoundedBitmap(workBitmap: Bitmap?): Bitmap? {
         workBitmap ?: return null
         var bitmap = workBitmap
@@ -28,7 +27,6 @@ object ImageHelper {
         return output
     }
 
-    @JvmStatic
     fun getEllipseBitmap(workBitmap: Bitmap?, angle: Float): Bitmap? {
         workBitmap ?: return null
         var bitmap = workBitmap

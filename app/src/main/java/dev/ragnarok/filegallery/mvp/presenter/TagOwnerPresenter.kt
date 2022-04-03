@@ -1,14 +1,13 @@
 package dev.ragnarok.filegallery.mvp.presenter
 
 import android.os.Bundle
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
 import dev.ragnarok.filegallery.Includes
 import dev.ragnarok.filegallery.db.interfaces.ISearchRequestHelperStorage
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.model.FileItem
 import dev.ragnarok.filegallery.model.tags.TagOwner
 import dev.ragnarok.filegallery.mvp.presenter.base.RxSupportPresenter
 import dev.ragnarok.filegallery.mvp.view.ITagOwnerView
-import dev.ragnarok.filegallery.util.Utils
 
 class TagOwnerPresenter(savedInstanceState: Bundle?) :
     RxSupportPresenter<ITagOwnerView>(savedInstanceState) {
@@ -53,8 +52,8 @@ class TagOwnerPresenter(savedInstanceState: Bundle?) :
         )
     }
 
-    fun renameTagOwner(name: String, owner: TagOwner) {
-        if (Utils.isEmpty(name)) {
+    fun renameTagOwner(name: String?, owner: TagOwner) {
+        if (name.isNullOrEmpty()) {
             return
         }
         appendDisposable(
@@ -78,11 +77,11 @@ class TagOwnerPresenter(savedInstanceState: Bundle?) :
     }
 
     fun addOwner(name: String?) {
-        if (Utils.isEmpty(name)) {
+        if (name.isNullOrEmpty()) {
             return
         }
         appendDisposable(
-            storage.insertTagOwner(name!!)
+            storage.insertTagOwner(name)
                 .fromIOToMain()
                 .subscribe(
                     {

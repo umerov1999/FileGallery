@@ -1,6 +1,7 @@
 package dev.ragnarok.filegallery.mvp.view
 
 import dev.ragnarok.filegallery.model.Photo
+import dev.ragnarok.filegallery.model.Video
 import dev.ragnarok.filegallery.mvp.core.IMvpView
 
 interface IPhotoPagerView : IMvpView, IErrorView, IToastView {
@@ -14,4 +15,5 @@ interface IPhotoPagerView : IMvpView, IErrorView, IToastView {
     fun returnInfo(position: Int, parcelNativePtr: Long)
     fun returnOnlyPos(position: Int)
     fun returnFileInfo(path: String)
+    fun displayVideo(video: Video)
 }

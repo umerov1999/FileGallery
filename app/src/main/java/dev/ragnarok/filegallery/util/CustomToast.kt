@@ -114,7 +114,6 @@ class CustomToast private constructor(context: Context?, Timage: Bitmap?) {
     }
 
     companion object {
-        @JvmStatic
         fun CreateCustomToast(context: Context?): CustomToast {
             return CustomToast(context, null)
         }

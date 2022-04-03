@@ -146,7 +146,7 @@ open class TouchImageView @JvmOverloads constructor(
         isRotateImageToFitScreen = rotateImageToFitScreen
     }
 
-    override fun setOnTouchListener(onTouchListener: OnTouchListener) {
+    override fun setOnTouchListener(onTouchListener: OnTouchListener?) {
         userTouchListener = onTouchListener
     }
 
@@ -212,7 +212,7 @@ open class TouchImageView @JvmOverloads constructor(
         fitImageToView()
     }
 
-    override fun setImageBitmap(bm: Bitmap) {
+    override fun setImageBitmap(bm: Bitmap?) {
         clearAnimationDrawable()
         imageRenderedAtLeastOnce = false
         super.setImageBitmap(bm)
@@ -314,7 +314,7 @@ open class TouchImageView @JvmOverloads constructor(
     public override fun onRestoreInstanceState(state: Parcelable) {
         if (state is Bundle) {
             currentZoom = state.getFloat("saveScale")
-            floatMatrix = state.getFloatArray("matrix")!!
+            floatMatrix = (state.getFloatArray("matrix") ?: return)
             prevMatrix.setValues(floatMatrix)
             prevMatchViewHeight = state.getFloat("matchViewHeight")
             prevMatchViewWidth = state.getFloat("matchViewWidth")
@@ -340,10 +340,10 @@ open class TouchImageView @JvmOverloads constructor(
         imageRenderedAtLeastOnce = true
         if (delayedZoomVariables != null) {
             setZoom(
-                delayedZoomVariables!!.scale,
-                delayedZoomVariables!!.focusX,
-                delayedZoomVariables!!.focusY,
-                delayedZoomVariables!!.scaleType
+                (delayedZoomVariables ?: return).scale,
+                (delayedZoomVariables ?: return).focusX,
+                (delayedZoomVariables ?: return).focusY,
+                (delayedZoomVariables ?: return).scaleType
             )
             delayedZoomVariables = null
         }
@@ -468,7 +468,7 @@ open class TouchImageView @JvmOverloads constructor(
             }
         }
         if (scaleType != touchScaleType) {
-            setScaleType(scaleType!!)
+            setScaleType(scaleType ?: return)
         }
         resetZoom()
         scaleImage(scale.toDouble(), viewWidth / 2.toFloat(), viewHeight / 2.toFloat(), true)
@@ -676,7 +676,7 @@ open class TouchImageView @JvmOverloads constructor(
      * maintain zoom level and attempt to roughly put the same part of the image in the View as was
      * there before, paying attention to orientationChangeFixedPixel or viewSizeChangeFixedPixel.
      */
-    private fun fitImageToView() {
+    fun fitImageToView() {
         val fixedPixel =
             if (orientationJustChanged) orientationChangeFixedPixel else viewSizeChangeFixedPixel
         orientationJustChanged = false

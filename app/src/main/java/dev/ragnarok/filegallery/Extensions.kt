@@ -15,150 +15,207 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
+import kotlin.contracts.contract
 
-class Extensions {
-    companion object {
-        fun <T : Any> Single<T>.fromIOToMain(): Single<T> =
-            subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+inline fun <reified T : Any> Single<T>.fromIOToMain(): Single<T> =
+    subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
 
-        fun <T : Any> Single<T>.subscribeIOAndIgnoreResults(): Disposable =
-            subscribeOn(Schedulers.io()).subscribe(RxUtils.ignore(), RxUtils.ignore())
+inline fun <reified T : Any> Single<T>.subscribeIOAndIgnoreResults(): Disposable =
+    subscribeOn(Schedulers.io()).subscribe(RxUtils.ignore(), RxUtils.ignore())
 
-        fun <T : Any> Flowable<T>.toMainThread(): Flowable<T> =
-            observeOn(AndroidSchedulers.mainThread())
+inline fun <reified T : Any> Flowable<T>.toMainThread(): Flowable<T> =
+    observeOn(AndroidSchedulers.mainThread())
 
-        fun <T : Any> Observable<T>.toMainThread(): Observable<T> =
-            observeOn(AndroidSchedulers.mainThread())
+inline fun <reified T : Any> Observable<T>.toMainThread(): Observable<T> =
+    observeOn(AndroidSchedulers.mainThread())
 
-        fun Completable.fromIOToMain(): Completable =
-            subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+fun Completable.fromIOToMain(): Completable =
+    subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
 
-        fun SQLiteDatabase.query(
-            tableName: String,
-            columns: Array<String>,
-            where: String?,
-            args: Array<String>?
-        ): Cursor = query(tableName, columns, where, args, null, null, null)
+fun SQLiteDatabase.query(
+    tableName: String,
+    columns: Array<String>,
+    where: String?,
+    args: Array<String>?
+): Cursor = query(tableName, columns, where, args, null, null, null)
 
-        fun SQLiteDatabase.query(tablename: String, columns: Array<String>): Cursor =
-            query(tablename, columns, null, null)
+fun SQLiteDatabase.query(tableName: String, columns: Array<String>): Cursor =
+    query(tableName, columns, null, null)
 
-        fun Cursor.getNullableInt(columnName: String): Int? =
-            getColumnIndex(columnName).let { if (isNull(it)) null else getInt(it) }
+fun Cursor.getNullableInt(columnName: String): Int? =
+    getColumnIndex(columnName).let { if (it < 0) null else getInt(it) }
 
-        fun Cursor.getInt(columnName: String): Int = getInt(getColumnIndexOrThrow(columnName))
+fun Cursor.getInt(columnName: String): Int = getInt(getColumnIndexOrThrow(columnName))
 
-        fun Cursor.getLong(columnName: String): Long = getLong(getColumnIndexOrThrow(columnName))
+fun Cursor.getLong(columnName: String): Long = getLong(getColumnIndexOrThrow(columnName))
 
-        fun Cursor.getBoolean(columnName: String): Boolean =
-            getInt(getColumnIndexOrThrow(columnName)) == 1
+fun Cursor.getBoolean(columnName: String): Boolean =
+    getInt(getColumnIndexOrThrow(columnName)) == 1
 
-        fun Cursor.getNullableLong(columnName: String): Long? =
-            getColumnIndex(columnName).let { if (isNull(it)) null else getLong(it) }
+fun Cursor.getNullableLong(columnName: String): Long? =
+    getColumnIndex(columnName).let { if (it < 0) null else getLong(it) }
 
-        fun Cursor.getString(columnName: String): String? =
-            getString(getColumnIndexOrThrow(columnName))
+fun Cursor.getString(columnName: String): String? =
+    getString(getColumnIndexOrThrow(columnName))
 
-        fun Disposable.notDisposed(): Boolean = !isDisposed
+fun Disposable.notDisposed(): Boolean = !isDisposed
 
-        fun <T : Any> Collection<T>?.nullOrEmpty(): Boolean = if (this == null) true else size == 0
 
-        fun <T : Any> Collection<T>?.nonEmpty(): Boolean = if (this == null) false else size > 0
+inline fun <reified T> Collection<T>?.nonNullNoEmpty(): Boolean {
+    contract {
+        returns(true) implies (this@nonNullNoEmpty != null)
+    }
+    return this != null && !this.isEmpty()
+}
 
-        fun CharSequence?.nonEmpty(): Boolean = if (this == null) false else length > 0
+inline fun <reified T : CharSequence> T?.nonNullNoEmpty(): Boolean {
+    contract {
+        returns(true) implies (this@nonNullNoEmpty != null)
+    }
+    return this != null && this.isNotEmpty()
+}
 
-        fun <T : Any> Flowable<T>.subscribeIgnoreErrors(consumer: Consumer<in T>): Disposable =
-            subscribe(consumer, RxUtils.ignore())
+inline fun <reified K, reified V> Map<out K, V>?.nonNullNoEmpty(): Boolean {
+    contract {
+        returns(true) implies (this@nonNullNoEmpty != null)
+    }
+    return this != null && this.isNotEmpty()
+}
 
-        fun <T : Any> Single<T>.subscribeIgnoreErrors(consumer: Consumer<in T>): Disposable =
-            subscribe(consumer, RxUtils.ignore())
+fun IntArray?.nonNullNoEmpty(): Boolean {
+    contract {
+        returns(true) implies (this@nonNullNoEmpty != null)
+    }
+    return this != null && this.isNotEmpty()
+}
 
-        fun Completable.subscribeIOAndIgnoreResults(): Disposable =
-            subscribeOn(Schedulers.io()).subscribe(RxUtils.dummy(), RxUtils.ignore())
+fun IntArray?.nullOrEmpty(): Boolean {
+    contract {
+        returns(false) implies (this@nullOrEmpty != null)
+    }
+    return this == null || this.isEmpty()
+}
 
-        fun View.fadeOut(duration: Long, onEnd: () -> Unit = {}) {
-            ObjectAnimator.ofPropertyValuesHolder(
-                this,
-                PropertyValuesHolder.ofFloat(View.ALPHA, 1f, 0f)
-            ).apply {
-                this.duration = duration
-                addListener(object : StubAnimatorListener() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        onEnd()
-                    }
+inline fun <reified T : CharSequence> T?.trimmedIsNullOrEmpty(): Boolean {
+    contract {
+        returns(false) implies (this@trimmedIsNullOrEmpty != null)
+    }
+    return this == null || this.trim { it <= ' ' }.isEmpty()
+}
 
-                    override fun onAnimationEnd(animation: Animator?, isReverse: Boolean) {
-                        onEnd()
-                    }
-                })
-                start()
-            }
+inline fun <reified T : CharSequence> T?.trimmedNonNullNoEmpty(): Boolean {
+    contract {
+        returns(true) implies (this@trimmedNonNullNoEmpty != null)
+    }
+    return this != null && this.trim { it <= ' ' }.isNotEmpty()
+}
+
+inline fun <reified T : CharSequence> T?.nonNullNoEmpty(block: (T) -> Unit) {
+    if (!isNullOrEmpty()) apply(block)
+}
+
+inline fun <reified T, reified E : Collection<T>> E?.nonNullNoEmpty(block: (E) -> Unit) {
+    if (!isNullOrEmpty()) apply(block)
+}
+
+inline fun <reified T : CharSequence> T?.trimmedNonNullNoEmpty(block: (T) -> Unit) {
+    this?.let {
+        if (trim { it <= ' ' }.isNotEmpty()) {
+            apply(block)
         }
+    }
+}
 
-        fun View.show() {
-            visibility = View.VISIBLE
-        }
+inline fun <reified T : Any> Flowable<T>.subscribeIgnoreErrors(consumer: Consumer<in T>): Disposable =
+    subscribe(consumer, RxUtils.ignore())
 
-        fun View.hide() {
-            visibility = View.GONE
-        }
+inline fun <reified T : Any> Single<T>.subscribeIgnoreErrors(consumer: Consumer<in T>): Disposable =
+    subscribe(consumer, RxUtils.ignore())
 
-        fun View.fadeIn(duration: Long, onEnd: () -> Unit = {}) {
-            ObjectAnimator.ofPropertyValuesHolder(
-                this,
-                PropertyValuesHolder.ofFloat(View.ALPHA, 0f, 1f)
-            ).apply {
-                this.duration = duration
-                addListener(object : StubAnimatorListener() {
-                    override fun onAnimationEnd(animation: Animator?) {
-                        onEnd()
-                    }
+fun Completable.subscribeIOAndIgnoreResults(): Disposable =
+    subscribeOn(Schedulers.io()).subscribe(RxUtils.dummy(), RxUtils.ignore())
 
-                    override fun onAnimationEnd(animation: Animator?, isReverse: Boolean) {
-                        onEnd()
-                    }
-                })
-                start()
-            }
-        }
-
-        fun <T> MutableList<T>.insert(index: Int, element: T) {
-            if (index <= size) {
-                add(index, element)
-            } else {
-                add(element)
-            }
-        }
-
-        fun <T> MutableList<T>.insertAfter(index: Int, element: T) {
-            val cur = index + 1
-            if (cur <= size) {
-                add(cur, element)
-            } else {
-                add(element)
-            }
-        }
-
-        open class StubAnimatorListener : Animator.AnimatorListener {
-            override fun onAnimationRepeat(animation: Animator?) {
-
+inline fun View.fadeOut(duration: Long, crossinline onEnd: () -> Unit = {}) {
+    ObjectAnimator.ofPropertyValuesHolder(
+        this,
+        PropertyValuesHolder.ofFloat(View.ALPHA, 1f, 0f)
+    ).apply {
+        this.duration = duration
+        addListener(object : StubAnimatorListener() {
+            override fun onAnimationEnd(animation: Animator?) {
+                onEnd()
             }
 
             override fun onAnimationEnd(animation: Animator?, isReverse: Boolean) {
-
+                onEnd()
             }
+        })
+        start()
+    }
+}
 
+fun View.show() {
+    visibility = View.VISIBLE
+}
+
+fun View.hide() {
+    visibility = View.GONE
+}
+
+inline fun View.fadeIn(duration: Long, crossinline onEnd: () -> Unit = {}) {
+    ObjectAnimator.ofPropertyValuesHolder(
+        this,
+        PropertyValuesHolder.ofFloat(View.ALPHA, 0f, 1f)
+    ).apply {
+        this.duration = duration
+        addListener(object : StubAnimatorListener() {
             override fun onAnimationEnd(animation: Animator?) {
-
+                onEnd()
             }
 
-            override fun onAnimationCancel(animation: Animator?) {
-
+            override fun onAnimationEnd(animation: Animator?, isReverse: Boolean) {
+                onEnd()
             }
+        })
+        start()
+    }
+}
 
-            override fun onAnimationStart(animation: Animator?) {
+fun <T> MutableList<T>.insert(index: Int, element: T) {
+    if (index <= size) {
+        add(index, element)
+    } else {
+        add(element)
+    }
+}
 
-            }
-        }
+fun <T> MutableList<T>.insertAfter(index: Int, element: T) {
+    val cur = index + 1
+    if (cur <= size) {
+        add(cur, element)
+    } else {
+        add(element)
+    }
+}
+
+open class StubAnimatorListener : Animator.AnimatorListener {
+    override fun onAnimationRepeat(animation: Animator?) {
+
+    }
+
+    override fun onAnimationEnd(animation: Animator?, isReverse: Boolean) {
+
+    }
+
+    override fun onAnimationEnd(animation: Animator?) {
+
+    }
+
+    override fun onAnimationCancel(animation: Animator?) {
+
+    }
+
+    override fun onAnimationStart(animation: Animator?) {
+
     }
 }

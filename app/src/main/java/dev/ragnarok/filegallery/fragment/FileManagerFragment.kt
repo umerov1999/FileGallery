@@ -22,18 +22,19 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dev.ragnarok.filegallery.Constants
-import dev.ragnarok.filegallery.Extensions.Companion.fromIOToMain
 import dev.ragnarok.filegallery.Extra
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.activity.ActivityFeatures
 import dev.ragnarok.filegallery.adapter.FileManagerAdapter
 import dev.ragnarok.filegallery.adapter.FileManagerAdapter.ClickListener
 import dev.ragnarok.filegallery.fragment.base.BaseMvpFragment
+import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.listener.*
 import dev.ragnarok.filegallery.media.music.MusicPlaybackController
 import dev.ragnarok.filegallery.media.music.MusicPlaybackService
 import dev.ragnarok.filegallery.model.*
 import dev.ragnarok.filegallery.mvp.core.IPresenterFactory
+import dev.ragnarok.filegallery.mvp.core.PresenterAction
 import dev.ragnarok.filegallery.mvp.presenter.FileManagerPresenter
 import dev.ragnarok.filegallery.mvp.view.IFileManagerView
 import dev.ragnarok.filegallery.place.PlaceFactory
@@ -71,10 +72,17 @@ class FileManagerFragment : BaseMvpFragment<FileManagerPresenter, IFileManagerVi
     private val requestPhotoUpdate = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
-        if (result.resultCode == Activity.RESULT_OK && result.data != null && result.data!!
+        if (result.resultCode == Activity.RESULT_OK && result.data != null && (result.data
+                ?: return@registerForActivityResult)
                 .extras != null
         ) {
-            presenter?.scrollTo(result.data!!.extras!!.getString(Extra.PATH)!!)
+            postPresenterReceive(object : PresenterAction<FileManagerPresenter, IFileManagerView> {
+                override fun call(presenter: FileManagerPresenter) {
+                    presenter.scrollTo(
+                        ((result.data ?: return).extras ?: return).getString(Extra.PATH) ?: return
+                    )
+                }
+            })
         }
     }
 
@@ -112,7 +120,9 @@ class FileManagerFragment : BaseMvpFragment<FileManagerPresenter, IFileManagerVi
         parentFragmentManager.setFragmentResultListener(
             TagOwnerBottomSheetSelected.SELECTED_OWNER_KEY, this
         ) { _: String?, result: Bundle ->
-            presenter?.setSelectedOwner(result.getParcelable(Extra.NAME)!!)
+            presenter?.setSelectedOwner(
+                result.getParcelable(Extra.NAME) ?: return@setFragmentResultListener
+            )
         }
     }
 

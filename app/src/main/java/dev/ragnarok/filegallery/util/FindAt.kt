@@ -1,5 +1,7 @@
 package dev.ragnarok.filegallery.util
 
+import dev.ragnarok.filegallery.nonNullNoEmpty
+
 class FindAt {
 
     constructor() {
@@ -27,7 +29,7 @@ class FindAt {
     }
 
     fun do_compare(q: String?): Boolean {
-        if (Utils.isEmpty(q) && Utils.isEmpty(this.q) || !Utils.isEmpty(this.q) && !Utils.isEmpty(q) && this.q.equals(
+        if (q.isNullOrEmpty() && this.q.isNullOrEmpty() || this.q.nonNullNoEmpty() && q.nonNullNoEmpty() && this.q.equals(
                 q,
                 ignoreCase = true
             )
@@ -54,7 +56,7 @@ class FindAt {
     }
 
     fun isSearchMode(): Boolean {
-        return !Utils.isEmpty(q)
+        return q.nonNullNoEmpty()
     }
 
     fun getOffset(): Int {

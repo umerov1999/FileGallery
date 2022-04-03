@@ -47,7 +47,10 @@ class PicassoInstance @SuppressLint("CheckResult") private constructor(
         Logger.d(TAG, "Picasso singleton creation")
         getCache_data()
         val builder: OkHttpClient.Builder = OkHttpClient.Builder()
-            .cache(cache_data) //.addNetworkInterceptor(chain -> chain.proceed(chain.request()).newBuilder().header("Cache-Control", "max-age=31536000,public").build())
+            .cache(cache_data).addNetworkInterceptor(Interceptor { chain: Interceptor.Chain ->
+                chain.proceed(chain.request()).newBuilder()
+                    .header("Cache-Control", "max-age=86400").build()
+            })
             .addInterceptor(Interceptor { chain: Interceptor.Chain ->
                 val request = chain.request().newBuilder()
                     .addHeader("User-Agent", Constants.USER_AGENT).build()
@@ -73,12 +76,10 @@ class PicassoInstance @SuppressLint("CheckResult") private constructor(
             instance = PicassoInstance(context.applicationContext)
         }
 
-        @JvmStatic
         fun with(): Picasso {
             return instance!!.getSingleton()
         }
 
-        @JvmStatic
         fun getCoversPath(context: Context): File {
             val cache = File(context.cacheDir, "covers-cache")
             //val cache = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "covers-cache")
@@ -88,7 +89,6 @@ class PicassoInstance @SuppressLint("CheckResult") private constructor(
             return cache
         }
 
-        @JvmStatic
         @Throws(IOException::class)
         fun clear_cache() {
             instance?.getCache_data()

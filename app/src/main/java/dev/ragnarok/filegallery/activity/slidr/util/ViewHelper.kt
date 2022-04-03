@@ -13,7 +13,6 @@ import dev.ragnarok.filegallery.view.TouchImageView
 import java.util.*
 
 object ViewHelper {
-    @JvmStatic
     fun hasScrollableChildUnderPoint(
         mView: View,
         direction: SlidrPosition,

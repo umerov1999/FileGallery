@@ -97,12 +97,14 @@ open class Place : Parcelable {
     }
 
     fun applyFragmentListener(fragment: Fragment, fragmentManager: FragmentManager) {
-        if (requestListener != null) {
-            fragmentManager.setFragmentResultListener(
-                requestListenerKey!!,
-                fragment,
-                requestListener!!
-            )
+        requestListener?.let {
+            requestListenerKey?.let { it1 ->
+                fragmentManager.setFragmentResultListener(
+                    it1,
+                    fragment,
+                    it
+                )
+            }
         }
     }
 

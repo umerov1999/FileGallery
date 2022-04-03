@@ -24,7 +24,7 @@ class App : Application() {
         AppCompatDelegate.setDefaultNightMode(Settings.get().main().getNightMode())
         GalleryNative.loadNativeLibrary { it.printStackTrace() }
         GalleryNative.updateAppContext(this)
-        GalleryNative.updateDensity { Utils.getDensity() }
+        GalleryNative.updateDensity { Utils.density }
         ConstructorConstructor.setLogUnsafe(Settings.get().main().isDeveloper_mode())
 
         if (GalleryNative.isNativeLoaded()) {
@@ -45,13 +45,11 @@ class App : Application() {
         @Volatile
         private var sApplicationHandler: Handler? = null
 
-        @JvmStatic
         val applicationHandler: Handler?
             get() {
                 return sApplicationHandler
             }
 
-        @JvmStatic
         val instance: App
             get() {
                 checkNotNull(sInstanse) { "App instance is null!!! WTF???" }
