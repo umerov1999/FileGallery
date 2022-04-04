@@ -50,7 +50,7 @@ class RLottieShapeableImageView @JvmOverloads constructor(
     }
 
     private fun setAnimationByUrlCache(url: String, w: Int, h: Int) {
-        if (!GalleryNative.isNativeLoaded()) {
+        if (!GalleryNative.isNativeLoaded) {
             return
         }
         val ch = cache.fetch(url)
@@ -59,12 +59,20 @@ class RLottieShapeableImageView @JvmOverloads constructor(
             return
         }
         autoRepeat = false
-        setAnimation(RLottieDrawable(ch, true, w, h, false, false, null, false))
+        setAnimation(
+            RLottieDrawable(
+                ch, true, w, h,
+                precache = false,
+                limitFps = false,
+                colorReplacement = null,
+                useMoveColor = false
+            )
+        )
         playAnimation()
     }
 
     fun fromNet(url: String?, client: OkHttpClient.Builder, w: Int, h: Int) {
-        if (!GalleryNative.isNativeLoaded() || url == null || url.isEmpty()) {
+        if (!GalleryNative.isNativeLoaded || url == null || url.isEmpty()) {
             return
         }
         clearAnimationDrawable()
@@ -125,7 +133,7 @@ class RLottieShapeableImageView @JvmOverloads constructor(
         colorReplacement: IntArray? = null,
         useMoveColor: Boolean = false
     ) {
-        if (!GalleryNative.isNativeLoaded()) {
+        if (!GalleryNative.isNativeLoaded) {
             return
         }
         clearAnimationDrawable()
@@ -143,11 +151,19 @@ class RLottieShapeableImageView @JvmOverloads constructor(
     }
 
     fun fromFile(file: File, w: Int, h: Int) {
-        if (!GalleryNative.isNativeLoaded()) {
+        if (!GalleryNative.isNativeLoaded) {
             return
         }
         clearAnimationDrawable()
-        setAnimation(RLottieDrawable(file, false, w, h, false, false, null, false))
+        setAnimation(
+            RLottieDrawable(
+                file, false, w, h,
+                precache = false,
+                limitFps = false,
+                colorReplacement = null,
+                useMoveColor = false
+            )
+        )
     }
 
     fun clearAnimationDrawable() {
@@ -266,7 +282,7 @@ class RLottieShapeableImageView @JvmOverloads constructor(
         val width = a.getDimension(R.styleable.RLottieImageView_w, 28f).toInt()
         val height = a.getDimension(R.styleable.RLottieImageView_h, 28f).toInt()
         a.recycle()
-        if (GalleryNative.isNativeLoaded() && animRes != 0) {
+        if (GalleryNative.isNativeLoaded && animRes != 0) {
             animatedDrawable =
                 RLottieDrawable(animRes, "" + animRes, width, height, false, null, false)
             setAnimation(animatedDrawable!!)

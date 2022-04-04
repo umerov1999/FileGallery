@@ -186,7 +186,7 @@ class PhotosLocalServerPresenter(savedInstanceState: Bundle?) :
     }
 
     fun updateInfo(position: Int, ptr: Long) {
-        val p = ParcelNative.fromNative(ptr).readParcelableList(Photo.NativeCreator)
+        val p = ParcelNative.fromNative(ptr).readParcelableList(Photo.NativeCreator)!!
         photos.clear()
         photos.addAll(p)
         view?.scrollTo(

@@ -99,7 +99,7 @@ class FileExistJVM : AbsFileExist {
             val list = stores.searchQueriesStore().getAllTagDirs().blockingGet()
             CachedTags.clear()
             for (u in list) {
-                CachedTags.add(u.path)
+                u.path?.let { it1 -> CachedTags.add(it1) }
             }
             setBusy(false)
         }

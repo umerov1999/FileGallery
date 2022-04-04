@@ -48,8 +48,8 @@ class TagDirPresenter(private val owner_id: Int, savedInstanceState: Bundle?) :
                 if (i.name.isNullOrEmpty()) {
                     continue
                 }
-                if (i.name.lowercase(Locale.getDefault())
-                        .contains(q?.lowercase(Locale.getDefault()).toString())
+                if (i.name?.lowercase(Locale.getDefault())
+                        ?.contains(q?.lowercase(Locale.getDefault()).toString()) == true
                 ) {
                     tagDirDataSearch.add(i)
                 }
@@ -151,15 +151,14 @@ class TagDirPresenter(private val owner_id: Int, savedInstanceState: Bundle?) :
                 audio.thumb_image = "thumb_file://" + i.path
 
                 var TrackName: String =
-                    i.name
-                        .replace(".mp3", "")
+                    i.name?.replace(".mp3", "") ?: ""
                 val Artist: String
                 val arr = TrackName.split(" - ").toTypedArray()
                 if (arr.size > 1) {
                     Artist = arr[0]
                     TrackName = TrackName.replace("$Artist - ", "")
                 } else {
-                    Artist = i.name
+                    Artist = i.name ?: ""
                 }
                 audio.setIsLocal()
                 audio.artist = Artist

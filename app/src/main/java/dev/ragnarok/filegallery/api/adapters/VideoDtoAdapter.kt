@@ -7,7 +7,7 @@ import com.google.gson.JsonParseException
 import dev.ragnarok.filegallery.model.Video
 import java.lang.reflect.Type
 
-class VideoDtoAdapter : AbsAdapter(), JsonDeserializer<Video?> {
+class VideoDtoAdapter : AbsAdapter(), JsonDeserializer<Video> {
     @Throws(JsonParseException::class)
     override fun deserialize(
         json: JsonElement,

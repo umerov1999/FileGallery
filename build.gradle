@@ -4,19 +4,18 @@ buildscript {
     ext.filegalleryNdk = '24.0.8215888'
     ext.filegalleryMinSDK = 21
     ext.filegalleryTargetSDK = 31
-    ext.FileGalleryVersionCode = 1
-    ext.FileGalleryVersionName = '1.00'
+    ext.FileGalleryVersionCode = 2
+    ext.FileGalleryVersionName = '1.02'
 
-    ext.kotlin_version = '1.6.20-RC2'
+    ext.kotlin_version = '1.6.20'
     ext.kotlin_coroutines = '1.6.0'
-    ext.retrofitLibraryVersion = '2.9.0'
     ext.okhttpLibraryVersion = '5.0.0-alpha.6'
     ext.okioVersion = '3.0.0'
     ext.rxJavaVersion = '3.1.4'
     ext.rxAndroidVersion = '3.0.0'
     ext.guavaVersion = '31.1-android'
     ext.exoLibraryVersion = '2.17.1'
-    ext.checkerQualVersion = '3.21.3'
+    ext.checkerQualVersion = '3.21.4'
     ext.annotationVersion = '1.3.0'
     ext.coreVersion = '1.7.0'
     ext.appcompatVersion = '1.4.1'
@@ -38,7 +37,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.1.2'
-        classpath 'com.google.gms:google-services:4.3.10'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }

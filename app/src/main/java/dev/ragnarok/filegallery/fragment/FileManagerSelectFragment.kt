@@ -139,7 +139,7 @@ class FileManagerSelectFragment :
 
     override fun onClick(position: Int, item: FileItemSelect) {
         if (item.isDir) {
-            val sel = File(item.file_path)
+            val sel = File(item.file_path ?: return)
             mLayoutManager?.onSaveInstanceState()?.let { presenter?.backupDirectoryScroll(it) }
             presenter?.setCurrent(sel)
         } else {

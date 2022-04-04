@@ -7,7 +7,7 @@ import com.google.gson.JsonParseException
 import dev.ragnarok.filegallery.model.Audio
 import java.lang.reflect.Type
 
-class AudioDtoAdapter : AbsAdapter(), JsonDeserializer<Audio?> {
+class AudioDtoAdapter : AbsAdapter(), JsonDeserializer<Audio> {
     @Throws(JsonParseException::class)
     override fun deserialize(
         json: JsonElement,

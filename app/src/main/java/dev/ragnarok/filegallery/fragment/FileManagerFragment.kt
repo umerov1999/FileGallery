@@ -212,7 +212,7 @@ class FileManagerFragment : BaseMvpFragment<FileManagerPresenter, IFileManagerVi
 
     override fun onClick(position: Int, item: FileItem) {
         if (item.type == FileType.folder) {
-            val sel = File(item.file_path)
+            val sel = File(item.file_path ?: return)
             if (presenter?.canRefresh() == true) {
                 mLayoutManager?.onSaveInstanceState()?.let { presenter?.backupDirectoryScroll(it) }
                 presenter?.setCurrent(sel)
@@ -227,11 +227,11 @@ class FileManagerFragment : BaseMvpFragment<FileManagerPresenter, IFileManagerVi
     }
 
     override fun onFixDir(item: FileItem) {
-        presenter?.fireFixDirTime(item.file_path)
+        item.file_path?.let { presenter?.fireFixDirTime(it) }
     }
 
     override fun onUpdateTimeFile(item: FileItem) {
-        val tmp = File(item.file_path)
+        val tmp = File(item.file_path ?: return)
         if (tmp.setLastModified(Calendar.getInstance().time.time)) {
             showMessage(R.string.success)
             presenter?.loadFiles(back = false, caches = false)

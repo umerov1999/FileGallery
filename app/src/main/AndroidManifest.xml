@@ -47,7 +47,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.FileManagerActivity" />
+        <activity
+            android:name=".activity.FileManagerSelectActivity"
+            android:theme="@style/App.DayNight.Swipes" />
 
         <activity
             android:name=".activity.PhotoPagerActivity"

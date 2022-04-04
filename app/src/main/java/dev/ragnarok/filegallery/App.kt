@@ -22,12 +22,20 @@ class App : Application() {
         sApplicationHandler = Handler(mainLooper)
         super.onCreate()
         AppCompatDelegate.setDefaultNightMode(Settings.get().main().getNightMode())
-        GalleryNative.loadNativeLibrary { it.printStackTrace() }
+        GalleryNative.loadNativeLibrary(object : GalleryNative.NativeOnException {
+            override fun onException(e: Error) {
+                e.printStackTrace()
+            }
+        })
         GalleryNative.updateAppContext(this)
-        GalleryNative.updateDensity { Utils.density }
+        GalleryNative.updateDensity(object : GalleryNative.OnGetDensity {
+            override fun get(): Float {
+                return Utils.density
+            }
+        })
         ConstructorConstructor.setLogUnsafe(Settings.get().main().isDeveloper_mode())
 
-        if (GalleryNative.isNativeLoaded()) {
+        if (GalleryNative.isNativeLoaded) {
             MusicPlaybackController.tracksExist = FileExistNative()
         } else {
             MusicPlaybackController.tracksExist = FileExistJVM()

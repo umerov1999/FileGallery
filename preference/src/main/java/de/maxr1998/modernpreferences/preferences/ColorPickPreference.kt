@@ -24,13 +24,13 @@ class ColorPickPreference(key: String, fragmentManager: FragmentManager) :
 
     var alphaSlider = false
     var lightSlider = false
-    var border = false
+    private var border = false
 
     @ColorInt
     var selectedColor = 0
         private set
 
-    var wheelType: WHEEL_TYPE = WHEEL_TYPE.FLOWER
+    private var wheelType: WHEEL_TYPE = WHEEL_TYPE.FLOWER
     var density = 0
 
     @ColorInt
@@ -38,7 +38,7 @@ class ColorPickPreference(key: String, fragmentManager: FragmentManager) :
     var colorBeforeChangeListener: OnColorBeforeChangeListener? = null
     var colorAfterChangeListener: OnColorAfterChangeListener? = null
 
-    var colorIndicator: ImageView? = null
+    private var colorIndicator: ImageView? = null
 
     fun copyColorPick(other: ColorPickPreference): ColorPickPreference {
         alphaSlider = other.alphaSlider

@@ -55,7 +55,7 @@ class FileExistNative : AbsFileExist {
             CachedAudios.clear()
             CachedTags.clear()
             for (u in list) {
-                CachedTags.insert(u.path)
+                u.path?.let { it1 -> CachedTags.insert(it1) }
             }
         }
     }

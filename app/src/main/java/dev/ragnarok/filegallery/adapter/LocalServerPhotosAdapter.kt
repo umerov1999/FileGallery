@@ -41,7 +41,7 @@ class LocalServerPhotosAdapter(private val mContext: Context, private var data: 
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val photo = data[position]
-        if (GalleryNative.isNativeLoaded()) {
+        if (GalleryNative.isNativeLoaded) {
             if (currentPosition == position) {
                 viewHolder.current.visibility = View.VISIBLE
                 viewHolder.current.fromRes(

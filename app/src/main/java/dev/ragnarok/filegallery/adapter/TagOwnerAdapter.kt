@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.model.tags.TagOwner
 import dev.ragnarok.filegallery.nonNullNoEmpty
-import dev.ragnarok.filegallery.picasso.transforms.RoundTransformation
 
 
 class TagOwnerAdapter(private var data: List<TagOwner>, private val context: Context) :
@@ -37,50 +36,49 @@ class TagOwnerAdapter(private var data: List<TagOwner>, private val context: Con
         }
     }
 
-    fun createGradientImage(width: Int, height: Int, owner_id: Int): Bitmap {
-        val pp = owner_id % 10
-        var Color1 = "#D81B60"
-        var Color2 = "#F48FB1"
-        when (pp) {
-            0 -> {
-                Color1 = "#FF0061"
-                Color2 = "#FF4200"
-            }
+    private fun createGradientImage(width: Int, height: Int, owner_id: Int): Bitmap {
+        val color1: String
+        val color2: String
+        when (owner_id % 10) {
             1 -> {
-                Color1 = "#00ABD6"
-                Color2 = "#8700D6"
+                color1 = "#cfe1b9"
+                color2 = "#718355"
             }
             2 -> {
-                Color1 = "#FF7900"
-                Color2 = "#FF9500"
+                color1 = "#e3d0d8"
+                color2 = "#c6d2ed"
             }
             3 -> {
-                Color1 = "#55D600"
-                Color2 = "#00D67A"
+                color1 = "#38a3a5"
+                color2 = "#80ed99"
             }
             4 -> {
-                Color1 = "#9400D6"
-                Color2 = "#D6008E"
+                color1 = "#9400D6"
+                color2 = "#D6008E"
             }
             5 -> {
-                Color1 = "#cd8fff"
-                Color2 = "#9100ff"
+                color1 = "#cd8fff"
+                color2 = "#9100ff"
             }
             6 -> {
-                Color1 = "#ff7f69"
-                Color2 = "#fe0bdb"
+                color1 = "#ff7f69"
+                color2 = "#fe0bdb"
             }
             7 -> {
-                Color1 = "#FE790B"
-                Color2 = "#0BFEAB"
+                color1 = "#07beb8"
+                color2 = "#c4fff9"
             }
             8 -> {
-                Color1 = "#9D0BFE"
-                Color2 = "#0BFEAB"
+                color1 = "#3a7ca5"
+                color2 = "#d9dcd6"
             }
             9 -> {
-                Color1 = "#9D0BFE"
-                Color2 = "#FEDF0B"
+                color1 = "#004e64"
+                color2 = "#7ae582"
+            }
+            else -> {
+                color1 = "#f5efff"
+                color2 = "#adadff"
             }
         }
         val bitmap: Bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
@@ -89,14 +87,23 @@ class TagOwnerAdapter(private var data: List<TagOwner>, private val context: Con
             0f,
             width.toFloat(),
             height.toFloat(),
-            Color.parseColor(Color1),
-            Color.parseColor(Color2),
+            Color.parseColor(color1),
+            Color.parseColor(color2),
             Shader.TileMode.CLAMP
         )
         val canvas = Canvas(bitmap)
-        val paint2 = Paint()
+        val paint2 = Paint(Paint.ANTI_ALIAS_FLAG)
         paint2.shader = gradient
-        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint2)
+        val pth = (width + height).toFloat() / 2
+        canvas.drawRoundRect(
+            0f,
+            0f,
+            width.toFloat(),
+            height.toFloat(),
+            pth * 0.35f,
+            pth * 0.35f,
+            paint2
+        )
         return bitmap
     }
 
@@ -112,7 +119,7 @@ class TagOwnerAdapter(private var data: List<TagOwner>, private val context: Con
         }
 
         if (item.name.nonNullNoEmpty()) {
-            var name: String = item.name
+            var name: String = item.name ?: ""
             if (name.length > 2) name = name.substring(0, 2)
             name = name.trim { it <= ' ' }
             holder.tvBackgroundText.text = name
@@ -120,12 +127,10 @@ class TagOwnerAdapter(private var data: List<TagOwner>, private val context: Con
             holder.tvBackgroundText.visibility = View.GONE
         }
         holder.tvBackgroundImage.setImageBitmap(
-            RoundTransformation().localTransform(
-                createGradientImage(
-                    200,
-                    200,
-                    item.id
-                )
+            createGradientImage(
+                200,
+                200,
+                item.id
             )
         )
     }

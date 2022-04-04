@@ -26,7 +26,7 @@ class TmpGalleryPagerPresenter(
         currentIndex = index
         changeLoadingNowState(true)
         onInitialLoadingFinished(
-            ParcelNative.fromNative(source).readParcelableList(Photo.NativeCreator)
+            ParcelNative.fromNative(source).readParcelableList(Photo.NativeCreator)!!
         )
     }
 }

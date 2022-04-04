@@ -200,7 +200,7 @@ class FileManagerPresenter(
         return parent != null && parent.canRead()
     }
 
-    fun loadCache(back: Boolean) {
+    private fun loadCache(back: Boolean) {
         isLoading = true
         view?.resolveEmptyText(false)
         view?.resolveLoading(isLoading)
@@ -430,16 +430,18 @@ class FileManagerPresenter(
         if (selectedOwner != null) {
             item.checkTag()
             if (item.isHasTag) {
-                appendDisposable(
-                    Includes.stores.searchQueriesStore().deleteTagDirByPath(item.file_path)
-                        .fromIOToMain().subscribe({
-                            item.checkTag()
-                            val list = if (q == null) fileList else fileListSearch
-                            view?.notifyItemChanged(list.indexOf(item))
-                        }, {
-                            view?.onError(it)
-                        })
-                )
+                item.file_path?.let { op ->
+                    appendDisposable(
+                        Includes.stores.searchQueriesStore().deleteTagDirByPath(op)
+                            .fromIOToMain().subscribe({
+                                item.checkTag()
+                                val list = if (q == null) fileList else fileListSearch
+                                view?.notifyItemChanged(list.indexOf(item))
+                            }, {
+                                view?.onError(it)
+                            })
+                    )
+                }
             } else {
                 appendDisposable(
                     Includes.stores.searchQueriesStore()
@@ -512,15 +514,14 @@ class FileManagerPresenter(
                 audio.duration = i.size.toInt()
 
                 var TrackName: String =
-                    i.file_name
-                        .replace(".mp3", "")
+                    i.file_name?.replace(".mp3", "") ?: ""
                 val Artist: String
                 val arr = TrackName.split(" - ").toTypedArray()
                 if (arr.size > 1) {
                     Artist = arr[0]
                     TrackName = TrackName.replace("$Artist - ", "")
                 } else {
-                    Artist = i.parent_name
+                    Artist = i.parent_name ?: ""
                 }
                 audio.setIsLocal()
                 audio.artist = Artist

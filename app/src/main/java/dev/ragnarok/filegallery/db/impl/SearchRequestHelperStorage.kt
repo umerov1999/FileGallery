@@ -21,6 +21,7 @@ import io.reactivex.rxjava3.core.CompletableEmitter
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.core.SingleEmitter
 import java.io.File
+import java.util.*
 
 class SearchRequestHelperStorage internal constructor(context: Context) :
     ISearchRequestHelperStorage {
@@ -421,7 +422,7 @@ class SearchRequestHelperStorage internal constructor(context: Context) :
                     val cv = ContentValues()
                     cv.put(TagOwnerColumns.NAME, p.name)
                     val v = Math.toIntExact(db.insert(TagOwnerColumns.TABLENAME, null, cv))
-                    for (kk in p.dirs) {
+                    for (kk in (p.dirs ?: Collections.emptyList())) {
                         val cvDir = ContentValues()
                         cvDir.put(TagDirsColumns.OWNER_ID, v)
                         cvDir.put(TagDirsColumns.NAME, kk.name)

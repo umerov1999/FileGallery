@@ -17,8 +17,8 @@ import dev.ragnarok.filegallery.Constants
 import dev.ragnarok.filegallery.Includes
 import dev.ragnarok.filegallery.fragment.FileManagerFragment.Companion.isExtension
 import dev.ragnarok.filegallery.module.GalleryNative
-import dev.ragnarok.filegallery.module.StringExist
-import dev.ragnarok.filegallery.module.animation.AnimatedFileDrawable
+import dev.ragnarok.filegallery.module.StringHash
+import dev.ragnarok.filegallery.module.animation.AnimatedFileFrame
 import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.util.CoverSafeResize
 import dev.ragnarok.filegallery.util.Utils
@@ -30,7 +30,7 @@ import java.util.*
 class PicassoMediaMetadataHandler(val context: Context) : RequestHandler() {
     companion object {
         fun toSha1(str: String): String {
-            return StringExist.calculateSha1(str)
+            return StringHash.calculateSha1(str)
         }
     }
 
@@ -151,7 +151,7 @@ class PicassoMediaMetadataHandler(val context: Context) : RequestHandler() {
                 Settings.get().main().videoExt()
             ) || requestUri.toString().endsWith("gif", true) -> {
                 var target =
-                    if (GalleryNative.isNativeLoaded()) AnimatedFileDrawable.getThumbnail(requestUri.toFile().absoluteFile) else null
+                    if (GalleryNative.isNativeLoaded) AnimatedFileFrame.getThumbnail(requestUri.toFile().absoluteFile) else null
                 if (target == null) {
                     dir.createNewFile()
                     callback.onError(Throwable("Thumb work error"))

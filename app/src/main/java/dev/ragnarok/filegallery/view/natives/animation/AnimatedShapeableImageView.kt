@@ -42,7 +42,7 @@ class AnimatedShapeableImageView @JvmOverloads constructor(
     }
 
     private fun setAnimationByUrlCache(url: String, fade: Boolean) {
-        if (!GalleryNative.isNativeLoaded()) {
+        if (!GalleryNative.isNativeLoaded) {
             decoderCallback?.onLoaded(false)
             return
         }
@@ -52,14 +52,25 @@ class AnimatedShapeableImageView @JvmOverloads constructor(
             decoderCallback?.onLoaded(false)
             return
         }
-        setAnimation(AnimatedFileDrawable(ch, 0, defaultWidth, defaultHeight, fade) {
-            decoderCallback?.onLoaded(false)
-        })
+        setAnimation(
+            AnimatedFileDrawable(
+                ch,
+                0,
+                defaultWidth,
+                defaultHeight,
+                fade,
+                object : AnimatedFileDrawable.DecoderListener {
+                    override fun onError() {
+                        decoderCallback?.onLoaded(false)
+                    }
+
+                })
+        )
         playAnimation()
     }
 
     private fun setAnimationByResCache(@RawRes res: Int, fade: Boolean) {
-        if (!GalleryNative.isNativeLoaded()) {
+        if (!GalleryNative.isNativeLoaded) {
             decoderCallback?.onLoaded(false)
             return
         }
@@ -69,14 +80,25 @@ class AnimatedShapeableImageView @JvmOverloads constructor(
             decoderCallback?.onLoaded(false)
             return
         }
-        setAnimation(AnimatedFileDrawable(ch, 0, defaultWidth, defaultHeight, fade) {
-            decoderCallback?.onLoaded(false)
-        })
+        setAnimation(
+            AnimatedFileDrawable(
+                ch,
+                0,
+                defaultWidth,
+                defaultHeight,
+                fade,
+                object : AnimatedFileDrawable.DecoderListener {
+                    override fun onError() {
+                        decoderCallback?.onLoaded(false)
+                    }
+
+                })
+        )
         playAnimation()
     }
 
     fun fromNet(key: String, url: String?, client: OkHttpClient.Builder) {
-        if (!GalleryNative.isNativeLoaded() || url == null || url.isEmpty()) {
+        if (!GalleryNative.isNativeLoaded || url == null || url.isEmpty()) {
             decoderCallback?.onLoaded(false)
             return
         }
@@ -118,7 +140,7 @@ class AnimatedShapeableImageView @JvmOverloads constructor(
     }
 
     fun fromRes(@RawRes res: Int) {
-        if (!GalleryNative.isNativeLoaded()) {
+        if (!GalleryNative.isNativeLoaded) {
             decoderCallback?.onLoaded(false)
             return
         }
@@ -160,14 +182,25 @@ class AnimatedShapeableImageView @JvmOverloads constructor(
     }
 
     fun fromFile(file: File) {
-        if (!GalleryNative.isNativeLoaded()) {
+        if (!GalleryNative.isNativeLoaded) {
             decoderCallback?.onLoaded(false)
             return
         }
         clearAnimationDrawable()
-        setAnimation(AnimatedFileDrawable(file, 0, defaultWidth, defaultHeight, false) {
-            decoderCallback?.onLoaded(false)
-        })
+        setAnimation(
+            AnimatedFileDrawable(
+                file,
+                0,
+                defaultWidth,
+                defaultHeight,
+                false,
+                object : AnimatedFileDrawable.DecoderListener {
+                    override fun onError() {
+                        decoderCallback?.onLoaded(false)
+                    }
+
+                })
+        )
     }
 
     fun clearAnimationDrawable() {
@@ -269,7 +302,7 @@ class AnimatedShapeableImageView @JvmOverloads constructor(
 
     private fun copyRes(@RawRes rawRes: Int): Boolean {
         try {
-            GalleryNative.getAppContext().resources.openRawResource(rawRes).use { inputStream ->
+            context.resources.openRawResource(rawRes).use { inputStream ->
                 val out = File(
                     parentResDir(
                         context

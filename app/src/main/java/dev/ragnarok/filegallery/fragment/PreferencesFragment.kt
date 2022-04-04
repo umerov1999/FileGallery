@@ -41,7 +41,7 @@ import dev.ragnarok.filegallery.*
 import dev.ragnarok.filegallery.Includes.provideApplicationContext
 import dev.ragnarok.filegallery.activity.ActivityFeatures
 import dev.ragnarok.filegallery.activity.ActivityUtils
-import dev.ragnarok.filegallery.activity.FileManagerActivity
+import dev.ragnarok.filegallery.activity.FileManagerSelectActivity
 import dev.ragnarok.filegallery.listener.BackPressCallback
 import dev.ragnarok.filegallery.listener.CanBackPressedCallback
 import dev.ragnarok.filegallery.listener.OnSectionResumeCallback
@@ -473,7 +473,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 iconRes = R.drawable.dir_song
                 onClick {
                     musicDir.launch(
-                        FileManagerActivity.makeFileManager(
+                        FileManagerSelectActivity.makeFileManager(
                             requireActivity(),
                             Environment.getExternalStorageDirectory().absolutePath,
                             "dirs"
@@ -488,7 +488,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 iconRes = R.drawable.dir_photo
                 onClick {
                     photoDir.launch(
-                        FileManagerActivity.makeFileManager(
+                        FileManagerSelectActivity.makeFileManager(
                             requireActivity(),
                             Environment.getExternalStorageDirectory().absolutePath,
                             "dirs"
@@ -503,7 +503,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 iconRes = R.drawable.dir_video
                 onClick {
                     videoDir.launch(
-                        FileManagerActivity.makeFileManager(
+                        FileManagerSelectActivity.makeFileManager(
                             requireActivity(),
                             Environment.getExternalStorageDirectory().absolutePath,
                             "dirs"
@@ -647,7 +647,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 titleRes = R.string.export_settings
                 onClick {
                     exportSettings.launch(
-                        FileManagerActivity.makeFileManager(
+                        FileManagerSelectActivity.makeFileManager(
                             requireActivity(),
                             Environment.getExternalStorageDirectory().absolutePath,
                             "dirs"
@@ -660,7 +660,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 titleRes = R.string.import_settings
                 onClick {
                     importSettings.launch(
-                        FileManagerActivity.makeFileManager(
+                        FileManagerSelectActivity.makeFileManager(
                             requireActivity(),
                             Environment.getExternalStorageDirectory().absolutePath,
                             "json"
@@ -676,7 +676,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
             onClick {
                 val view = View.inflate(requireActivity(), R.layout.dialog_about_us, null)
                 val anim: RLottieImageView = view.findViewById(R.id.lottie_animation)
-                if (GalleryNative.isNativeLoaded()) {
+                if (GalleryNative.isNativeLoaded) {
                     anim.fromRes(
                         R.raw.fenrir,
                         Utils.dp(170f),

@@ -43,7 +43,6 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import java.io.File
 
-
 class FileManagerAdapter(private var context: Context, private var data: List<FileItem>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val colorPrimary = CurrentTheme.getColorPrimary(context)
@@ -223,16 +222,14 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
         t.thumb_image = "thumb_file://" + audio.file_path
         t.duration = audio.size.toInt()
 
-        var TrackName: String =
-            audio.file_name
-                .replace(".mp3", "")
+        var TrackName: String = audio.file_name?.replace(".mp3", "") ?: ""
         val Artist: String
         val arr = TrackName.split(" - ").toTypedArray()
         if (arr.size > 1) {
             Artist = arr[0]
             TrackName = TrackName.replace("$Artist - ", "")
         } else {
-            Artist = audio.parent_name
+            Artist = audio.parent_name ?: ""
         }
         t.setIsLocal()
         t.artist = Artist
@@ -324,7 +321,7 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
                                 FileProvider.getUriForFile(
                                     context,
                                     Constants.FILE_PROVIDER_AUTHORITY,
-                                    File(audio.file_path)
+                                    File(audio.file_path ?: return)
                                 ), MimeTypeMap.getSingleton()
                                     .getMimeTypeFromExtension(File(audio.file_path).extension)
                             ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -333,7 +330,7 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
                         AudioLocalOption.share_item -> {
                             val intent_send = Intent(Intent.ACTION_SEND)
                             intent_send.type = MimeTypeMap.getSingleton()
-                                .getMimeTypeFromExtension(File(audio.file_path).extension)
+                                .getMimeTypeFromExtension(File(audio.file_path ?: return).extension)
                             intent_send.putExtra(
                                 Intent.EXTRA_STREAM, FileProvider.getUriForFile(
                                     context,
@@ -356,7 +353,7 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
     private fun onBindAudioHolder(holder: AudioHolder, position: Int) {
         val item = data[position]
 
-        if (GalleryNative.isNativeLoaded()) {
+        if (GalleryNative.isNativeLoaded) {
             if (item.isSelected) {
                 holder.current.visibility = View.VISIBLE
                 holder.current.fromRes(
@@ -466,7 +463,7 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
                                 FileProvider.getUriForFile(
                                     context,
                                     Constants.FILE_PROVIDER_AUTHORITY,
-                                    File(file.file_path)
+                                    File(file.file_path ?: return)
                                 ), MimeTypeMap.getSingleton()
                                     .getMimeTypeFromExtension(File(file.file_path).extension)
                             ).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -475,7 +472,7 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
                         AudioLocalOption.share_item -> {
                             val intent_send = Intent(Intent.ACTION_SEND)
                             intent_send.type = MimeTypeMap.getSingleton()
-                                .getMimeTypeFromExtension(File(file.file_path).extension)
+                                .getMimeTypeFromExtension(File(file.file_path ?: return).extension)
                             intent_send.putExtra(
                                 Intent.EXTRA_STREAM, FileProvider.getUriForFile(
                                     context,
@@ -534,7 +531,7 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
     private fun onBindFileHolder(holder: FileHolder, position: Int) {
         val item = data[position]
 
-        if (GalleryNative.isNativeLoaded()) {
+        if (GalleryNative.isNativeLoaded) {
             if (item.isSelected) {
                 holder.current.visibility = View.VISIBLE
                 holder.current.fromRes(

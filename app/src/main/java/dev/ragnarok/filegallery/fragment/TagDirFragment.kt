@@ -156,7 +156,9 @@ class TagDirFragment : AbsMvpFragment<TagDirPresenter, ITagDirView>(), ITagDirVi
 
     override fun onClick(position: Int, item: TagDir) {
         if (item.type == FileType.folder) {
-            PlaceFactory.getFileManagerPlace(item.path, true).tryOpenWith(requireActivity())
+            item.path?.let {
+                PlaceFactory.getFileManagerPlace(it, true).tryOpenWith(requireActivity())
+            }
         } else {
             presenter?.onClickFile(item)
         }

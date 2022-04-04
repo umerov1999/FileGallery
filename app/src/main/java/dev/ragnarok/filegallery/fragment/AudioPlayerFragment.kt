@@ -722,7 +722,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
             override fun onBitmapFailed(e: Exception, errorDrawable: Drawable?) {
                 if (isAdded) {
                     ivCover.scaleType = ImageView.ScaleType.CENTER
-                    if (GalleryNative.isNativeLoaded()) {
+                    if (GalleryNative.isNativeLoaded) {
                         ivCover.fromRes(
                             R.raw.auidio_no_cover,
                             450,
@@ -757,7 +757,7 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
             } else {
                 PicassoInstance.with().cancelRequest(holderTarget)
                 ivCover.scaleType = ImageView.ScaleType.CENTER
-                if (GalleryNative.isNativeLoaded()) {
+                if (GalleryNative.isNativeLoaded) {
                     ivCover.fromRes(
                         R.raw.auidio_no_cover,
                         450,

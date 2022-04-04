@@ -163,11 +163,23 @@ open class TouchImageView @JvmOverloads constructor(
     }
 
     open fun fromFile(file: File) {
-        if (!GalleryNative.isNativeLoaded()) {
+        if (!GalleryNative.isNativeLoaded) {
             return
         }
         clearAnimationDrawable()
-        setAnimation(AnimatedFileDrawable(file, 0, 100, 100, true) {})
+        setAnimation(
+            AnimatedFileDrawable(
+                file,
+                0,
+                100,
+                100,
+                true,
+                object : AnimatedFileDrawable.DecoderListener {
+                    override fun onError() {
+
+                    }
+                })
+        )
     }
 
     open fun clearAnimationDrawable() {

@@ -7,7 +7,7 @@ import com.google.gson.JsonParseException
 import dev.ragnarok.filegallery.model.Photo
 import java.lang.reflect.Type
 
-class PhotoDtoAdapter : AbsAdapter(), JsonDeserializer<Photo?> {
+class PhotoDtoAdapter : AbsAdapter(), JsonDeserializer<Photo> {
     @Throws(JsonParseException::class)
     override fun deserialize(
         json: JsonElement,

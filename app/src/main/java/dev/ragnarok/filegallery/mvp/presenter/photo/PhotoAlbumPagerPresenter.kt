@@ -35,7 +35,7 @@ class PhotoAlbumPagerPresenter(
     }
 
     override fun close() {
-        if (GalleryNative.isNativeLoaded()) {
+        if (GalleryNative.isNativeLoaded) {
             val ptr = ParcelNative.createParcelableList(mPhotos, ParcelFlags.NULL_LIST)
             view?.returnInfo(
                 currentIndex,
@@ -74,7 +74,7 @@ class PhotoAlbumPagerPresenter(
     init {
         canLoad = true
         this.invertPhotoRev = invertPhotoRev
-        mPhotos.addAll(ParcelNative.fromNative(source).readParcelableList(Photo.NativeCreator))
+        mPhotos.addAll(ParcelNative.fromNative(source).readParcelableList(Photo.NativeCreator)!!)
         currentIndex = index
         refreshPagerView()
         resolveButtonsBarVisible()

@@ -117,7 +117,7 @@ class TagDirAdapter(context: Context, private var data: List<TagDir>) :
     private fun onBindAudioHolder(holder: AudioHolder, position: Int) {
         val item = data[position]
 
-        if (GalleryNative.isNativeLoaded()) {
+        if (GalleryNative.isNativeLoaded) {
             if (item.isSelected) {
                 holder.current.visibility = View.VISIBLE
                 holder.current.fromRes(
@@ -192,7 +192,7 @@ class TagDirAdapter(context: Context, private var data: List<TagDir>) :
 
     private fun onBindFileHolder(holder: FileHolder, position: Int) {
         val item = data[position]
-        if (GalleryNative.isNativeLoaded()) {
+        if (GalleryNative.isNativeLoaded) {
             if (item.isSelected) {
                 holder.current.visibility = View.VISIBLE
                 holder.current.fromRes(
