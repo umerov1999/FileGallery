@@ -14,4 +14,5 @@ object Extra {
     const val EXT = "ext"
     const val HIDE_TITLE = "hide_tittle"
     const val TITLE = "tittle"
+    const val STACK_TRACE = "stack_trace"
 }

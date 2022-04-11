@@ -12,7 +12,6 @@ import com.squareup.picasso3.BitmapUtils
 import com.squareup.picasso3.Picasso
 import com.squareup.picasso3.Request
 import com.squareup.picasso3.RequestHandler
-import com.yalantis.ucrop.util.BitmapLoadUtils.getExifOrientation
 import dev.ragnarok.filegallery.Constants
 import dev.ragnarok.filegallery.Includes
 import dev.ragnarok.filegallery.fragment.FileManagerFragment.Companion.isExtension
@@ -96,7 +95,7 @@ class PicassoMediaMetadataHandler(val context: Context) : RequestHandler() {
         }
     }
 
-    internal fun getExifRotation(orientation: Int) =
+    private fun getExifRotation(orientation: Int) =
         when (orientation) {
             ExifInterface.ORIENTATION_ROTATE_90, ExifInterface.ORIENTATION_TRANSPOSE -> 90
             ExifInterface.ORIENTATION_ROTATE_180, ExifInterface.ORIENTATION_FLIP_VERTICAL -> 180
@@ -182,7 +181,7 @@ class PicassoMediaMetadataHandler(val context: Context) : RequestHandler() {
                 }
                 var exifOrientation = 0
                 try {
-                    exifOrientation = getExifRotation(getExifOrientation(context, requestUri))
+                    exifOrientation = getExifRotation(getExifOrientation(requestUri))
                 } catch (e: Exception) {
                     if (Constants.IS_DEBUG) {
                         e.printStackTrace()
@@ -263,6 +262,14 @@ class PicassoMediaMetadataHandler(val context: Context) : RequestHandler() {
         }
         return true
 
+    }
+
+    private fun getExifOrientation(uri: Uri): Int {
+        val path = uri.path ?: throw FileNotFoundException("path == null, uri: $uri")
+        return ExifInterface(path).getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )
     }
 
     override fun load(picasso: Picasso, request: Request, callback: Callback) {

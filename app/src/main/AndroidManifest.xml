@@ -67,6 +67,11 @@
             android:supportsPictureInPicture="true"
             android:theme="@style/App.DayNight.Swipes" />
 
+        <activity
+            android:name=".activity.crash.DefaultErrorActivity"
+            android:process=":file_gallery_error_activity"
+            android:theme="@style/App.DayNight.Swipes" />
+
         <service
             android:name=".media.music.MusicPlaybackService"
             android:exported="false">

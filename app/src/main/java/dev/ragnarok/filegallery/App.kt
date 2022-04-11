@@ -5,6 +5,7 @@ import android.app.Application
 import android.os.Handler
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.gson.internal.ConstructorConstructor
+import dev.ragnarok.filegallery.activity.crash.CrashUtils
 import dev.ragnarok.filegallery.media.music.MusicPlaybackController
 import dev.ragnarok.filegallery.module.GalleryNative
 import dev.ragnarok.filegallery.module.rlottie.RLottieDrawable
@@ -22,6 +23,8 @@ class App : Application() {
         sApplicationHandler = Handler(mainLooper)
         super.onCreate()
         AppCompatDelegate.setDefaultNightMode(Settings.get().main().getNightMode())
+        CrashUtils.install(this)
+
         GalleryNative.loadNativeLibrary(object : GalleryNative.NativeOnException {
             override fun onException(e: Error) {
                 e.printStackTrace()

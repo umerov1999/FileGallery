@@ -14,6 +14,7 @@ object RetrofitProvider {
     val gson: Gson = GsonBuilder()
         .registerTypeAdapter(Photo::class.java, PhotoDtoAdapter())
         .registerTypeAdapter(Boolean::class.javaPrimitiveType, BooleanAdapter())
+        .registerTypeAdapter(Boolean::class.java, BooleanAdapter())
         .registerTypeAdapter(Audio::class.java, AudioDtoAdapter())
         .registerTypeAdapter(Video::class.java, VideoDtoAdapter())
         .create()

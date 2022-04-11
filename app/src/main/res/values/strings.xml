@@ -158,6 +158,15 @@
     <string name="select_file">Выбор %1$s</string>
     <string name="select_folder">Выбор директории</string>
 
+    <string name="crash_error_activity_error_occurred_explanation">Необрабатываемое исключение.</string>
+    <string name="crash_error_activity_restart_app">Перезапуск</string>
+    <string name="crash_error_activity_error_details">Детали</string>
+    <string name="crash_error_activity_error_details_title">Детали исключения</string>
+    <string name="crash_error_activity_error_details_close">Закрыть</string>
+    <string name="crash_error_activity_error_details_copy">Копировать</string>
+    <string name="crash_error_activity_error_details_copied">Скопировано</string>
+    <string name="crash_error_activity_error_details_clipboard_label">Информация об ошибке</string>
+
     <string-array name="night_mode_values" translatable="false">
         <item>1</item>
         <item>2</item>

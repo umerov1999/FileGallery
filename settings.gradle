@@ -1,2 +1,0 @@
-include ':app', ':picasso', ':image', ':retrofit', ':material', ':gson', ':preference'
-//include ':libnative'
