@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="message_bubble_color" format="color" />
-    <attr name="sticker_hint_color" format="color" />
-    <attr name="dialogs_unread_color" format="color" />
     <attr name="toast_background" format="color" />
-    <attr name="icon_color_active" format="color" />
-    <attr name="icon_color_inactive" format="color" />
     <attr name="white_color" format="color" />
     <attr name="toolbar_left_icon_color" format="color" />
 
@@ -13,10 +9,6 @@
     <attr name="fab_player" format="reference" />
 
     <attr name="messages_background_color" format="color" />
-    <attr name="my_messages_bubble_color" format="color" />
-    <attr name="my_messages_secondary_bubble_color" format="color" />
-    <attr name="message_unread_color" format="color" />
-    <attr name="buttonAddPhotoBackground" format="reference" />
     <attr name="dividerColor" format="color" />
     <attr name="materialCardStyle" format="reference" />
     <attr name="materialCardBackgroundStyle" format="reference" />

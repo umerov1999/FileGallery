@@ -52,6 +52,7 @@
     <string name="rendering_mode">Режим отрисовки изображений</string>
     <string name="need_restart">Требуется перезапуск</string>
     <string name="enable_cache_ui_anim">Кэшировать UI анимации</string>
+    <string name="enable_dirs_files_count">Количество файлов в папке</string>
     <string name="cache_cleaner">Очистить кэш</string>
     <string name="local_media_server">Локальный медиа сервер</string>
     <string name="settings">Настройки</string>
@@ -157,6 +158,7 @@
     <string name="detect_qr">Распознать QR</string>
     <string name="select_file">Выбор %1$s</string>
     <string name="select_folder">Выбор директории</string>
+    <string name="not_supported">Неподдерживается</string>
 
     <string name="crash_error_activity_error_occurred_explanation">Необрабатываемое исключение.</string>
     <string name="crash_error_activity_restart_app">Перезапуск</string>

@@ -301,11 +301,16 @@
 
   <declare-styleable name="MaterialAutoCompleteTextView" parent="AppCompatAutoCompleteTextView">
     <attr name="android:inputType"/>
+    <attr name="android:popupElevation"/>
 
     <!-- The default layout used to inflate auto-complete items -->
     <attr name="simpleItemLayout" format="reference"/>
     <!-- The default auto-completion items in a string array -->
     <attr name="simpleItems" format="reference"/>
+    <!-- The color of the default selected item of the dropdown list. -->
+    <attr name="simpleItemSelectedColor" format="color"/>
+    <!-- The ripple color of the default selected item of the dropdown list. -->
+    <attr name="simpleItemSelectedRippleColor" format="color"/>
   </declare-styleable>
 
 </resources>

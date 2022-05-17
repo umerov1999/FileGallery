@@ -7,7 +7,7 @@
 
     <integer name="files_column_count">2</integer>
     <integer name="photos_column_count">3</integer>
-    <integer name="videos_column_count">3</integer>
+    <integer name="videos_column_count">2</integer>
 
     <!-- Audio player -->
     <dimen name="audio_player_controls_end_button_width">50dp</dimen>

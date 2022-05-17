@@ -44,24 +44,12 @@
         <item name="floatingActionButtonStyle">@style/Theme.FloatingActionButton</item>
         <item name="fab_secondary">@style/Theme.FloatingActionButtonSecondary</item>
         <item name="fab_player">@style/Theme.FloatingActionButtonAudio</item>
-        <item name="icon_color_active">@color/m3_ref_palette_dynamic_primary60</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
 
         <item name="dividerColor">#313131</item>
-
-        <item name="dialogs_unread_color">#20b0b0b0</item>
         <item name="toast_background">#FFFFFF</item>
 
         <item name="messages_background_color">#151515</item>
-        <item name="my_messages_bubble_color">@color/m3_ref_palette_dynamic_primary20</item>
-        <item name="my_messages_secondary_bubble_color">@color/m3_ref_palette_dynamic_primary10
-        </item>
-        <item name="message_unread_color">@color/m3_ref_palette_dynamic_primary80</item>
-
         <item name="message_bubble_color">#313131</item>
-        <item name="sticker_hint_color">#DD313131</item>
-
-        <item name="buttonAddPhotoBackground">@drawable/background_rectangle_dash</item>
         <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     </style>
 </resources>

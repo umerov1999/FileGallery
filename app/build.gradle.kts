@@ -3,6 +3,13 @@ plugins {
     id("kotlin-android")
 }
 
+fun selectAppSignVersion(config: com.android.build.api.dsl.ApkSigningConfig) {
+    config.enableV1Signing = MakeConfig.appMinSDK < 24
+    config.enableV2Signing = MakeConfig.appMinSDK < 28
+    config.enableV3Signing = MakeConfig.appMinSDK >= 28
+    config.enableV4Signing = false
+}
+
 android {
     packagingOptions {
         resources.excludes.addAll(
@@ -12,7 +19,6 @@ android {
                 "META-INF/LICENSE",
                 "META-INF/NOTICE",
                 "META-INF/DEPENDENCIES",
-                "/okhttp3/**",
                 "META-INF/*.version"
             )
         )
@@ -58,6 +64,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
         encoding = "utf-8"
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs = listOf("-opt-in=kotlin.contracts.ExperimentalContracts")
@@ -75,7 +82,6 @@ android {
         }
     }
 }
-
 
 dependencies {
     implementation(fileTree("include" to "*.aar", "dir" to "libs"))
@@ -110,7 +116,7 @@ dependencies {
     implementation("com.squareup.okio:okio:${MakeConfig.okioVersion}")
     implementation("com.google.android.exoplayer:exoplayer-core:${MakeConfig.exoLibraryVersion}")
     implementation("androidx.constraintlayout:constraintlayout:${MakeConfig.constraintlayoutVersion}")
-    implementation("androidx.media:media:1.6.0-rc01")
+    implementation("androidx.media:media:1.6.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:${MakeConfig.coordinatorlayoutVersion}")
     implementation("androidx.activity:activity-ktx:${MakeConfig.activityVersion}")
     implementation("androidx.fragment:fragment-ktx:${MakeConfig.fragmentVersion}")
@@ -119,4 +125,5 @@ dependencies {
     implementation("androidx.drawerlayout:drawerlayout:${MakeConfig.drawerlayoutVersion}")
     implementation("androidx.loader:loader:1.1.0")
     implementation("androidx.collection:collection-ktx:${MakeConfig.collectionVersion}")
+    implementation("androidx.savedstate:savedstate-ktx:${MakeConfig.savedStateVersion}")
 }

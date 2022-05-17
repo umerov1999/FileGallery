@@ -20,8 +20,10 @@
         tools:ignore="ScopedStorage" />
 
     <application
-        android:name=".App"
+        android:name="dev.ragnarok.filegallery.App"
+        android:allowAudioPlaybackCapture="true"
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
@@ -32,10 +34,10 @@
         android:supportsRtl="false"
         android:theme="@style/App.DayNight"
         android:usesCleartextTraffic="true"
-        tools:targetApi="q">
+        tools:targetApi="s">
 
         <activity
-            android:name=".activity.MainActivity"
+            android:name="dev.ragnarok.filegallery.activity.MainActivity"
             android:configChanges="keyboardHidden"
             android:exported="true"
             android:launchMode="singleTask"
@@ -45,21 +47,51 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:mimeType="vnd.android.cursor.dir/image" />
+                <data android:mimeType="vnd.android.cursor.dir/video" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+
+                <category android:name="android.intent.category.OPENABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="vnd.android.cursor.dir/image" />
+                <data android:mimeType="vnd.android.cursor.dir/video" />
+            </intent-filter>
         </activity>
 
         <activity
-            android:name=".activity.FileManagerSelectActivity"
+            android:name="dev.ragnarok.filegallery.activity.FileManagerSelectActivity"
             android:theme="@style/App.DayNight.Swipes" />
 
         <activity
-            android:name=".activity.PhotoPagerActivity"
+            android:name="dev.ragnarok.filegallery.activity.PhotoPagerActivity"
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/local_server_photo"
             android:theme="@style/App.DayNight.Swipes"
             android:windowSoftInputMode="adjustResize|stateHidden" />
 
         <activity
-            android:name=".activity.VideoPlayerActivity"
+            android:name="dev.ragnarok.filegallery.activity.VideoPlayerActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:label="@string/local_server_video"
             android:launchMode="singleTask"
@@ -68,12 +100,12 @@
             android:theme="@style/App.DayNight.Swipes" />
 
         <activity
-            android:name=".activity.crash.DefaultErrorActivity"
+            android:name="dev.ragnarok.filegallery.activity.crash.DefaultErrorActivity"
             android:process=":file_gallery_error_activity"
             android:theme="@style/App.DayNight.Swipes" />
 
         <service
-            android:name=".media.music.MusicPlaybackService"
+            android:name="dev.ragnarok.filegallery.media.music.MusicPlaybackService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />

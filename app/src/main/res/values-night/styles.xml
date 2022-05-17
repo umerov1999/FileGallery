@@ -46,23 +46,15 @@
         <item name="floatingActionButtonStyle">@style/Theme.FloatingActionButton</item>
         <item name="fab_secondary">@style/Theme.FloatingActionButtonSecondary</item>
         <item name="fab_player">@style/Theme.FloatingActionButtonAudio</item>
-        <item name="icon_color_active">#AA448AFF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
 
         <item name="dividerColor">#313131</item>
 
-        <item name="dialogs_unread_color">#20b0b0b0</item>
         <item name="toast_background">#FFFFFF</item>
 
         <item name="messages_background_color">#151515</item>
-        <item name="my_messages_bubble_color">#D42C3C53</item>
-        <item name="my_messages_secondary_bubble_color">#D42C3C53</item>
-        <item name="message_unread_color">#f564b5f6</item>
 
         <item name="message_bubble_color">#313131</item>
-        <item name="sticker_hint_color">#DD313131</item>
 
-        <item name="buttonAddPhotoBackground">@drawable/background_rectangle_dash</item>
         <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialog</item>
     </style>
 
@@ -70,10 +62,6 @@
         <item name="colorPrimary">#9800FF</item>
         <item name="colorControlNormal">#9800FF</item>
         <item name="colorSecondary">#8500FF</item>
-        <item name="icon_color_active">#AA9800FF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
-        <item name="my_messages_bubble_color">#86DB59FF</item>
-        <item name="my_messages_secondary_bubble_color">#886C42DF</item>
         <item name="colorOnPrimary">#1F092F</item>
         <item name="colorOnPrimaryContainer">#EFDCF9</item>
         <item name="colorPrimaryContainer">#331948</item>
@@ -87,10 +75,6 @@
         <item name="colorPrimary">#9800FF</item>
         <item name="colorControlNormal">#9800FF</item>
         <item name="colorSecondary">#444444</item>
-        <item name="icon_color_active">#AA9800FF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
-        <item name="my_messages_bubble_color">#86DB59FF</item>
-        <item name="my_messages_secondary_bubble_color">#886C42DF</item>
         <item name="colorOnPrimary">#1E0A30</item>
         <item name="colorOnPrimaryContainer">#EEDCFA</item>
         <item name="colorPrimaryContainer">#311A49</item>
@@ -104,8 +88,6 @@
         <item name="colorPrimary">#448AFF</item>
         <item name="colorControlNormal">#448AFF</item>
         <item name="colorSecondary">#82B1FF</item>
-        <item name="icon_color_active">#AA448AFF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#0C1B32</item>
         <item name="colorPrimaryContainer">#1B2E4A</item>
         <item name="colorPrimaryInverse">#304767</item>
@@ -119,8 +101,6 @@
         <item name="colorPrimary">#448AFF</item>
         <item name="colorControlNormal">#448AFF</item>
         <item name="colorSecondary">#1E88E5</item>
-        <item name="icon_color_active">#AA448AFF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#0C1B32</item>
         <item name="colorOnPrimaryContainer">#E3EAF8</item>
         <item name="colorPrimaryContainer">#1B2E4A</item>
@@ -134,8 +114,6 @@
         <item name="colorPrimary">#9800FF</item>
         <item name="colorControlNormal">#9800FF</item>
         <item name="colorSecondary">#F44336</item>
-        <item name="icon_color_active">#AAF44336</item>
-        <item name="icon_color_inactive">#AA151515</item>
         <item name="colorOnPrimary">#1F092F</item>
         <item name="colorOnPrimaryContainer">#EFDCF9</item>
         <item name="colorPrimaryContainer">#331948</item>
@@ -149,8 +127,6 @@
         <item name="colorPrimary">#448AFF</item>
         <item name="colorControlNormal">#448AFF</item>
         <item name="colorSecondary">#4CAF50</item>
-        <item name="icon_color_active">#AA448AFF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#0C1B32</item>
         <item name="colorOnPrimaryContainer">#E3EAF8</item>
         <item name="colorPrimaryContainer">#1B2E4A</item>
@@ -164,8 +140,6 @@
         <item name="colorPrimary">#448AFF</item>
         <item name="colorControlNormal">#448AFF</item>
         <item name="colorSecondary">#FF0000</item>
-        <item name="icon_color_active">#AA448AFF</item>
-        <item name="icon_color_inactive">#AA151515</item>
         <item name="colorOnPrimary">#0C1B32</item>
         <item name="colorOnPrimaryContainer">#E3EAF8</item>
         <item name="colorPrimaryContainer">#1B2E4A</item>
@@ -179,8 +153,6 @@
         <item name="colorPrimary">#757AFF</item>
         <item name="colorControlNormal">#757AFF</item>
         <item name="colorSecondary">#50F2C4</item>
-        <item name="icon_color_active">#AA757AFF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#111333</item>
         <item name="colorOnPrimaryContainer">#E8E8F4</item>
         <item name="colorPrimaryContainer">#242749</item>
@@ -191,41 +163,35 @@
     </style>
 
     <style name="App.DayNight.Cold" parent="App.DayNight">
-        <item name="colorPrimary">#9BC4FC</item>
-        <item name="colorControlNormal">#9BC4FC</item>
-        <item name="colorSecondary">#D1B8FD</item>
-        <item name="icon_color_active">#AA448AFF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
-        <item name="colorOnPrimary">#0D1B2D</item>
-        <item name="colorOnPrimaryContainer">#E5E9EE</item>
-        <item name="colorPrimaryContainer">#202F41</item>
-        <item name="colorPrimaryInverse">#38485A</item>
-        <item name="colorOnSecondary">#141316</item>
-        <item name="colorOnSecondaryContainer">#E9E7ED</item>
-        <item name="colorSecondaryContainer">#2D2C30</item>
+        <item name="colorPrimary">#A4C9FF</item>
+        <item name="colorControlNormal">#C4C6CF</item>
+        <item name="colorSecondary">#BCC7DB</item>
+        <item name="colorOnPrimary">#00315F</item>
+        <item name="colorOnPrimaryContainer">#D3E3FF</item>
+        <item name="colorPrimaryContainer">#16477D</item>
+        <item name="colorPrimaryInverse">#346096</item>
+        <item name="colorOnSecondary">#263140</item>
+        <item name="colorOnSecondaryContainer">#D8E3F8</item>
+        <item name="colorSecondaryContainer">#3D4758</item>
     </style>
 
     <style name="App.DayNight.ColdGreen" parent="App.DayNight">
-        <item name="colorPrimary">#9BC4FC</item>
-        <item name="colorControlNormal">#9BC4FC</item>
-        <item name="colorSecondary">#A2E3A3</item>
-        <item name="icon_color_active">#AA448AFF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
-        <item name="colorOnPrimary">#0D1B2D</item>
-        <item name="colorOnPrimaryContainer">#E5E9EE</item>
-        <item name="colorPrimaryContainer">#202F41</item>
-        <item name="colorPrimaryInverse">#38485A</item>
-        <item name="colorOnSecondary">#131613</item>
-        <item name="colorOnSecondaryContainer">#E7EDE7</item>
-        <item name="colorSecondaryContainer">#2C302D</item>
+        <item name="colorPrimary">#BDCF76</item>
+        <item name="colorControlNormal">#C7C7B8</item>
+        <item name="colorSecondary">#C4CAA8</item>
+        <item name="colorOnPrimary">#293500</item>
+        <item name="colorOnPrimaryContainer">#D9EB90</item>
+        <item name="colorPrimaryContainer">#3F4C00</item>
+        <item name="colorPrimaryInverse">#556518</item>
+        <item name="colorOnSecondary">#2E331B</item>
+        <item name="colorOnSecondaryContainer">#E1E6C3</item>
+        <item name="colorSecondaryContainer">#444930</item>
     </style>
 
     <style name="App.DayNight.ColdGold" parent="App.DayNight">
         <item name="colorPrimary">#9BA0FC</item>
         <item name="colorControlNormal">#9BA0FC</item>
         <item name="colorSecondary">#CAAF92</item>
-        <item name="icon_color_active">#AA448AFF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#0D1B2D</item>
         <item name="colorOnPrimaryContainer">#E5E9EE</item>
         <item name="colorPrimaryContainer">#202F41</item>
@@ -239,8 +205,6 @@
         <item name="colorPrimary">#448AFF</item>
         <item name="colorControlNormal">#448AFF</item>
         <item name="colorSecondary">#FFA726</item>
-        <item name="icon_color_active">#AA448AFF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#0C1B32</item>
         <item name="colorOnPrimaryContainer">#E3EAF8</item>
         <item name="colorPrimaryContainer">#1B2E4A</item>
@@ -254,8 +218,6 @@
         <item name="colorPrimary">#FF9800</item>
         <item name="colorControlNormal">#FF9800</item>
         <item name="colorSecondary">#FFA726</item>
-        <item name="icon_color_active">#AAFF9800</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#2F1F09</item>
         <item name="colorOnPrimaryContainer">#F9EFDC</item>
         <item name="colorPrimaryContainer">#483319</item>
@@ -269,8 +231,6 @@
         <item name="colorPrimary">#FF0000</item>
         <item name="colorControlNormal">#FF0000</item>
         <item name="colorSecondary">#F44336</item>
-        <item name="icon_color_active">#AAFF0000</item>
-        <item name="icon_color_inactive">#AA151515</item>
         <item name="colorOnPrimary">#341212</item>
         <item name="colorOnPrimaryContainer">#FDE5E2</item>
         <item name="colorPrimaryContainer">#4C2324</item>
@@ -286,10 +246,6 @@
         <item name="colorSecondary">#777777</item>
         <item name="colorOnPrimary">#000000</item>
         <item name="colorOnSecondary">#FFFFFF</item>
-        <item name="my_messages_bubble_color">#D4505050</item>
-        <item name="my_messages_secondary_bubble_color">#D4303030</item>
-        <item name="icon_color_active">#86448AFF</item>
-        <item name="icon_color_inactive">#88FF0000</item>
         <item name="white_color">#000000</item>
         <item name="colorOnPrimaryContainer">#ECECEC</item>
         <item name="colorPrimaryContainer">#3A2C2D</item>
@@ -302,8 +258,6 @@
         <item name="colorPrimary">#F44336</item>
         <item name="colorControlNormal">#9800FF</item>
         <item name="colorSecondary">#9800FF</item>
-        <item name="icon_color_active">#AA9800FF</item>
-        <item name="icon_color_inactive">#AA151515</item>
         <item name="colorOnPrimary">#2E120F</item>
         <item name="colorOnPrimaryContainer">#EEDDDA</item>
         <item name="colorPrimaryContainer">#462220</item>
@@ -317,8 +271,6 @@
         <item name="colorPrimary">#448AFF</item>
         <item name="colorControlNormal">#448AFF</item>
         <item name="colorSecondary">#8500FF</item>
-        <item name="icon_color_active">#AA448AFF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#0C1B32</item>
         <item name="colorOnPrimaryContainer">#E3EAF8</item>
         <item name="colorPrimaryContainer">#1B2E4A</item>
@@ -332,8 +284,6 @@
         <item name="colorPrimary">#FF9800</item>
         <item name="colorControlNormal">#FF9800</item>
         <item name="colorSecondary">#8500FF</item>
-        <item name="icon_color_active">#AAFF9800</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#2F1F09</item>
         <item name="colorOnPrimaryContainer">#F9EFDC</item>
         <item name="colorPrimaryContainer">#483319</item>
@@ -347,8 +297,6 @@
         <item name="colorPrimary">#AAD300</item>
         <item name="colorControlNormal">#AAD300</item>
         <item name="colorSecondary">#04D9FF</item>
-        <item name="icon_color_active">#AAAAD300</item>
-        <item name="icon_color_inactive">#AA151515</item>
         <item name="colorOnPrimary">#161B04</item>
         <item name="colorOnPrimaryContainer">#C7CEB6</item>
         <item name="colorPrimaryContainer">#282D0F</item>
@@ -362,8 +310,6 @@
         <item name="colorPrimary">#8500FF</item>
         <item name="colorControlNormal">#8500FF</item>
         <item name="colorSecondary">#FF9800</item>
-        <item name="icon_color_active">#AA9800FF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#1E0A30</item>
         <item name="colorOnPrimaryContainer">#EEDCFA</item>
         <item name="colorPrimaryContainer">#311A49</item>
@@ -377,8 +323,6 @@
         <item name="colorPrimary">#FE59C2</item>
         <item name="colorControlNormal">#FE59C2</item>
         <item name="colorSecondary">#CFFF04</item>
-        <item name="icon_color_active">#AAFE59C2</item>
-        <item name="icon_color_inactive">#AA151515</item>
         <item name="colorOnPrimary">#2E0920</item>
         <item name="colorOnPrimaryContainer">#F4E2EC</item>
         <item name="colorPrimaryContainer">#451835</item>
@@ -392,8 +336,6 @@
         <item name="colorPrimary">#FE4164</item>
         <item name="colorControlNormal">#FE4164</item>
         <item name="colorSecondary">#BC13FE</item>
-        <item name="icon_color_active">#AAFE4164</item>
-        <item name="icon_color_inactive">#AA151515</item>
         <item name="colorOnPrimary">#330E16</item>
         <item name="colorOnPrimaryContainer">#F7E4E6</item>
         <item name="colorPrimaryContainer">#4B1E29</item>
@@ -407,8 +349,6 @@
         <item name="colorPrimary">#8500FF</item>
         <item name="colorControlNormal">#8500FF</item>
         <item name="colorSecondary">#268000</item>
-        <item name="icon_color_active">#AA9800FF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#1E0A30</item>
         <item name="colorOnPrimaryContainer">#EEDCFA</item>
         <item name="colorPrimaryContainer">#311A49</item>
@@ -422,8 +362,6 @@
         <item name="colorPrimary">#268000</item>
         <item name="colorControlNormal">#268000</item>
         <item name="colorSecondary">#8500FF</item>
-        <item name="icon_color_active">#AA268000</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#000000</item>
         <item name="colorOnPrimaryContainer">#747F70</item>
         <item name="colorPrimaryContainer">#030602</item>
@@ -437,8 +375,6 @@
         <item name="colorPrimary">#268000</item>
         <item name="colorControlNormal">#268000</item>
         <item name="colorSecondary">#4CAF50</item>
-        <item name="icon_color_active">#AA268000</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#000000</item>
         <item name="colorOnPrimaryContainer">#747F70</item>
         <item name="colorPrimaryContainer">#11220B</item>
@@ -452,8 +388,6 @@
         <item name="colorPrimary">#FF4F8B</item>
         <item name="colorControlNormal">#FF4F8B</item>
         <item name="colorSecondary">#444444</item>
-        <item name="icon_color_active">#AAFF4F8B</item>
-        <item name="icon_color_inactive">#AA151515</item>
         <item name="colorOnPrimary">#320C1A</item>
         <item name="colorOnPrimaryContainer">#F7E4E9</item>
         <item name="colorPrimaryContainer">#4A1C2D</item>
@@ -467,8 +401,6 @@
         <item name="colorPrimary">#444444</item>
         <item name="colorControlNormal">#444444</item>
         <item name="colorSecondary">#777777</item>
-        <item name="icon_color_active">#AA448AFF</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#FFFFFF</item>
         <item name="colorOnPrimaryContainer">#3F3F3F</item>
         <item name="colorPrimaryContainer">#151515</item>
@@ -482,8 +414,6 @@
         <item name="colorPrimary">#FF5722</item>
         <item name="colorControlNormal">#FF5722</item>
         <item name="colorSecondary">#FF6F00</item>
-        <item name="icon_color_active">#BBFF8D02</item>
-        <item name="icon_color_inactive">#AA151515</item>
         <item name="colorOnPrimary">#33170E</item>
         <item name="colorOnPrimaryContainer">#FAE9E1</item>
         <item name="colorPrimaryContainer">#4C291F</item>
@@ -497,8 +427,6 @@
         <item name="colorPrimary">#FF5722</item>
         <item name="colorControlNormal">#FF5722</item>
         <item name="colorSecondary">#777777</item>
-        <item name="icon_color_active">#BBFF8D02</item>
-        <item name="icon_color_inactive">#AA151515</item>
         <item name="colorOnPrimary">#33170E</item>
         <item name="colorOnPrimaryContainer">#FAE9E1</item>
         <item name="colorPrimaryContainer">#4C291F</item>
@@ -512,8 +440,6 @@
         <item name="colorPrimary">#167C80</item>
         <item name="colorControlNormal">#167C80</item>
         <item name="colorSecondary">#63FFDE</item>
-        <item name="icon_color_active">#AA167C80</item>
-        <item name="icon_color_inactive">#AAFF0000</item>
         <item name="colorOnPrimary">#000000</item>
         <item name="colorOnPrimaryContainer">#6F797A</item>
         <item name="colorPrimaryContainer">#010505</item>
@@ -533,7 +459,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -547,7 +472,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -561,7 +485,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -575,7 +498,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -590,7 +512,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -605,7 +526,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -620,7 +540,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -635,7 +554,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -650,7 +568,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -665,7 +582,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -680,7 +596,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -695,7 +610,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -710,7 +624,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -725,7 +638,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -740,7 +652,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -755,7 +666,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -770,7 +680,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -785,7 +694,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -800,7 +708,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -815,7 +722,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -830,7 +736,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -845,7 +750,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -860,7 +764,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -875,7 +778,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -890,7 +792,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -905,7 +806,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -920,7 +820,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -935,7 +834,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -950,7 +848,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -965,7 +862,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
@@ -980,7 +876,6 @@
         <item name="colorOnBackground">#000000</item>
         <item name="colorSurface">#F20B0B0B</item>
         <item name="message_bubble_color">#0B0B0B</item>
-        <item name="sticker_hint_color">#DD0B0B0B</item>
         <item name="messages_background_color">#000000</item>
     </style>
 
