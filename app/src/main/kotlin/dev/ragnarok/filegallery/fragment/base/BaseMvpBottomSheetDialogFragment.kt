@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -28,15 +27,6 @@ import dev.ragnarok.filegallery.util.ViewUtils
 
 abstract class BaseMvpBottomSheetDialogFragment<P : AbsPresenter<V>, V : IMvpView> :
     AbsMvpBottomSheetDialogFragment<P, V>(), IMvpView, IErrorView, IToastView, IToolbarView {
-    override fun showToast(@StringRes titleTes: Int, isLong: Boolean, vararg params: Any?) {
-        if (isAdded) {
-            Toast.makeText(
-                requireActivity(),
-                getString(titleTes, *params),
-                if (isLong) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
 
     override fun showError(errorText: String?) {
         if (isAdded) {

@@ -45,6 +45,7 @@ android {
         ndk {
             abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
         }
+        resourceConfigurations.addAll(listOf("en", "ru"))
     }
 
     lint {
@@ -67,7 +68,11 @@ android {
 
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs = listOf("-opt-in=kotlin.contracts.ExperimentalContracts")
+        freeCompilerArgs = listOf(
+            "-opt-in=kotlin.contracts.ExperimentalContracts",
+            "-opt-in=kotlin.RequiresOptIn",
+            "-opt-in=kotlin.ExperimentalStdlibApi"
+        )
     }
 
     buildTypes {
@@ -92,6 +97,7 @@ dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-annotations-jvm:${MakeConfig.kotlin_version}")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.1.5")
     implementation("androidx.core:core-ktx:${MakeConfig.coreVersion}")
+    implementation("androidx.biometric:biometric-ktx:1.2.0-alpha04")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:${MakeConfig.lifecycleVersion}")
     implementation("androidx.lifecycle:lifecycle-common:${MakeConfig.lifecycleVersion}")
     implementation("androidx.annotation:annotation:${MakeConfig.annotationVersion}")
@@ -99,7 +105,7 @@ dependencies {
     implementation("androidx.viewpager2:viewpager2:${MakeConfig.viewpager2Version}")
     implementation("androidx.vectordrawable:vectordrawable:${MakeConfig.vectordrawableVersion}")
     implementation("androidx.appcompat:appcompat:${MakeConfig.appcompatVersion}")
-    implementation("androidx.customview:customview:1.1.0")
+    implementation("androidx.customview:customview:1.2.0-alpha01")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01")
     implementation("androidx.browser:browser:1.4.0")
     implementation("androidx.exifinterface:exifinterface:${MakeConfig.exifinterfaceVersion}")
@@ -114,7 +120,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:${MakeConfig.okhttpLibraryVersion}")
     implementation("com.squareup.okhttp3:logging-interceptor:${MakeConfig.okhttpLibraryVersion}")
     implementation("com.squareup.okio:okio:${MakeConfig.okioVersion}")
-    implementation("com.google.android.exoplayer:exoplayer-core:${MakeConfig.exoLibraryVersion}")
+    //implementation("com.google.android.exoplayer:exoplayer-core:${MakeConfig.exoLibraryVersion}")
+    implementation(project("path" to ":exoplayer"))
     implementation("androidx.constraintlayout:constraintlayout:${MakeConfig.constraintlayoutVersion}")
     implementation("androidx.media:media:1.6.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:${MakeConfig.coordinatorlayoutVersion}")

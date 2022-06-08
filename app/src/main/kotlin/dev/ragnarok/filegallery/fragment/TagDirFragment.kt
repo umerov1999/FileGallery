@@ -26,7 +26,6 @@ import dev.ragnarok.filegallery.model.Video
 import dev.ragnarok.filegallery.model.tags.TagDir
 import dev.ragnarok.filegallery.mvp.compat.AbsMvpFragment
 import dev.ragnarok.filegallery.mvp.core.IPresenterFactory
-import dev.ragnarok.filegallery.mvp.core.PresenterAction
 import dev.ragnarok.filegallery.mvp.presenter.TagDirPresenter
 import dev.ragnarok.filegallery.mvp.view.ITagDirView
 import dev.ragnarok.filegallery.place.PlaceFactory
@@ -84,13 +83,12 @@ class TagDirFragment : AbsMvpFragment<TagDirPresenter, ITagDirView>(), ITagDirVi
                 ?: return@registerForActivityResult)
                 .extras != null
         ) {
-            postPresenterReceive(object : PresenterAction<TagDirPresenter, ITagDirView> {
-                override fun call(presenter: TagDirPresenter) {
-                    presenter.scrollTo(
-                        ((result.data ?: return).extras ?: return).getString(Extra.PATH) ?: return
-                    )
-                }
-            })
+            lazyPresenter {
+                scrollTo(
+                    ((result.data ?: return@lazyPresenter).extras
+                        ?: return@lazyPresenter).getString(Extra.PATH) ?: return@lazyPresenter
+                )
+            }
         }
     }
 

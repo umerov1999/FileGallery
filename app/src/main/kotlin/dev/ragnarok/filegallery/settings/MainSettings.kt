@@ -81,6 +81,10 @@ internal class MainSettings(context: Context) : IMainSettings {
         return PreferenceScreen.getPreferences(app).getBoolean("enable_dirs_files_count", true)
     }
 
+    override fun isDeleteDisabled(): Boolean {
+        return PreferenceScreen.getPreferences(app).getBoolean("delete_disabled", false)
+    }
+
     @Suppress("DEPRECATION")
     override fun getMusicDir(): String {
         var ret = PreferenceScreen.getPreferences(app).getString("music_dir", null)

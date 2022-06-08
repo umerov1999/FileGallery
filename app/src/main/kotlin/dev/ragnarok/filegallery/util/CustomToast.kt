@@ -88,7 +88,8 @@ class CustomToast private constructor(context: Context?, Timage: Bitmap?) {
          */
         val view = View.inflate(mContext, R.layout.toast_error, null)
         val subtitle = view.findViewById<TextView>(R.id.text)
-        val imagev = view.findViewById<ImageView>(R.id.icon_toast_error)
+        val imagev =
+            view.findViewById<ImageView>(R.id.icon_toast_error)
         if (image != null)
             imagev.setImageBitmap(image)
         subtitle.text = message

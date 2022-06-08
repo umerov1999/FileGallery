@@ -13,6 +13,8 @@ import android.os.IBinder
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.ColorInt
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
@@ -28,6 +30,7 @@ import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dev.ragnarok.filegallery.R
+import dev.ragnarok.filegallery.activity.EnterPinActivity.Companion.getClass
 import dev.ragnarok.filegallery.fragment.*
 import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.listener.*
@@ -87,15 +90,38 @@ class MainActivity : AppCompatActivity(), OnSectionResumeCallback, AppStyleable,
             keyboardHide(this)
         }
 
+    private val requestEnterPin = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode != RESULT_OK) {
+            finish()
+        } else {
+            handleIntent(intent?.action, true)
+        }
+    }
+
+    private fun startEnterPinActivity() {
+        val intent = Intent(this, getClass(this))
+        requestEnterPin.launch(intent)
+    }
+
     public override fun onCreate(savedInstanceState: Bundle?) {
+        delegate.applyDayNight()
         savedInstanceState ?: nextRandom()
         setTheme(currentStyle())
-        delegate.applyDayNight()
         Utils.prepareDensity(this)
         super.onCreate(savedInstanceState)
         mDestroyed = false
 
-        savedInstanceState ?: handleIntent(intent?.action, true)
+        savedInstanceState ?: run {
+            if (Settings.get().security().isUsePinForEntrance && Settings.get().security()
+                    .hasPinHash()
+            ) {
+                startEnterPinActivity()
+            } else {
+                handleIntent(intent?.action, true)
+            }
+        }
         bindToAudioPlayService()
         setContentView(noMainContentView)
         mBottomNavigation = findViewById(R.id.bottom_navigation_menu)
@@ -347,6 +373,7 @@ class MainActivity : AppCompatActivity(), OnSectionResumeCallback, AppStyleable,
             Place.TAG_DIRS -> {
                 attachToFront(TagDirFragment.newInstance(args))
             }
+            Place.SECURITY -> attachToFront(SecurityPreferencesFragment())
         }
     }
 

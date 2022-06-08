@@ -9,6 +9,7 @@ object Constants {
     const val PICASSO_TAG = "picasso_tag"
 
     val IS_DEBUG: Boolean = DEBUG
+    const val PIN_DIGITS_COUNT = 4
 
     val USER_AGENT
         get() = String.format(

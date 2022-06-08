@@ -134,6 +134,7 @@ open class Place : Parcelable {
         const val VIDEO_PLAYER = 8
         const val TAGS = 9
         const val TAG_DIRS = 10
+        const val SECURITY = 11
 
         @JvmField
         val CREATOR: Parcelable.Creator<Place> = object : Parcelable.Creator<Place> {

@@ -51,6 +51,11 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
     private var mPlayerDisposable = Disposable.disposed()
     private var audioListDisposable = Disposable.disposed()
     private var currAudio: Audio? = MusicPlaybackController.currentAudio
+    private var isSelectMode = false
+
+    fun updateSelectedMode(show: Boolean) {
+        isSelectMode = show
+    }
 
     fun setItems(data: List<FileItem>) {
         this.data = data
@@ -227,7 +232,7 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
 
         var TrackName: String = audio.file_name?.replace(".mp3", "") ?: ""
         val Artist: String
-        val arr = TrackName.split(" - ").toTypedArray()
+        val arr = TrackName.split(Regex(" - ")).toTypedArray()
         if (arr.size > 1) {
             Artist = arr[0]
             TrackName = TrackName.replace("$Artist - ", "")
@@ -296,6 +301,14 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
                 false
             )
         )
+        menus.add(
+            OptionRequest(
+                AudioLocalOption.delete_item,
+                context.getString(R.string.delete),
+                R.drawable.ic_outline_delete,
+                false
+            )
+        )
         menus.header(
             audio.file_name,
             R.drawable.song,
@@ -308,6 +321,9 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
                     when (option.id) {
                         AudioLocalOption.add_dir_tag_item -> {
                             clickListener?.onDirTag(audio)
+                        }
+                        AudioLocalOption.delete_item -> {
+                            clickListener?.onDelete(audio)
                         }
                         AudioLocalOption.play_item_audio -> {
                             clickListener?.onClick(position, audio)
@@ -447,6 +463,14 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
                 false
             )
         )
+        menus.add(
+            OptionRequest(
+                AudioLocalOption.delete_item,
+                context.getString(R.string.delete),
+                R.drawable.ic_outline_delete,
+                false
+            )
+        )
         menus.header(
             file.file_name,
             R.drawable.file,
@@ -459,6 +483,9 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
                     when (option.id) {
                         AudioLocalOption.add_dir_tag_item -> {
                             clickListener?.onDirTag(file)
+                        }
+                        AudioLocalOption.delete_item -> {
+                            clickListener?.onDelete(file)
                         }
                         AudioLocalOption.open_with_item -> {
                             val intent_open = Intent(Intent.ACTION_VIEW)
@@ -499,6 +526,14 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
         val menus = ModalBottomSheetDialogFragment.Builder()
         menus.add(
             OptionRequest(
+                AudioLocalOption.delete_item,
+                context.getString(R.string.delete),
+                R.drawable.ic_outline_delete,
+                false
+            )
+        )
+        menus.add(
+            OptionRequest(
                 AudioLocalOption.fix_dir_time_item,
                 context.getString(R.string.fix_dir_time),
                 R.drawable.ic_recent,
@@ -523,6 +558,9 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
                         }
                         AudioLocalOption.add_dir_tag_item -> {
                             clickListener?.onDirTag(file)
+                        }
+                        AudioLocalOption.delete_item -> {
+                            clickListener?.onDelete(file)
                         }
                         else -> {}
                     }
@@ -569,7 +607,11 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
             if (item.type != FileType.folder) {
                 doFileMenu(item)
             } else {
-                doFolderMenu(item)
+                if (isSelectMode) {
+                    clickListener?.onToggleDirTag(item)
+                } else {
+                    doFolderMenu(item)
+                }
             }
             true
         }
@@ -588,6 +630,8 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
         fun onFixDir(item: FileItem)
         fun onUpdateTimeFile(item: FileItem)
         fun onDirTag(item: FileItem)
+        fun onToggleDirTag(item: FileItem)
+        fun onDelete(item: FileItem)
     }
 
     class FileHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

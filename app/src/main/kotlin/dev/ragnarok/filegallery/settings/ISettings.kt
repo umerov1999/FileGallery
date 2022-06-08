@@ -9,6 +9,7 @@ import io.reactivex.rxjava3.core.Observable
 
 interface ISettings {
     fun main(): IMainSettings
+    fun security(): ISecuritySettings
     interface IMainSettings {
         fun getFontSize(): Int
 
@@ -63,5 +64,20 @@ interface ISettings {
 
         fun getViewpager_page_transform(): Int
         fun getPlayer_cover_transform(): Int
+        fun isDeleteDisabled(): Boolean
+    }
+
+    interface ISecuritySettings {
+        fun isPinValid(values: IntArray): Boolean
+        fun setPin(pin: IntArray?)
+        val isEntranceByFingerprintAllowed: Boolean
+
+        fun firePinAttemptNow()
+        fun clearPinHistory()
+        val pinEnterHistory: List<Long>
+        fun hasPinHash(): Boolean
+        fun pinHistoryDepthValue(): Int
+        fun updateLastPinTime()
+        val isUsePinForEntrance: Boolean
     }
 }

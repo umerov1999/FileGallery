@@ -10,7 +10,8 @@ import androidx.annotation.IntDef
     AudioLocalOption.open_with_item,
     AudioLocalOption.fix_dir_time_item,
     AudioLocalOption.update_file_time_item,
-    AudioLocalOption.add_dir_tag_item
+    AudioLocalOption.add_dir_tag_item,
+    AudioLocalOption.delete_item
 )
 @Retention(
     AnnotationRetention.SOURCE
@@ -25,5 +26,6 @@ annotation class AudioLocalOption {
         const val fix_dir_time_item = 6
         const val update_file_time_item = 7
         const val add_dir_tag_item = 8
+        const val delete_item = 9
     }
 }

@@ -6,17 +6,11 @@
     android:layout_height="match_parent"
     android:background="@android:color/black">
 
-    <dev.ragnarok.filegallery.view.AlternativeAspectRatioFrameLayout
-        android:id="@+id/aspect_ratio_layout"
+    <dev.ragnarok.filegallery.view.ExpandableSurfaceView
+        android:id="@+id/videoSurface"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true">
-
-        <SurfaceView
-            android:id="@+id/videoSurface"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </dev.ragnarok.filegallery.view.AlternativeAspectRatioFrameLayout>
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true" />
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"

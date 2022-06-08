@@ -16,6 +16,13 @@
     <attr name="toolbarElevation" format="reference" />
     <attr name="statusbarNonColoredColor" format="color" />
 
+    <declare-styleable name="KeyboardView">
+        <attr name="keyboard_theme" format="enum">
+            <enum name="fullscreen" value="0" />
+            <enum name="dialog" value="1" />
+        </attr>
+    </declare-styleable>
+
     <declare-styleable name="CircleCounterButton">
         <attr name="button_icon" format="reference" />
         <attr name="always_counter" format="boolean" />
@@ -26,16 +33,6 @@
         <attr name="active_background_color" format="color" />
         <attr name="noactive_background_color" format="color" />
         <attr name="text_color" format="color" />
-    </declare-styleable>
-
-    <declare-styleable name="AspectRatioFrameLayout">
-        <attr name="aspectRatioHeight" format="integer" />
-        <attr name="aspectRatioWidth" format="integer" />
-    </declare-styleable>
-
-    <declare-styleable name="AlternativeAspectRatioFrameLayout">
-        <attr name="altAspectRatioWidth" format="integer" />
-        <attr name="altAspectRatioHeight" format="integer" />
     </declare-styleable>
 
     <declare-styleable name="MySearchView">

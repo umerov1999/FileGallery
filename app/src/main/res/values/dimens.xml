@@ -4,6 +4,10 @@
     <dimen name="toolbar_with_elevation">2dp</dimen>
 
     <dimen name="pref_image_size">130dp</dimen>
+    <bool name="is_tablet">false</bool>
+    <dimen name="content_large_margin">16dp</dimen>
+    <dimen name="pincode_row_height">64dp</dimen>
+    <dimen name="pincode_button_subtitle_text_size">8dp</dimen>
 
     <integer name="files_column_count">2</integer>
     <integer name="photos_column_count">3</integer>
@@ -17,7 +21,6 @@
 
     <dimen name="fab_margin">16dp</dimen>
 
-    <dimen name="font_size_title">17sp</dimen>
     <dimen name="font_size_subtitle">15sp</dimen>
     <dimen name="font_size_additional">12sp</dimen>
     <dimen name="refresher_offset_start">40dp</dimen>

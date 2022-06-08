@@ -5,13 +5,13 @@ import dev.ragnarok.filegallery.Constants
 import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.settings.ISettings.IMainSettings
 import dev.ragnarok.filegallery.util.Utils.firstNonEmptyString
+import dev.ragnarok.filegallery.util.retrofit.gson.GsonConverterFactory
+import dev.ragnarok.filegallery.util.retrofit.rxjava3.RxJava3CallAdapterFactory
 import io.reactivex.rxjava3.core.Single
 import okhttp3.FormBody
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class OtherRetrofitProvider @SuppressLint("CheckResult") constructor(private val mainSettings: IMainSettings) :

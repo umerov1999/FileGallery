@@ -60,7 +60,6 @@
             android:layout_margin="@dimen/fab_margin"
             android:contentDescription="@null"
             android:src="@drawable/audio_player"
-            app:fabSize="normal"
             app:layout_behavior="dev.ragnarok.filegallery.view.FABBehavior"
             app:maxImageSize="30dp" />
 
@@ -73,7 +72,6 @@
             android:contentDescription="@null"
             android:src="@drawable/ic_done"
             android:visibility="gone"
-            app:fabSize="normal"
             app:layout_behavior="dev.ragnarok.filegallery.view.FABBehavior"
             app:maxImageSize="30dp" />
 

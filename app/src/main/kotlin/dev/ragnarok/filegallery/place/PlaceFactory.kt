@@ -70,4 +70,7 @@ object PlaceFactory {
         return Place(Place.TAG_DIRS)
             .setArguments(TagDirFragment.buildArgs(ownerId, isSelect))
     }
+
+    val securitySettingsPlace: Place
+        get() = Place(Place.SECURITY)
 }

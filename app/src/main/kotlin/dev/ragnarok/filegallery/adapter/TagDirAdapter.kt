@@ -95,7 +95,10 @@ class TagDirAdapter(context: Context, private var data: List<TagDir>) :
         return data[position].type
     }
 
-    private fun fixNumerical(context: Context, num: Int): String {
+    private fun fixNumerical(context: Context, num: Int): String? {
+        if (num < 0) {
+            return null
+        }
         val preLastDigit = num % 100 / 10
         if (preLastDigit == 1) {
             return context.getString(R.string.files_count_c, num)

@@ -8,6 +8,7 @@ import androidx.annotation.RawRes
 import androidx.appcompat.widget.AppCompatImageView
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.fromIOToMain
+import dev.ragnarok.filegallery.module.BufferWriteNative
 import dev.ragnarok.filegallery.module.GalleryNative
 import dev.ragnarok.filegallery.module.rlottie.RLottieDrawable
 import dev.ragnarok.filegallery.util.RxUtils
@@ -163,7 +164,7 @@ class RLottieImageView @JvmOverloads constructor(context: Context, attrs: Attrib
         )
     }
 
-    fun fromString(jsonString: String, w: Int, h: Int) {
+    fun fromString(jsonString: BufferWriteNative, w: Int, h: Int) {
         if (!GalleryNative.isNativeLoaded) {
             return
         }

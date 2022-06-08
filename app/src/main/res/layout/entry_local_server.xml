@@ -59,21 +59,19 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/enabled_audio_local_sync"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="false"
-            android:padding="8dp"
             android:text="@string/enabled_audio_local_sync"
             android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
+        <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/enabled_server"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:checked="false"
-            android:padding="8dp"
             android:text="@string/enabled"
             android:textAppearance="@style/TextAppearance.Material3.BodyLarge" />
     </LinearLayout>

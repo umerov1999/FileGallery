@@ -48,7 +48,7 @@ class ExoVideoPlayer(
     private fun createPlayer(context: Context): ExoPlayer {
         val ret = ExoPlayer.Builder(context, DefaultRenderersFactory(context)).build()
         ret.setAudioAttributes(
-            AudioAttributes.Builder().setContentType(C.CONTENT_TYPE_MOVIE).setUsage(
+            AudioAttributes.Builder().setContentType(C.AUDIO_CONTENT_TYPE_MOVIE).setUsage(
                 C.USAGE_MEDIA
             ).build(), true
         )
@@ -123,7 +123,7 @@ class ExoVideoPlayer(
 
     private fun onVideoSizeChanged(w: Int, h: Int) {
         for (listener in videoSizeChangeListeners) {
-            listener.onVideoSizeChanged(this, dev.ragnarok.filegallery.model.VideoSize(w, h))
+            listener.onVideoSizeChanged(this, w, h)
         }
     }
 

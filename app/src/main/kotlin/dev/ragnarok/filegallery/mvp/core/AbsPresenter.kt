@@ -129,22 +129,6 @@ abstract class AbsPresenter<V : IMvpView>(savedInstanceState: Bundle?) : IPresen
         outState.putInt(SAVE_ID, id)
     }
 
-    protected fun callView(action: ViewAction<V>) {
-        view?.run {
-            action.call(this)
-            //return
-        }
-        //Utils.showYellowTopToast(Includes.provideApplicationContext(), "View not attached to presenter!")
-    }
-
-    protected fun callResumedView(action: ViewAction<V>) {
-        resumedView?.run {
-            action.call(this)
-            //return
-        }
-        //Utils.showYellowTopToast(Includes.provideApplicationContext(), "View not resumed!")
-    }
-
     companion object {
         private val IDGEN = AtomicInteger()
         private const val SAVE_ID = "save_presenter_id"

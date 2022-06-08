@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -30,16 +29,6 @@ abstract class BaseMvpFragment<P : AbsPresenter<V>, V : IMvpView> : AbsMvpFragme
     IMvpView, IErrorView, IToastView, IToolbarView {
     protected fun hasHideToolbarExtra(): Boolean {
         return arguments?.getBoolean(EXTRA_HIDE_TOOLBAR) == true
-    }
-
-    override fun showToast(@StringRes titleTes: Int, isLong: Boolean, vararg params: Any?) {
-        if (isAdded) {
-            Toast.makeText(
-                requireActivity(),
-                getString(titleTes, *params),
-                if (isLong) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
-            ).show()
-        }
     }
 
     override fun showError(errorText: String?) {

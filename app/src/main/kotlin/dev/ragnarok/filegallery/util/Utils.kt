@@ -64,6 +64,10 @@ object Utils {
         return target
     }
 
+    fun is600dp(context: Context): Boolean {
+        return context.resources.getBoolean(R.bool.is_tablet)
+    }
+
     fun hasMarshmallow(): Boolean {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
     }

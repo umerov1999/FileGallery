@@ -23,7 +23,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textview.MaterialTextView
 import com.google.gson.GsonBuilder
@@ -41,6 +41,7 @@ import dev.ragnarok.filegallery.*
 import dev.ragnarok.filegallery.Includes.provideApplicationContext
 import dev.ragnarok.filegallery.activity.ActivityFeatures
 import dev.ragnarok.filegallery.activity.ActivityUtils
+import dev.ragnarok.filegallery.activity.EnterPinActivity
 import dev.ragnarok.filegallery.activity.FileManagerSelectActivity
 import dev.ragnarok.filegallery.listener.BackPressCallback
 import dev.ragnarok.filegallery.listener.CanBackPressedCallback
@@ -300,6 +301,20 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                     )
                 }
             }
+        }
+
+        pref("security") {
+            titleRes = R.string.security
+            iconRes = R.drawable.security_settings
+            onClick {
+                onSecurityClick()
+                true
+            }
+        }
+
+        switch("delete_disabled") {
+            defaultValue = false
+            titleRes = R.string.delete_disabled
         }
 
         singleChoice(
@@ -703,6 +718,22 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
         }
     }
 
+    private val requestPin = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            PlaceFactory.securitySettingsPlace.tryOpenWith(requireActivity())
+        }
+    }
+
+    private fun onSecurityClick() {
+        if (Settings.get().security().hasPinHash()) {
+            requestPin.launch(Intent(requireActivity(), EnterPinActivity::class.java))
+        } else {
+            PlaceFactory.securitySettingsPlace.tryOpenWith(requireActivity())
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (requireActivity() as AppCompatActivity).setSupportActionBar(view.findViewById(R.id.toolbar))
@@ -741,10 +772,10 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
             val view =
                 View.inflate(requireActivity(), R.layout.entry_player_background, null)
-            val enabledRotation: SwitchMaterial = view.findViewById(R.id.enabled_anim)
-            val invertRotation: SwitchMaterial =
+            val enabledRotation: MaterialSwitch = view.findViewById(R.id.enabled_anim)
+            val invertRotation: MaterialSwitch =
                 view.findViewById(R.id.edit_invert_rotation)
-            val fadeSaturation: SwitchMaterial =
+            val fadeSaturation: MaterialSwitch =
                 view.findViewById(R.id.edit_fade_saturation)
             val rotationSpeed = view.findViewById<SeekBar>(R.id.edit_rotation_speed)
             val zoom = view.findViewById<SeekBar>(R.id.edit_zoom)
@@ -841,8 +872,8 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
             val view = View.inflate(requireActivity(), R.layout.entry_local_server, null)
             val url: TextInputEditText = view.findViewById(R.id.edit_url)
             val password: TextInputEditText = view.findViewById(R.id.edit_password)
-            val enabled: SwitchMaterial = view.findViewById(R.id.enabled_server)
-            val enabled_audio_local_sync: SwitchMaterial =
+            val enabled: MaterialSwitch = view.findViewById(R.id.enabled_server)
+            val enabled_audio_local_sync: MaterialSwitch =
                 view.findViewById(R.id.enabled_audio_local_sync)
             val settings = Settings.get().main().getLocalServer()
             url.setText(settings.url)

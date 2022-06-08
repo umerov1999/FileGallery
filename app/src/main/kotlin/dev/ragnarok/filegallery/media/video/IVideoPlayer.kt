@@ -2,7 +2,6 @@ package dev.ragnarok.filegallery.media.video
 
 import android.content.Context
 import android.view.SurfaceHolder
-import dev.ragnarok.filegallery.model.VideoSize
 
 interface IVideoPlayer {
     fun updateSource(
@@ -25,7 +24,7 @@ interface IVideoPlayer {
     fun addVideoSizeChangeListener(listener: IVideoSizeChangeListener)
     fun removeVideoSizeChangeListener(listener: IVideoSizeChangeListener)
     interface IVideoSizeChangeListener {
-        fun onVideoSizeChanged(player: IVideoPlayer, size: VideoSize?)
+        fun onVideoSizeChanged(player: IVideoPlayer, w: Int, h: Int)
     }
 
     interface IUpdatePlayListener {

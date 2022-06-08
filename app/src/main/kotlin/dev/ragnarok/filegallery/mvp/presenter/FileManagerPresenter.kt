@@ -20,7 +20,6 @@ import java.io.File
 import java.io.FilenameFilter
 import java.util.*
 
-
 class FileManagerPresenter(
     private var path: File,
     private val base: Boolean,
@@ -428,6 +427,38 @@ class FileManagerPresenter(
         }, { view?.onError(it) })
     }
 
+    fun fireToggleDirTag(item: FileItem) {
+        if (selectedOwner == null) {
+            return
+        }
+        if (item.isHasTag) {
+            item.file_path?.let { op ->
+                appendDisposable(
+                    Includes.stores.searchQueriesStore().deleteTagDirByPath(op)
+                        .fromIOToMain().subscribe({
+                            item.checkTag()
+                            val list = if (q == null) fileList else fileListSearch
+                            view?.notifyItemChanged(list.indexOf(item))
+                        }, {
+                            view?.onError(it)
+                        })
+                )
+            }
+        } else {
+            appendDisposable(
+                Includes.stores.searchQueriesStore()
+                    .insertTagDir((selectedOwner ?: return).id, item)
+                    .fromIOToMain().subscribe({
+                        item.checkTag()
+                        val list = if (q == null) fileList else fileListSearch
+                        view?.notifyItemChanged(list.indexOf(item))
+                    }, {
+                        view?.onError(it)
+                    })
+            )
+        }
+    }
+
     fun onClickFile(item: FileItem) {
         if (selectedOwner != null) {
             item.checkTag()
@@ -519,7 +550,7 @@ class FileManagerPresenter(
                 var TrackName: String =
                     i.file_name?.replace(".mp3", "") ?: ""
                 val Artist: String
-                val arr = TrackName.split(" - ").toTypedArray()
+                val arr = TrackName.split(Regex(" - ")).toTypedArray()
                 if (arr.size > 1) {
                     Artist = arr[0]
                     TrackName = TrackName.replace("$Artist - ", "")
@@ -535,6 +566,53 @@ class FileManagerPresenter(
             }
             view?.startPlayAudios(mAudios, index)
         }
+    }
+
+    private fun deleteRecursive(dir: String) {
+        val fDir = File(dir)
+        if (fDir.exists() && fDir.isDirectory) {
+            val children = fDir.list()
+            if (children != null) {
+                for (child in children) {
+                    val rem = File(fDir, child)
+                    if (rem.isFile) {
+                        rem.delete()
+                    } else if (rem.isDirectory && rem.name != "." && rem.name != "..") {
+                        deleteRecursive(rem.absolutePath)
+                        rem.delete()
+                    }
+                }
+            }
+        }
+    }
+
+    fun fireDelete(item: FileItem) {
+        isLoading = true
+        view?.resolveLoading(isLoading)
+        Completable.create {
+            if (item.type != FileType.folder) {
+                if (item.file_path?.let { it1 -> File(it1).delete() } == true) {
+                    it.onComplete()
+                } else {
+                    it.onError(Throwable("Can't Delete File"))
+                }
+            } else {
+                item.file_path?.let { it1 -> deleteRecursive(it1) }
+                if (item.file_path?.let { it1 -> File(it1).delete() } == true) {
+                    it.onComplete()
+                } else {
+                    it.onError(Throwable("Can't Delete Folder"))
+                }
+            }
+        }.fromIOToMain()
+            .subscribe({
+                isLoading = false
+                view?.resolveLoading(isLoading)
+                view?.showMessage(R.string.success)
+                loadFiles(back = false, caches = false)
+            }, {
+                view?.onError(it)
+            })
     }
 
     @FileType

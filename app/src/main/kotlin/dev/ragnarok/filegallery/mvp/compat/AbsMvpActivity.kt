@@ -5,8 +5,6 @@ import androidx.loader.app.LoaderManager
 import dev.ragnarok.filegallery.activity.NoMainActivity
 import dev.ragnarok.filegallery.mvp.core.IMvpView
 import dev.ragnarok.filegallery.mvp.core.IPresenter
-import dev.ragnarok.filegallery.mvp.core.PresenterAction
-import dev.ragnarok.filegallery.mvp.core.RetPresenterAction
 import dev.ragnarok.filegallery.mvp.view.IErrorView
 import dev.ragnarok.filegallery.mvp.view.IToastView
 import dev.ragnarok.filegallery.mvp.view.IToolbarView
@@ -62,15 +60,7 @@ abstract class AbsMvpActivity<P : IPresenter<V>, V : IMvpView> : NoMainActivity(
         super.onDestroy()
     }
 
-    fun callPresenter(action: PresenterAction<P, V>) {
-        delegate.callPresenter(action)
-    }
-
-    fun <T> callPresenter(action: RetPresenterAction<P, V, T>, onDefault: T): T {
-        return delegate.callPresenter(action, onDefault)
-    }
-
-    fun postPresenterReceive(action: PresenterAction<P, V>) {
-        delegate.postPresenterReceive(action)
+    fun lazyPresenter(block: P.() -> Unit) {
+        delegate.lazyPresenter(block)
     }
 }

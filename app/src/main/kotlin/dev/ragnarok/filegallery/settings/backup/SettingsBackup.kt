@@ -15,6 +15,7 @@ class SettingsBackup {
         SettingCollector("app_theme", SettingTypes.TYPE_STRING),
         SettingCollector("night_switch", SettingTypes.TYPE_STRING),
         SettingCollector("theme_overlay", SettingTypes.TYPE_STRING),
+        SettingCollector("delete_disabled", SettingTypes.TYPE_BOOL),
         SettingCollector("font_size", SettingTypes.TYPE_STRING),
         SettingCollector("local_media_server", SettingTypes.TYPE_STRING),
         SettingCollector("use_internal_downloader", SettingTypes.TYPE_BOOL),

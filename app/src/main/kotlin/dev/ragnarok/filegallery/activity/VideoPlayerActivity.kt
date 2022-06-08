@@ -12,7 +12,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import android.util.Rational
-import android.view.*
+import android.view.SurfaceHolder
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageView
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
@@ -25,7 +28,6 @@ import dev.ragnarok.filegallery.media.video.ExoVideoPlayer
 import dev.ragnarok.filegallery.media.video.IVideoPlayer
 import dev.ragnarok.filegallery.media.video.IVideoPlayer.IVideoSizeChangeListener
 import dev.ragnarok.filegallery.model.Video
-import dev.ragnarok.filegallery.model.VideoSize
 import dev.ragnarok.filegallery.settings.CurrentTheme.getColorBackground
 import dev.ragnarok.filegallery.settings.CurrentTheme.getColorPrimary
 import dev.ragnarok.filegallery.settings.CurrentTheme.getNavigationBarColor
@@ -35,7 +37,7 @@ import dev.ragnarok.filegallery.settings.Settings.get
 import dev.ragnarok.filegallery.settings.theme.ThemesController.currentStyle
 import dev.ragnarok.filegallery.util.Logger
 import dev.ragnarok.filegallery.util.Utils
-import dev.ragnarok.filegallery.view.AlternativeAspectRatioFrameLayout
+import dev.ragnarok.filegallery.view.ExpandableSurfaceView
 import dev.ragnarok.filegallery.view.VideoControllerView
 
 class VideoPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback,
@@ -43,10 +45,11 @@ class VideoPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback,
     private var mDecorView: View? = null
     private var mSpeed: ImageView? = null
     private var mControllerView: VideoControllerView? = null
-    private var Frame: AlternativeAspectRatioFrameLayout? = null
+    private var mSurfaceView: ExpandableSurfaceView? = null
     private var mPlayer: IVideoPlayer? = null
     private var video: Video? = null
     private var onStopCalled = false
+    private var seekSave: Long = -1
     private var isLandscape = false
     override fun onStop() {
         onStopCalled = true
@@ -82,6 +85,12 @@ class VideoPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback,
         super.attachBaseContext(Utils.updateActivityContext(newBase))
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable("video", video)
+        outState.putLong("seek", mPlayer?.currentPosition ?: -1)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(currentStyle())
         Utils.prepareDensity(this)
@@ -104,18 +113,26 @@ class VideoPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback,
         }
         if (savedInstanceState == null) {
             handleIntent(intent, false)
+        } else {
+            video = savedInstanceState.getParcelable("video")
+            seekSave = savedInstanceState.getLong("seek")
+            val actionBar = supportActionBar
+            actionBar?.title = video?.title
+            actionBar?.subtitle = video?.description
         }
         mControllerView = VideoControllerView(this)
         val surfaceContainer = findViewById<ViewGroup>(R.id.videoSurfaceContainer)
-        val mSurfaceView = findViewById<SurfaceView>(R.id.videoSurface)
-        Frame = findViewById(R.id.aspect_ratio_layout)
+        mSurfaceView = findViewById(R.id.videoSurface)
         surfaceContainer.setOnClickListener { resolveControlsVisibility() }
-        val videoHolder = mSurfaceView.holder
-        videoHolder.addCallback(this)
+        val videoHolder = mSurfaceView?.holder
+        videoHolder?.addCallback(this)
         resolveControlsVisibility()
         mPlayer = createPlayer()
         mPlayer?.addVideoSizeChangeListener(this)
         mPlayer?.play()
+        if (seekSave > 0) {
+            mPlayer?.seekTo(seekSave)
+        }
         mSpeed = findViewById(R.id.toolbar_play_speed)
         Utils.setTint(
             mSpeed,
@@ -316,7 +333,7 @@ class VideoPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback,
             if (packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
                 && hasPipPermission()
             ) if (!isInPictureInPictureMode) {
-                Frame?.let {
+                mSurfaceView?.let {
                     val aspectRatio = Rational(it.width, it.height)
                     enterPictureInPictureMode(
                         PictureInPictureParams.Builder().setAspectRatio(aspectRatio).build()
@@ -335,8 +352,8 @@ class VideoPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback,
         }
     }
 
-    override fun onVideoSizeChanged(player: IVideoPlayer, size: VideoSize?) {
-        Frame?.setAspectRatio(size?.width ?: 0, size?.height ?: 0)
+    override fun onVideoSizeChanged(player: IVideoPlayer, w: Int, h: Int) {
+        mSurfaceView?.setAspectRatio(w, h)
     }
 
     @Suppress("DEPRECATION")

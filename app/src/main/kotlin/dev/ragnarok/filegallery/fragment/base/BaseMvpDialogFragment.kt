@@ -1,7 +1,6 @@
 package dev.ragnarok.filegallery.fragment.base
 
 import android.graphics.Color
-import android.widget.Toast
 import androidx.annotation.StringRes
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
@@ -20,15 +19,6 @@ import dev.ragnarok.filegallery.util.Utils
 
 abstract class BaseMvpDialogFragment<P : AbsPresenter<V>, V : IMvpView> :
     AbsMvpDialogFragment<P, V>(), IMvpView, IErrorView, IToastView {
-    override fun showToast(@StringRes titleTes: Int, isLong: Boolean, vararg params: Any?) {
-        if (isAdded) {
-            Toast.makeText(
-                requireActivity(),
-                getString(titleTes),
-                if (isLong) Toast.LENGTH_LONG else Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
 
     override fun showError(errorText: String?) {
         if (isAdded) {

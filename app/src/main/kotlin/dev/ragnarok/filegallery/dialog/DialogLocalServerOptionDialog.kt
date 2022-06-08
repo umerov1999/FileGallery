@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.CompoundButton
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.switchmaterial.SwitchMaterial
+import com.google.android.material.materialswitch.MaterialSwitch
 import dev.ragnarok.filegallery.R
 
 class DialogLocalServerOptionDialog : BottomSheetDialogFragment() {
@@ -26,7 +26,7 @@ class DialogLocalServerOptionDialog : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val root = View.inflate(requireActivity(), R.layout.dialog_local_server_options, null)
-        val scReverse: SwitchMaterial = root.findViewById(R.id.reverse_time)
+        val scReverse: MaterialSwitch = root.findViewById(R.id.reverse_time)
         toggleDiscography = root.findViewById(R.id.go_discography)
         scReverse.isChecked = isReverse
         scReverse.setOnCheckedChangeListener { _: CompoundButton?, isChecked: Boolean ->

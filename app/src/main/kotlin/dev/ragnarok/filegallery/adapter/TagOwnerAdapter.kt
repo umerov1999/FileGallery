@@ -24,7 +24,10 @@ class TagOwnerAdapter(private var data: List<TagOwner>, private val context: Con
         return Holder(LayoutInflater.from(context).inflate(R.layout.item_tag_owner, parent, false))
     }
 
-    private fun fixNumerical(num: Int): String {
+    private fun fixNumerical(num: Int): String? {
+        if (num < 0) {
+            return null
+        }
         val preLastDigit = num % 100 / 10
         if (preLastDigit == 1) {
             return context.getString(R.string.tag_count_c, num)

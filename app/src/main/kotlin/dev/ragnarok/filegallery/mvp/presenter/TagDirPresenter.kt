@@ -152,7 +152,7 @@ class TagDirPresenter(private val owner_id: Int, savedInstanceState: Bundle?) :
                 var TrackName: String =
                     i.name?.replace(".mp3", "") ?: ""
                 val Artist: String
-                val arr = TrackName.split(" - ").toTypedArray()
+                val arr = TrackName.split(Regex(" - ")).toTypedArray()
                 if (arr.size > 1) {
                     Artist = arr[0]
                     TrackName = TrackName.replace("$Artist - ", "")

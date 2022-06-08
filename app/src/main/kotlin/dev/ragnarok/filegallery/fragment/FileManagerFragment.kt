@@ -3,6 +3,7 @@ package dev.ragnarok.filegallery.fragment
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.app.Activity.RESULT_OK
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -20,12 +21,14 @@ import androidx.core.net.toFile
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import dev.ragnarok.filegallery.Constants
 import dev.ragnarok.filegallery.Extra
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.activity.ActivityFeatures
+import dev.ragnarok.filegallery.activity.EnterPinActivity
 import dev.ragnarok.filegallery.adapter.FileManagerAdapter
 import dev.ragnarok.filegallery.adapter.FileManagerAdapter.ClickListener
 import dev.ragnarok.filegallery.fragment.base.BaseMvpFragment
@@ -35,7 +38,6 @@ import dev.ragnarok.filegallery.media.music.MusicPlaybackController
 import dev.ragnarok.filegallery.media.music.MusicPlaybackService
 import dev.ragnarok.filegallery.model.*
 import dev.ragnarok.filegallery.mvp.core.IPresenterFactory
-import dev.ragnarok.filegallery.mvp.core.PresenterAction
 import dev.ragnarok.filegallery.mvp.presenter.FileManagerPresenter
 import dev.ragnarok.filegallery.mvp.view.IFileManagerView
 import dev.ragnarok.filegallery.place.PlaceFactory
@@ -77,13 +79,12 @@ class FileManagerFragment : BaseMvpFragment<FileManagerPresenter, IFileManagerVi
                 ?: return@registerForActivityResult)
                 .extras != null
         ) {
-            postPresenterReceive(object : PresenterAction<FileManagerPresenter, IFileManagerView> {
-                override fun call(presenter: FileManagerPresenter) {
-                    presenter.scrollTo(
-                        ((result.data ?: return).extras ?: return).getString(Extra.PATH) ?: return
-                    )
-                }
-            })
+            lazyPresenter {
+                scrollTo(
+                    ((result.data ?: return@lazyPresenter).extras
+                        ?: return@lazyPresenter).getString(Extra.PATH) ?: return@lazyPresenter
+                )
+            }
         }
     }
 
@@ -260,6 +261,46 @@ class FileManagerFragment : BaseMvpFragment<FileManagerPresenter, IFileManagerVi
             .show(parentFragmentManager, "tag_add")
     }
 
+    override fun onToggleDirTag(item: FileItem) {
+        presenter?.fireToggleDirTag(item)
+    }
+
+    private val requestEnterPin = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == RESULT_OK) {
+            result.data?.getParcelableExtra<FileItem>(Extra.PATH)?.let { presenter?.fireDelete(it) }
+        }
+    }
+
+    private fun startEnterPinActivity(item: FileItem) {
+        val intent = Intent(
+            requireActivity(),
+            EnterPinActivity.getClass(requireActivity())
+        ).putExtra(Extra.PATH, item)
+        requestEnterPin.launch(intent)
+    }
+
+    override fun onDelete(item: FileItem) {
+        if (Settings.get().main().isDeleteDisabled()) {
+            showMessage(R.string.delete_disabled)
+            return
+        }
+        MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.attention)
+            .setMessage(requireActivity().getString(R.string.do_remove, item.file_name))
+            .setPositiveButton(R.string.button_yes) { _: DialogInterface?, _: Int ->
+                if (Settings.get().security().isUsePinForEntrance && Settings.get().security()
+                        .hasPinHash()
+                ) {
+                    startEnterPinActivity(item)
+                } else {
+                    presenter?.fireDelete(item)
+                }
+            }
+            .setNegativeButton(R.string.button_cancel, null)
+            .show()
+    }
+
     override fun onBackPressed(): Boolean {
         if (presenter?.canLoadUp() == true) {
             mLayoutManager?.onSaveInstanceState()?.let { presenter?.backupDirectoryScroll(it) }
@@ -371,6 +412,7 @@ class FileManagerFragment : BaseMvpFragment<FileManagerPresenter, IFileManagerVi
 
     override fun updateSelectedMode(show: Boolean) {
         mSelected?.visibility = if (show) View.VISIBLE else View.GONE
+        mAdapter?.updateSelectedMode(show)
     }
 
     override fun notifyAllChanged() {

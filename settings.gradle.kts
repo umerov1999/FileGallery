@@ -6,4 +6,6 @@ include(
     ":gson",
     ":preference"
 )
+include(":exoplayer")
+
 //include(":libnative")
