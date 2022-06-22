@@ -31,8 +31,8 @@ import dev.ragnarok.filegallery.mvp.core.IPresenterFactory
 import dev.ragnarok.filegallery.mvp.presenter.FileManagerSelectPresenter
 import dev.ragnarok.filegallery.mvp.view.IFileManagerSelectView
 import dev.ragnarok.filegallery.settings.CurrentTheme
-import dev.ragnarok.filegallery.util.RxUtils
 import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.rxutils.RxUtils
 import dev.ragnarok.filegallery.view.MySearchView
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import io.reactivex.rxjava3.core.Completable

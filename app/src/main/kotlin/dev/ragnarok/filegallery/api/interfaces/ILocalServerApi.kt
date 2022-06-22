@@ -2,6 +2,7 @@ package dev.ragnarok.filegallery.api.interfaces
 
 import androidx.annotation.CheckResult
 import dev.ragnarok.filegallery.model.Audio
+import dev.ragnarok.filegallery.model.FileRemote
 import dev.ragnarok.filegallery.model.Photo
 import dev.ragnarok.filegallery.model.Video
 import io.reactivex.rxjava3.core.Single
@@ -62,4 +63,10 @@ interface ILocalServerApi {
 
     @CheckResult
     fun update_file_name(hash: String?, name: String?): Single<Int>
+
+    @CheckResult
+    fun fsGet(dir: String?): Single<List<FileRemote>>
+
+    @CheckResult
+    fun rebootPC(type: String?): Single<Int>
 }

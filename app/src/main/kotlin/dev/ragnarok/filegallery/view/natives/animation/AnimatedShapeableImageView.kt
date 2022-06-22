@@ -11,7 +11,7 @@ import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.module.GalleryNative
 import dev.ragnarok.filegallery.module.animation.AnimatedFileDrawable
-import dev.ragnarok.filegallery.util.RxUtils
+import dev.ragnarok.filegallery.util.rxutils.RxUtils
 import dev.ragnarok.filegallery.view.natives.animation.AnimationNetworkCache.Companion.filenameForRes
 import dev.ragnarok.filegallery.view.natives.animation.AnimationNetworkCache.Companion.parentResDir
 import io.reactivex.rxjava3.core.Single

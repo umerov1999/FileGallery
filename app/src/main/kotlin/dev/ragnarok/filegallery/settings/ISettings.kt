@@ -65,6 +65,7 @@ interface ISettings {
         fun getViewpager_page_transform(): Int
         fun getPlayer_cover_transform(): Int
         fun isDeleteDisabled(): Boolean
+        val isValidate_tls: Boolean
     }
 
     interface ISecuritySettings {

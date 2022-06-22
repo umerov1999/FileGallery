@@ -10,6 +10,7 @@
     <string name="crash_error_activity_error_details_copy">Копировать</string>
     <string name="crash_error_activity_error_details_copied">Скопировано</string>
     <string name="crash_error_activity_error_details_clipboard_label">Информация об ошибке</string>
+    <string name="crash_error_activity_out_of_memory">Недостаточно оперативной памяти!</string>
 
     <string-array name="night_mode_values" translatable="false">
         <item>1</item>
@@ -313,4 +314,10 @@
     <string name="do_remove">Вы уверены, что хотите удалить %1$s?</string>
     <string name="attention">Внимание</string>
     <string name="delete_disabled">Удаление заблокировано</string>
+    <string name="root_dir">Корень</string>
+    <string name="general_settings">Общие</string>
+    <string name="validate_tls">Верификация сертификатов</string>
+    <string name="validate_tls_summary">Отключение делает вас уязвимым</string>
+    <string name="reboot_pc_win">Перезапуск Win</string>
+    <string name="reboot_pc_linux">Перезапуск Linux</string>
 </resources>

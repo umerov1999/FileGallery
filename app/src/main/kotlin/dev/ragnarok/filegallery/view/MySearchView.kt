@@ -21,8 +21,8 @@ import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.listener.TextWatcherAdapter
 import dev.ragnarok.filegallery.trimmedNonNullNoEmpty
 import dev.ragnarok.filegallery.util.Logger
-import dev.ragnarok.filegallery.util.RxUtils
 import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.rxutils.RxUtils
 import io.reactivex.rxjava3.disposables.Disposable
 
 class MySearchView : LinearLayout {

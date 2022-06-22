@@ -1,0 +1,3 @@
+include ":app", ":picasso", ":retrofit", ":material", ":gson", ":preference", ":viewpager2"
+
+//include ":libnative"

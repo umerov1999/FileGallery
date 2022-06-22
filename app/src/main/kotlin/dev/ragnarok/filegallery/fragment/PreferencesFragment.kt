@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputEditText
@@ -61,16 +62,22 @@ import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.settings.backup.SettingsBackup
 import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.rxutils.RxUtils
 import dev.ragnarok.filegallery.view.MySearchView
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.Disposable
 import java.io.*
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.TimeUnit
 
 class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScreenChangeListener,
     BackPressCallback, CanBackPressedCallback {
     private var preferencesView: RecyclerView? = null
     private var layoutManager: LinearLayoutManager? = null
     private var searchView: MySearchView? = null
+    private var sleepDataDisposable = Disposable.disposed()
+    private val SEARCH_DELAY = 2000
     override val keyInstanceState: String = "root_preferences"
 
     private val musicDir = registerForActivityResult(
@@ -223,6 +230,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
             )
             it.setOnQueryTextListener(object : MySearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
+                    sleepDataDisposable.dispose()
                     if (query.nonNullNoEmpty() && query.trimmedNonNullNoEmpty()) {
                         preferencesAdapter?.findPreferences(requireActivity(), query, root)
                     }
@@ -230,6 +238,19 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 }
 
                 override fun onQueryTextChange(newText: String?): Boolean {
+                    sleepDataDisposable.dispose()
+                    sleepDataDisposable = Single.just(Any())
+                        .delay(SEARCH_DELAY.toLong(), TimeUnit.MILLISECONDS)
+                        .fromIOToMain()
+                        .subscribe({
+                            if (newText.nonNullNoEmpty() && newText.trimmedNonNullNoEmpty()) {
+                                preferencesAdapter?.findPreferences(
+                                    requireActivity(),
+                                    newText,
+                                    root
+                                )
+                            }
+                        }, { RxUtils.dummy() })
                     return false
                 }
             })
@@ -274,35 +295,122 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
 
     @Suppress("DEPRECATION")
     private fun createRootScreen() = screen(requireActivity()) {
-        pref(KEY_APP_THEME) {
-            iconRes = R.drawable.select_colored
-            titleRes = R.string.choose_theme_title
-            onClick {
-                PlaceFactory.getSettingsThemePlace().tryOpenWith(requireActivity())
-                true
-            }
-        }
-
-        singleChoice(
-            KEY_NIGHT_SWITCH,
-            selItems(R.array.night_mode_names, R.array.night_mode_values),
-            parentFragmentManager
-        ) {
-            initialSelection = "-1"
-            titleRes = R.string.night_mode_title
-            iconRes = R.drawable.night_mode_pref
-            onSelectionChange {
-                when (it.toInt()) {
-                    NightMode.DISABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                    NightMode.ENABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                    NightMode.AUTO -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY)
-                    NightMode.FOLLOW_SYSTEM -> AppCompatDelegate.setDefaultNightMode(
-                        AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                    )
+        subScreen("general_preferences") {
+            titleRes = R.string.general_settings
+            iconRes = R.drawable.preferences_settings
+            pref(KEY_APP_THEME) {
+                iconRes = R.drawable.select_colored
+                titleRes = R.string.choose_theme_title
+                onClick {
+                    PlaceFactory.getSettingsThemePlace().tryOpenWith(requireActivity())
+                    true
                 }
             }
-        }
 
+            singleChoice(
+                KEY_NIGHT_SWITCH,
+                selItems(R.array.night_mode_names, R.array.night_mode_values),
+                parentFragmentManager
+            ) {
+                initialSelection = "-1"
+                titleRes = R.string.night_mode_title
+                iconRes = R.drawable.night_mode_pref
+                onSelectionChange {
+                    when (it.toInt()) {
+                        NightMode.DISABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                        NightMode.ENABLE -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                        NightMode.AUTO -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY)
+                        NightMode.FOLLOW_SYSTEM -> AppCompatDelegate.setDefaultNightMode(
+                            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                        )
+                    }
+                }
+            }
+
+            switch("validate_tls") {
+                defaultValue = true
+                summaryRes = R.string.validate_tls_summary
+                titleRes = R.string.validate_tls
+            }
+
+            switch("delete_disabled") {
+                defaultValue = false
+                titleRes = R.string.delete_disabled
+            }
+
+            singleChoice(
+                "theme_overlay",
+                selItems(R.array.theme_overlay_names, R.array.theme_overlay_values),
+                parentFragmentManager
+            ) {
+                initialSelection = "0"
+                titleRes = R.string.theme_overlay
+                onSelectionChange {
+                    requireActivity().recreate()
+                }
+            }
+
+            singleChoice(
+                "font_size",
+                selItems(R.array.array_font_size_names, R.array.array_font_size_items),
+                parentFragmentManager
+            ) {
+                initialSelection = "0"
+                titleRes = R.string.font_size
+                onSelectionChange {
+                    requireActivity().recreate()
+                }
+            }
+            switch("use_internal_downloader") {
+                defaultValue = true
+                summaryRes = R.string.use_internal_downloader_summary
+                titleRes = R.string.use_internal_downloader
+            }
+
+            switch("video_controller_to_decor") {
+                defaultValue = false
+                titleRes = R.string.video_controller_to_decor
+            }
+
+            switch("video_swipes") {
+                defaultValue = true
+                titleRes = R.string.video_swipes
+            }
+
+            switch("download_photo_tap") {
+                defaultValue = true
+                titleRes = R.string.download_photo_tap
+            }
+
+            switch("show_photos_line") {
+                defaultValue = true
+                titleRes = R.string.show_photos_line
+            }
+
+            singleChoice(
+                "viewpager_page_transform",
+                selItems(
+                    R.array.array_pager_transform_names,
+                    R.array.array_pager_transform_anim_items
+                ),
+                parentFragmentManager
+            ) {
+                initialSelection = "0"
+                titleRes = R.string.viewpager_page_transform
+            }
+
+            singleChoice(
+                "player_cover_transform",
+                selItems(
+                    R.array.array_pager_transform_names,
+                    R.array.array_pager_transform_anim_items
+                ),
+                parentFragmentManager
+            ) {
+                initialSelection = "1"
+                titleRes = R.string.player_cover_transform
+            }
+        }
         pref("security") {
             titleRes = R.string.security
             iconRes = R.drawable.security_settings
@@ -312,95 +420,9 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
             }
         }
 
-        switch("delete_disabled") {
-            defaultValue = false
-            titleRes = R.string.delete_disabled
-        }
-
-        singleChoice(
-            "theme_overlay",
-            selItems(R.array.theme_overlay_names, R.array.theme_overlay_values),
-            parentFragmentManager
-        ) {
-            initialSelection = "0"
-            titleRes = R.string.theme_overlay
-            onSelectionChange {
-                requireActivity().recreate()
-            }
-        }
-
-        singleChoice(
-            "font_size",
-            selItems(R.array.array_font_size_names, R.array.array_font_size_items),
-            parentFragmentManager
-        ) {
-            initialSelection = "0"
-            titleRes = R.string.font_size
-            onSelectionChange {
-                requireActivity().recreate()
-            }
-        }
-
-        accentButtonPref("local_media_server") {
-            titleRes = R.string.local_media_server
-            onClick {
-                LocalMediaServerDialog().show(parentFragmentManager, "LocalMediaServer")
-                true
-            }
-        }
-
-        switch("use_internal_downloader") {
-            defaultValue = true
-            summaryRes = R.string.use_internal_downloader_summary
-            titleRes = R.string.use_internal_downloader
-        }
-
-        switch("video_controller_to_decor") {
-            defaultValue = false
-            titleRes = R.string.video_controller_to_decor
-        }
-
-        switch("video_swipes") {
-            defaultValue = true
-            titleRes = R.string.video_swipes
-        }
-
-        switch("download_photo_tap") {
-            defaultValue = true
-            titleRes = R.string.download_photo_tap
-        }
-
-        switch("show_photos_line") {
-            defaultValue = true
-            titleRes = R.string.show_photos_line
-        }
-
-        singleChoice(
-            "viewpager_page_transform",
-            selItems(
-                R.array.array_pager_transform_names,
-                R.array.array_pager_transform_anim_items
-            ),
-            parentFragmentManager
-        ) {
-            initialSelection = "0"
-            titleRes = R.string.viewpager_page_transform
-        }
-
-        singleChoice(
-            "player_cover_transform",
-            selItems(
-                R.array.array_pager_transform_names,
-                R.array.array_pager_transform_anim_items
-            ),
-            parentFragmentManager
-        ) {
-            initialSelection = "1"
-            titleRes = R.string.player_cover_transform
-        }
-
         subScreen("music_settings") {
             titleRes = R.string.music_settings
+            iconRes = R.drawable.player_settings
             collapseIcon = true
             switch("audio_round_icon") {
                 defaultValue = true
@@ -479,8 +501,8 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
             }
         }
 
-
         subScreen("download_directory") {
+            iconRes = R.drawable.save_settings
             titleRes = R.string.download_directory
 
             customText("music_dir", parentFragmentManager) {
@@ -537,6 +559,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
         }
 
         subScreen("dev_settings") {
+            iconRes = R.drawable.developer_mode
             titleRes = R.string.dev_settings
             switch("developer_mode") {
                 defaultValue = true
@@ -661,7 +684,9 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 }
             }
         }
+
         subScreen("import_export_settings") {
+            iconRes = R.drawable.preferences_settings
             titleRes = R.string.import_export_settings
             pref("export_settings") {
                 titleRes = R.string.export_settings
@@ -690,7 +715,16 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 }
             }
         }
+        accentButtonPref("local_media_server") {
+            iconRes = R.drawable.web_settings
+            titleRes = R.string.local_media_server
+            onClick {
+                LocalMediaServerDialog().show(parentFragmentManager, "LocalMediaServer")
+                true
+            }
+        }
         pref("version") {
+            iconRes = R.drawable.app_info_settings
             titleRes = R.string.app_name
             summary = BuildConfig.VERSION_NAME
             onClick {
@@ -880,6 +914,23 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
             password.setText(settings.password)
             enabled.isChecked = settings.enabled
             enabled_audio_local_sync.isChecked = settings.enabled_audio_local_sync
+
+            view.findViewById<MaterialButton>(R.id.reboot_pc_win).setOnClickListener {
+                Includes.networkInterfaces.localServerApi().rebootPC("win")
+                    .fromIOToMain()
+                    .subscribe({
+                        CreateCustomToast(requireActivity()).showToastSuccessBottom(R.string.success)
+                    }, { Utils.showErrorInAdapter(requireActivity(), it) })
+            }
+
+            view.findViewById<MaterialButton>(R.id.reboot_pc_linux).setOnClickListener {
+                Includes.networkInterfaces.localServerApi().rebootPC("linux")
+                    .fromIOToMain()
+                    .subscribe({
+                        CreateCustomToast(requireActivity()).showToastSuccessBottom(R.string.success)
+                    }, { Utils.showErrorInAdapter(requireActivity(), it) })
+            }
+
             return MaterialAlertDialogBuilder(requireActivity())
                 .setView(view)
                 .setCancelable(true)
@@ -1098,6 +1149,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
     }
 
     override fun onDestroy() {
+        sleepDataDisposable.dispose()
         preferencesView?.let { preferencesAdapter?.stopObserveScrollPosition(it) }
         preferencesAdapter?.onScreenChangeListener = null
         preferencesView?.adapter = null

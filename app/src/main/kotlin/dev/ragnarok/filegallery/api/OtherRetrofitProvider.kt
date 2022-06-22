@@ -29,7 +29,6 @@ class OtherRetrofitProvider @SuppressLint("CheckResult") constructor(private val
         val localSettings = mainSettings.getLocalServer()
         val builder = OkHttpClient.Builder()
             .readTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor(HttpLogger.DEFAULT_LOGGING_INTERCEPTOR)
             .addInterceptor(Interceptor { chain: Interceptor.Chain ->
                 val request =
                     chain.request().newBuilder().addHeader("User-Agent", Constants.USER_AGENT)
@@ -52,6 +51,8 @@ class OtherRetrofitProvider @SuppressLint("CheckResult") constructor(private val
                     .build()
                 chain.proceed(request)
             })
+        HttpLogger.adjust(builder)
+        HttpLogger.configureToIgnoreCertificates(builder)
         val url = firstNonEmptyString(localSettings.url, "https://debug.dev")!!
         return Retrofit.Builder()
             .baseUrl("$url/method/")

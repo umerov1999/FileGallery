@@ -7,7 +7,7 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/current_path">
+        android:layout_above="@id/current_path_root">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
@@ -103,19 +103,29 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/current_path"
+    <dev.ragnarok.filegallery.view.RoundCornerLinearView
+        android:id="@+id/current_path_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="?colorControlNormal"
-        android:gravity="center"
-        android:padding="8dp"
-        android:paddingStart="12dp"
-        android:paddingTop="4dp"
-        android:paddingEnd="12dp"
-        android:paddingBottom="4dp"
-        android:textColor="#ffffff" />
+        android:orientation="vertical"
+        app:radius_bottom_left="2dp"
+        app:radius_bottom_right="2dp"
+        app:radius_top_left="12dp"
+        app:radius_top_right="12dp"
+        app:view_color="?colorControlNormal">
+
+        <TextView
+            android:id="@+id/current_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingTop="4dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="4dp"
+            android:textColor="#ffffff" />
+    </dev.ragnarok.filegallery.view.RoundCornerLinearView>
 
 </RelativeLayout>
 

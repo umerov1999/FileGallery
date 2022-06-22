@@ -6,6 +6,7 @@ import dev.ragnarok.filegallery.api.model.Items
 import dev.ragnarok.filegallery.api.model.response.BaseResponse
 import dev.ragnarok.filegallery.api.services.ILocalServerService
 import dev.ragnarok.filegallery.model.Audio
+import dev.ragnarok.filegallery.model.FileRemote
 import dev.ragnarok.filegallery.model.Photo
 import dev.ragnarok.filegallery.model.Video
 import dev.ragnarok.filegallery.nonNullNoEmpty
@@ -132,6 +133,22 @@ internal class LocalServerApi(private val service: ILocalServerServiceProvider) 
             .flatMap { service: ILocalServerService ->
                 service.update_file_name(hash, name)
                     .map(extractResponseWithErrorHandlingSimple())
+            }
+    }
+
+    override fun rebootPC(type: String?): Single<Int> {
+        return service.provideLocalServerService()
+            .flatMap { service: ILocalServerService ->
+                service.rebootPC(type)
+                    .map(extractResponseWithErrorHandlingSimple())
+            }
+    }
+
+    override fun fsGet(dir: String?): Single<List<FileRemote>> {
+        return service.provideLocalServerService()
+            .flatMap { service: ILocalServerService ->
+                service.fsGet(dir)
+                    .map(extractResponseWithErrorHandling())
             }
     }
 

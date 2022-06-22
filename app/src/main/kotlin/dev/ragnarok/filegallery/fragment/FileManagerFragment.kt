@@ -46,9 +46,9 @@ import dev.ragnarok.filegallery.place.PlaceFactory.getPlayerPlace
 import dev.ragnarok.filegallery.settings.CurrentTheme
 import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
-import dev.ragnarok.filegallery.util.RxUtils
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.util.ViewUtils
+import dev.ragnarok.filegallery.util.rxutils.RxUtils
 import dev.ragnarok.filegallery.view.MySearchView
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import io.reactivex.rxjava3.core.Completable
@@ -139,7 +139,7 @@ class FileManagerFragment : BaseMvpFragment<FileManagerPresenter, IFileManagerVi
         empty = root.findViewById(R.id.empty)
         val mySearchView: MySearchView = root.findViewById(R.id.searchview)
         mySearchView.setRightButtonVisibility(true)
-        mySearchView.setRightIcon(R.drawable.star)
+        mySearchView.setRightIcon(R.drawable.ic_favorite_add)
         mySearchView.setLeftIcon(R.drawable.magnify)
         mySearchView.setOnBackButtonClickListener(object : MySearchView.OnBackButtonClickListener {
             override fun onBackButtonClick() {

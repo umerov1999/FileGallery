@@ -53,9 +53,9 @@ import dev.ragnarok.filegallery.settings.theme.ThemesController.nextRandom
 import dev.ragnarok.filegallery.util.AppPerms
 import dev.ragnarok.filegallery.util.AppPerms.requestPermissionsResultAbs
 import dev.ragnarok.filegallery.util.Logger
-import dev.ragnarok.filegallery.util.RxUtils
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.util.ViewUtils.keyboardHide
+import dev.ragnarok.filegallery.util.rxutils.RxUtils
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.io.File
 

@@ -14,12 +14,15 @@ import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.activity.ActivityFeatures
 import dev.ragnarok.filegallery.activity.ActivityUtils.supportToolbarFor
 import dev.ragnarok.filegallery.fragment.base.BaseFragment
+import dev.ragnarok.filegallery.listener.BackPressCallback
 import dev.ragnarok.filegallery.listener.OnSectionResumeCallback
 import dev.ragnarok.filegallery.model.SectionItem
 import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.util.Utils
 
-class LocalServerTabsFragment : BaseFragment() {
+class LocalServerTabsFragment : BaseFragment(), BackPressCallback {
+    private var mPagerAdapter: Adapter? = null
+    private var mCurrentTab = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,6 +37,26 @@ class LocalServerTabsFragment : BaseFragment() {
         return root
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState != null) {
+            mCurrentTab = savedInstanceState.getInt("mCurrentTab")
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt("mCurrentTab", mCurrentTab)
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (mPagerAdapter != null) {
+            val fragment = mPagerAdapter?.findByPosition(mCurrentTab)
+            return fragment !is BackPressCallback || (fragment as BackPressCallback).onBackPressed()
+        }
+        return true
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val viewPager: ViewPager2 = view.findViewById(R.id.fragment_tabs_pager)
         viewPager.offscreenPageLimit = 1
@@ -42,19 +65,27 @@ class LocalServerTabsFragment : BaseFragment() {
                 Settings.get().main().getViewpager_page_transform()
             )
         )
-        val adapter = Adapter(this)
-        setupViewPager(viewPager, adapter)
+        mPagerAdapter = Adapter(this)
+        setupViewPager(viewPager, mPagerAdapter ?: return)
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                mCurrentTab = position
+            }
+        })
         TabLayoutMediator(
             view.findViewById(R.id.fragment_local_media_server_tabs),
             viewPager
         ) { tab: TabLayout.Tab, position: Int ->
-            when (adapter.tFragments[position]) {
+            when ((mPagerAdapter ?: return@TabLayoutMediator).tFragments[position]) {
                 LOCAL_SERVER_AUDIO -> tab.text =
                     getString(R.string.local_server_audio)
                 LOCAL_SERVER_PHOTO -> tab.text =
                     getString(R.string.local_server_photo)
                 LOCAL_SERVER_VIDEO -> tab.text =
                     getString(R.string.local_server_video)
+                LOCAL_SERVER_FS -> tab.text =
+                    getString(R.string.files)
             }
         }.attach()
     }
@@ -68,6 +99,9 @@ class LocalServerTabsFragment : BaseFragment() {
             LOCAL_SERVER_VIDEO -> {
                 VideosLocalServerFragment()
             }
+            LOCAL_SERVER_FS -> {
+                FileManagerRemoteFragment()
+            }
             else -> throw UnsupportedOperationException()
         }
     }
@@ -76,6 +110,7 @@ class LocalServerTabsFragment : BaseFragment() {
         adapter.addFragment(LOCAL_SERVER_AUDIO)
         adapter.addFragment(LOCAL_SERVER_PHOTO)
         adapter.addFragment(LOCAL_SERVER_VIDEO)
+        adapter.addFragment(LOCAL_SERVER_FS)
         viewPager.adapter = adapter
     }
 
@@ -114,5 +149,6 @@ class LocalServerTabsFragment : BaseFragment() {
         const val LOCAL_SERVER_AUDIO = 0
         const val LOCAL_SERVER_PHOTO = 1
         const val LOCAL_SERVER_VIDEO = 2
+        const val LOCAL_SERVER_FS = 3
     }
 }

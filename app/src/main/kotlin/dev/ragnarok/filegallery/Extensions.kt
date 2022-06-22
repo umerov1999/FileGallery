@@ -6,8 +6,8 @@ import android.animation.PropertyValuesHolder
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.view.View
-import dev.ragnarok.filegallery.util.RxUtils
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import dev.ragnarok.filegallery.util.rxutils.RxUtils
+import dev.ragnarok.filegallery.util.rxutils.io.AndroidSchedulers
 import io.reactivex.rxjava3.core.*
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer

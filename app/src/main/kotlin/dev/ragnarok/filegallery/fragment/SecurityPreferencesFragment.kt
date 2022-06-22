@@ -28,7 +28,7 @@ import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.settings.SecuritySettings
 import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.trimmedNonNullNoEmpty
-import dev.ragnarok.filegallery.util.RxUtils
+import dev.ragnarok.filegallery.util.rxutils.RxUtils
 import dev.ragnarok.filegallery.view.MySearchView
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable

@@ -11,7 +11,7 @@ import dev.ragnarok.filegallery.fromIOToMain
 import dev.ragnarok.filegallery.module.BufferWriteNative
 import dev.ragnarok.filegallery.module.GalleryNative
 import dev.ragnarok.filegallery.module.rlottie.RLottieDrawable
-import dev.ragnarok.filegallery.util.RxUtils
+import dev.ragnarok.filegallery.util.rxutils.RxUtils
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.core.SingleEmitter
 import io.reactivex.rxjava3.core.SingleOnSubscribe

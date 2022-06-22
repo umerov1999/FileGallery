@@ -8,11 +8,10 @@ import dev.ragnarok.filegallery.db.impl.AppStorages
 import dev.ragnarok.filegallery.db.interfaces.IStorages
 import dev.ragnarok.filegallery.settings.ISettings
 import dev.ragnarok.filegallery.settings.SettingsImpl
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import dev.ragnarok.filegallery.util.rxutils.io.AndroidSchedulers
 import io.reactivex.rxjava3.core.Scheduler
 
 object Includes {
-
     val networkInterfaces: INetworker by lazy {
         Networker(settings.main())
     }

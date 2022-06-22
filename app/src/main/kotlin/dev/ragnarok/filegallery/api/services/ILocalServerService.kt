@@ -3,6 +3,7 @@ package dev.ragnarok.filegallery.api.services
 import dev.ragnarok.filegallery.api.model.Items
 import dev.ragnarok.filegallery.api.model.response.BaseResponse
 import dev.ragnarok.filegallery.model.Audio
+import dev.ragnarok.filegallery.model.FileRemote
 import dev.ragnarok.filegallery.model.Photo
 import dev.ragnarok.filegallery.model.Video
 import io.reactivex.rxjava3.core.Single
@@ -96,5 +97,17 @@ interface ILocalServerService {
     fun update_file_name(
         @Field("hash") hash: String?,
         @Field("name") name: String?
+    ): Single<BaseResponse<Int>>
+
+    @FormUrlEncoded
+    @POST("fs.get")
+    fun fsGet(
+        @Field("dir") dir: String?
+    ): Single<BaseResponse<Items<FileRemote>>>
+
+    @FormUrlEncoded
+    @POST("rebootPC")
+    fun rebootPC(
+        @Field("type") type: String?
     ): Single<BaseResponse<Int>>
 }
