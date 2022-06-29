@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
+    id("kotlinx-serialization")
 }
 
 android {
@@ -57,6 +58,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs = ["-opt-in=kotlin.contracts.ExperimentalContracts",
+                            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
                             "-opt-in=kotlin.RequiresOptIn", "-opt-in=kotlin.ExperimentalStdlibApi"]
     }
 
@@ -84,7 +86,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-common:$lifecycleVersion")
     implementation("androidx.annotation:annotation:$annotationVersion")
-    implementation("androidx.recyclerview:recyclerview:$recyclerviewVersion")
+    //implementation("androidx.recyclerview:recyclerview:$recyclerviewVersion")
     implementation("androidx.vectordrawable:vectordrawable:$vectordrawableVersion")
     implementation("androidx.appcompat:appcompat:$appcompatVersion")
     implementation("androidx.customview:customview:1.2.0-alpha01")
@@ -97,7 +99,7 @@ dependencies {
     implementation project(path: ":picasso")
     implementation project(path: ":viewpager2")
     implementation project(path: ":material")
-    implementation project(path: ":gson")
+    //implementation project(path: ":gson")
     implementation project(path: ":preference")
     implementation project(path: ":retrofit")
     implementation("com.squareup.okhttp3:okhttp-android:$okhttpLibraryVersion")
@@ -116,4 +118,5 @@ dependencies {
     implementation("androidx.loader:loader:1.1.0")
     implementation("androidx.collection:collection-ktx:$collectionVersion")
     implementation("androidx.savedstate:savedstate-ktx:$savedStateVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$kotlin_serializer")
 }

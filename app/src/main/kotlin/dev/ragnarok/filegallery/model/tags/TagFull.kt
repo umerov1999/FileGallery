@@ -2,12 +2,17 @@ package dev.ragnarok.filegallery.model.tags
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.annotation.Keep
 import dev.ragnarok.filegallery.model.FileType
+import kotlinx.serialization.Serializable
 
+@Serializable
+@Keep
 class TagFull : Parcelable {
     var name: String? = null
         private set
-    var dirs: List<TagDirEntry>? = null
+    var dirs: ArrayList<TagDirEntry>? = null
+
 
     constructor()
     constructor(`in`: Parcel) {
@@ -24,9 +29,13 @@ class TagFull : Parcelable {
         parcel.writeTypedList(dirs)
     }
 
-    fun setDirs(dirs: List<TagDirEntry>?): TagFull {
+    fun setDirs(dirs: ArrayList<TagDirEntry>?): TagFull {
         this.dirs = dirs
         return this
+    }
+
+    fun reverseList() {
+        dirs?.reverse()
     }
 
     fun setName(name: String?): TagFull {
@@ -34,13 +43,13 @@ class TagFull : Parcelable {
         return this
     }
 
+    @Serializable
     class TagDirEntry : Parcelable {
         var name: String? = null
             private set
         var path: String? = null
             private set
 
-        @get:FileType
         @FileType
         var type = FileType.folder
             private set
@@ -88,13 +97,16 @@ class TagFull : Parcelable {
         }
     }
 
-    companion object CREATOR : Parcelable.Creator<TagFull> {
-        override fun createFromParcel(parcel: Parcel): TagFull {
-            return TagFull(parcel)
-        }
+    companion object {
+        @JvmField
+        val CREATOR: Parcelable.Creator<TagFull> = object : Parcelable.Creator<TagFull> {
+            override fun createFromParcel(`in`: Parcel): TagFull {
+                return TagFull(`in`)
+            }
 
-        override fun newArray(size: Int): Array<TagFull?> {
-            return arrayOfNulls(size)
+            override fun newArray(size: Int): Array<TagFull?> {
+                return arrayOfNulls(size)
+            }
         }
     }
 }

@@ -2,7 +2,6 @@ package dev.ragnarok.filegallery
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.gson.internal.ConstructorConstructor
 import dev.ragnarok.filegallery.activity.crash.CrashUtils
 import dev.ragnarok.filegallery.media.music.MusicPlaybackController
 import dev.ragnarok.filegallery.module.GalleryNative
@@ -32,7 +31,6 @@ class App : Application() {
                 return Utils.density
             }
         })
-        ConstructorConstructor.setLogUnsafe(Settings.get().main().isDeveloper_mode())
 
         if (GalleryNative.isNativeLoaded) {
             MusicPlaybackController.tracksExist = FileExistNative()

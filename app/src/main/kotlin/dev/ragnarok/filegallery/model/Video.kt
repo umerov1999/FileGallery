@@ -2,8 +2,11 @@ package dev.ragnarok.filegallery.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import dev.ragnarok.filegallery.api.adapters.VideoDtoAdapter
 import dev.ragnarok.filegallery.module.parcel.ParcelNative
+import kotlinx.serialization.Serializable
 
+@Serializable(with = VideoDtoAdapter::class)
 class Video : Parcelable, ParcelNative.ParcelableNative {
     var id = 0
         private set

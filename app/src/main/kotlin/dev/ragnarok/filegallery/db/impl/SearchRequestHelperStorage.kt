@@ -469,7 +469,7 @@ class SearchRequestHelperStorage internal constructor(context: Context) :
                             TagDirsColumns.TABLENAME,
                             TAG_DIR_PROJECTION, where, args, null, null, BaseColumns._ID + " DESC"
                         )
-                        val data: MutableList<TagFull.TagDirEntry> = ArrayList(dCursor.count)
+                        val data: ArrayList<TagFull.TagDirEntry> = ArrayList(dCursor.count)
                         dCursor.use {
                             while (it.moveToNext()) {
                                 data.add(

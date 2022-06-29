@@ -3,9 +3,9 @@ package dev.ragnarok.filegallery.settings
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Environment
-import com.google.gson.Gson
 import de.maxr1998.modernpreferences.PreferenceScreen.Companion.getPreferences
 import dev.ragnarok.filegallery.Constants
+import dev.ragnarok.filegallery.kJson
 import dev.ragnarok.filegallery.model.LocalServerSettings
 import dev.ragnarok.filegallery.model.PlayerCoverBackgroundSettings
 import dev.ragnarok.filegallery.model.SlidrSettings
@@ -14,8 +14,9 @@ import dev.ragnarok.filegallery.settings.theme.ThemeOverlay
 import dev.ragnarok.filegallery.view.pager.Transformers_Types
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import java.io.File
-
 
 internal class MainSettings(context: Context) : IMainSettings {
     private val app: Context = context.applicationContext
@@ -126,13 +127,13 @@ internal class MainSettings(context: Context) : IMainSettings {
         return if (ret == null) {
             LocalServerSettings()
         } else {
-            Gson().fromJson(ret, LocalServerSettings::class.java)
+            kJson.decodeFromString(ret)
         }
     }
 
     override fun setLocalServer(settings: LocalServerSettings) {
         getPreferences(app).edit()
-            .putString("local_media_server", Gson().toJson(settings)).apply()
+            .putString("local_media_server", kJson.encodeToString(settings)).apply()
         localServerPublisher.onNext(settings)
     }
 
@@ -142,13 +143,13 @@ internal class MainSettings(context: Context) : IMainSettings {
         return if (ret == null) {
             PlayerCoverBackgroundSettings().set_default()
         } else {
-            Gson().fromJson(ret, PlayerCoverBackgroundSettings::class.java)
+            kJson.decodeFromString(ret)
         }
     }
 
     override fun setPlayerCoverBackgroundSettings(settings: PlayerCoverBackgroundSettings) {
         getPreferences(app).edit()
-            .putString("player_background_settings_json", Gson().toJson(settings)).apply()
+            .putString("player_background_settings_json", kJson.encodeToString(settings)).apply()
     }
 
     override fun getSlidrSettings(): SlidrSettings {
@@ -156,13 +157,13 @@ internal class MainSettings(context: Context) : IMainSettings {
         return if (ret == null) {
             SlidrSettings().set_default()
         } else {
-            Gson().fromJson(ret, SlidrSettings::class.java)
+            kJson.decodeFromString(ret)
         }
     }
 
     override fun setSlidrSettings(settings: SlidrSettings) {
         getPreferences(app).edit()
-            .putString("slidr_settings_json", Gson().toJson(settings)).apply()
+            .putString("slidr_settings_json", kJson.encodeToString(settings)).apply()
     }
 
     override fun getMusicLifecycle(): Int {

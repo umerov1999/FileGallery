@@ -1,21 +1,16 @@
 package dev.ragnarok.filegallery.api.adapters
 
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonParseException
 import dev.ragnarok.filegallery.model.Photo
-import java.lang.reflect.Type
+import dev.ragnarok.filegallery.orZero
+import dev.ragnarok.filegallery.util.serializeble.json.JsonElement
 
-class PhotoDtoAdapter : AbsAdapter(), JsonDeserializer<Photo> {
-    @Throws(JsonParseException::class)
+class PhotoDtoAdapter : AbsAdapter<Photo>("Photo") {
+    @Throws(Exception::class)
     override fun deserialize(
-        json: JsonElement,
-        typeOfT: Type,
-        context: JsonDeserializationContext
+        json: JsonElement
     ): Photo {
         if (!checkObject(json)) {
-            throw JsonParseException("$TAG error parse object")
+            throw Exception("$TAG error parse object")
         }
         val photo = Photo()
         val root = json.asJsonObject
@@ -25,11 +20,11 @@ class PhotoDtoAdapter : AbsAdapter(), JsonDeserializer<Photo> {
         photo.setText(optString(root, "text"))
         if (hasArray(root, "sizes")) {
             val sizesArray = root.getAsJsonArray("sizes")
-            for (i in 0 until sizesArray.size()) {
-                if (!checkObject(sizesArray[i])) {
+            for (i in 0 until sizesArray?.size.orZero()) {
+                if (!checkObject(sizesArray?.get(i))) {
                     continue
                 }
-                val p = sizesArray[i].asJsonObject
+                val p = sizesArray?.get(i)?.asJsonObject
                 if (optString(p, "type").equals("w")) {
                     photo.setPhoto_url(optString(p, "url"))
                 } else if (optString(p, "type").equals("s")) {

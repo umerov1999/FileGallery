@@ -12,7 +12,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import androidx.work.*
-import com.google.gson.Gson
 import dev.ragnarok.filegallery.Constants
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.media.music.MusicPlaybackController
@@ -263,7 +262,7 @@ object DownloadWorkUtils {
         try {
             val downloadWork = OneTimeWorkRequest.Builder(TrackDownloadWorker::class.java)
             val data = Data.Builder()
-            data.putString(ExtraDwn.URL, Gson().toJson(audio))
+            data.putString(ExtraDwn.URL, audio.url)
             data.putString(ExtraDwn.DIR, result_filename.path)
             data.putString(ExtraDwn.FILE, result_filename.file)
             data.putString(ExtraDwn.EXT, result_filename.ext)
@@ -526,14 +525,15 @@ object DownloadWorkUtils {
                 inputData.getString(ExtraDwn.FILE)!!,
                 inputData.getString(ExtraDwn.DIR)!!, inputData.getString(ExtraDwn.EXT)!!
             )
-            val audio = Gson().fromJson(inputData.getString(ExtraDwn.URL)!!, Audio::class.java)
 
-            if (audio.url.isNullOrEmpty()) {
+            val url = inputData.getString(ExtraDwn.URL)
+
+            if (url.isNullOrEmpty()) {
                 return Result.failure()
             }
 
             val ret = doDownload(
-                audio.url,
+                url,
                 file_v,
                 true
             )

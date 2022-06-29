@@ -3,10 +3,13 @@ package dev.ragnarok.filegallery.model
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.Keep
+import dev.ragnarok.filegallery.api.adapters.AudioDtoAdapter
 import dev.ragnarok.filegallery.util.DownloadWorkUtils.TrackIsDownloaded
 import dev.ragnarok.filegallery.util.Utils.stringEmptyIfNull
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable(with = AudioDtoAdapter::class)
 class Audio : Parcelable {
     var id = 0
         private set
@@ -129,13 +132,16 @@ class Audio : Parcelable {
         return result
     }
 
-    companion object CREATOR : Parcelable.Creator<Audio> {
-        override fun createFromParcel(parcel: Parcel): Audio {
-            return Audio(parcel)
-        }
+    companion object {
+        @JvmField
+        val CREATOR: Parcelable.Creator<Audio> = object : Parcelable.Creator<Audio> {
+            override fun createFromParcel(`in`: Parcel): Audio {
+                return Audio(`in`)
+            }
 
-        override fun newArray(size: Int): Array<Audio?> {
-            return arrayOfNulls(size)
+            override fun newArray(size: Int): Array<Audio?> {
+                return arrayOfNulls(size)
+            }
         }
     }
 }

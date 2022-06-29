@@ -8,11 +8,14 @@ import android.database.sqlite.SQLiteDatabase
 import android.view.View
 import dev.ragnarok.filegallery.util.rxutils.RxUtils
 import dev.ragnarok.filegallery.util.rxutils.io.AndroidSchedulers
+import dev.ragnarok.filegallery.util.serializeble.json.Json
 import io.reactivex.rxjava3.core.*
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.functions.Consumer
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlin.contracts.contract
+
+val kJson: Json by lazy { Json { ignoreUnknownKeys = true; isLenient = true } }
 
 inline fun <reified T : Any> Single<T>.fromIOToMain(): Single<T> =
     subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())

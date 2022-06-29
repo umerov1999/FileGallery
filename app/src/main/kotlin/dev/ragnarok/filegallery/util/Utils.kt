@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.*
@@ -99,6 +100,15 @@ object Utils {
             }
         }
         return null
+    }
+
+    fun getAppVersionName(context: Context): String? {
+        return try {
+            val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            packageInfo.versionName
+        } catch (ignored: PackageManager.NameNotFoundException) {
+            null
+        }
     }
 
     @SafeVarargs

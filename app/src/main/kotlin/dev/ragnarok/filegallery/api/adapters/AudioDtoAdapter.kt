@@ -1,21 +1,15 @@
 package dev.ragnarok.filegallery.api.adapters
 
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonParseException
 import dev.ragnarok.filegallery.model.Audio
-import java.lang.reflect.Type
+import dev.ragnarok.filegallery.util.serializeble.json.JsonElement
 
-class AudioDtoAdapter : AbsAdapter(), JsonDeserializer<Audio> {
-    @Throws(JsonParseException::class)
+class AudioDtoAdapter : AbsAdapter<Audio>("Audio") {
+    @Throws(Exception::class)
     override fun deserialize(
-        json: JsonElement,
-        typeOfT: Type,
-        context: JsonDeserializationContext
+        json: JsonElement
     ): Audio {
         if (!checkObject(json)) {
-            throw JsonParseException("$TAG error parse object")
+            throw Exception("$TAG error parse object")
         }
         val dto = Audio()
         val root = json.asJsonObject

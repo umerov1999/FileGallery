@@ -1,11 +1,13 @@
 package dev.ragnarok.filegallery.api.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class Error {
-    @SerializedName("error_msg")
+    @SerialName("error_msg")
     var errorMsg: String? = null
 
-    @SerializedName("method")
+    @SerialName("method")
     var method: String? = null
 }

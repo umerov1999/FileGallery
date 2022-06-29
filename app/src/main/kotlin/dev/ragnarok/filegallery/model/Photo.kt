@@ -3,9 +3,12 @@ package dev.ragnarok.filegallery.model
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.Keep
+import dev.ragnarok.filegallery.api.adapters.PhotoDtoAdapter
 import dev.ragnarok.filegallery.module.parcel.ParcelNative
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable(with = PhotoDtoAdapter::class)
 class Photo : Parcelable, ParcelNative.ParcelableNative {
     var id = 0
         private set

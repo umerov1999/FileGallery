@@ -1,21 +1,16 @@
 package dev.ragnarok.filegallery.api.adapters
 
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonParseException
 import dev.ragnarok.filegallery.model.Video
-import java.lang.reflect.Type
+import dev.ragnarok.filegallery.util.serializeble.json.JsonElement
+import dev.ragnarok.filegallery.util.serializeble.json.jsonPrimitive
 
-class VideoDtoAdapter : AbsAdapter(), JsonDeserializer<Video> {
-    @Throws(JsonParseException::class)
+class VideoDtoAdapter : AbsAdapter<Video>("Video") {
+    @Throws(Exception::class)
     override fun deserialize(
-        json: JsonElement,
-        typeOfT: Type,
-        context: JsonDeserializationContext
+        json: JsonElement
     ): Video {
         if (!checkObject(json)) {
-            throw JsonParseException("$TAG error parse object")
+            throw Exception("$TAG error parse object")
         }
         val root = json.asJsonObject
         val dto = Video()
@@ -32,7 +27,7 @@ class VideoDtoAdapter : AbsAdapter(), JsonDeserializer<Video> {
         }
         if (hasArray(root, "image")) {
             val images = root.getAsJsonArray("image")
-            dto.setImage(images[images.size() - 1].asJsonObject["url"].asString)
+            dto.setImage(images?.get(images.size - 1)?.asJsonObject?.get("url")?.jsonPrimitive?.content)
         }
         return dto
     }

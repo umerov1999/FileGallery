@@ -1,9 +1,11 @@
 package dev.ragnarok.filegallery.api.model.response
 
-import com.google.gson.annotations.SerializedName
 import dev.ragnarok.filegallery.api.model.Error
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 open class ErrorReponse {
-    @SerializedName("error")
+    @SerialName("error")
     var error: Error? = null
 }

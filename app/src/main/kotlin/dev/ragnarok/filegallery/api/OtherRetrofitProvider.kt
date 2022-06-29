@@ -2,11 +2,12 @@ package dev.ragnarok.filegallery.api
 
 import android.annotation.SuppressLint
 import dev.ragnarok.filegallery.Constants
+import dev.ragnarok.filegallery.kJson
 import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.settings.ISettings.IMainSettings
 import dev.ragnarok.filegallery.util.Utils.firstNonEmptyString
-import dev.ragnarok.filegallery.util.retrofit.gson.GsonConverterFactory
-import dev.ragnarok.filegallery.util.retrofit.rxjava3.RxJava3CallAdapterFactory
+import dev.ragnarok.filegallery.util.serializeble.retrofit.kotlinx.serialization.asConverterFactory
+import dev.ragnarok.filegallery.util.serializeble.retrofit.rxjava3.RxJava3CallAdapterFactory
 import io.reactivex.rxjava3.core.Single
 import okhttp3.FormBody
 import okhttp3.Interceptor
@@ -56,7 +57,7 @@ class OtherRetrofitProvider @SuppressLint("CheckResult") constructor(private val
         val url = firstNonEmptyString(localSettings.url, "https://debug.dev")!!
         return Retrofit.Builder()
             .baseUrl("$url/method/")
-            .addConverterFactory(GsonConverterFactory.create(RetrofitProvider.gson))
+            .addConverterFactory(kJson.asConverterFactory())
             .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
             .client(builder.build())
             .build()

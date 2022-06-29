@@ -3,45 +3,47 @@ package dev.ragnarok.filegallery.model
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.annotation.Keep
-import com.google.gson.annotations.SerializedName
 import dev.ragnarok.filegallery.module.parcel.ParcelNative
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Keep
+@Serializable
 class FileRemote : Parcelable, ParcelNative.ParcelableNative {
-    @SerializedName("id")
+    @SerialName("id")
     var id = 0
         private set
 
-    @SerializedName("owner_Id")
+    @SerialName("owner_Id")
     var owner_Id = 0
         private set
 
-    @SerializedName("file_name")
+    @SerialName("file_name")
     var file_name: String? = null
         private set
 
-    @SerializedName("type")
+    @SerialName("type")
     @FileType
     var type: Int = FileType.error
         private set
 
-    @SerializedName("modification_time")
+    @SerialName("modification_time")
     var modification_time: Long = 0
         private set
 
-    @SerializedName("size")
+    @SerialName("size")
     var size: Long = 0
         private set
 
-    @SerializedName("url")
+    @SerialName("url")
     var url: String? = null
         private set
 
-    @SerializedName("preview_url")
+    @SerialName("preview_url")
     var preview_url: String? = null
         private set
 
-    @SerializedName("is_selected")
+    @SerialName("is_selected")
     var isSelected: Boolean = false
         private set
 

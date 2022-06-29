@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -27,8 +28,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textview.MaterialTextView
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonParser
 import com.squareup.picasso3.BitmapSafeResize.isOverflowCanvas
 import com.squareup.picasso3.BitmapSafeResize.setHardwareRendering
 import com.squareup.picasso3.BitmapSafeResize.setMaxResolution
@@ -44,6 +43,8 @@ import dev.ragnarok.filegallery.activity.ActivityFeatures
 import dev.ragnarok.filegallery.activity.ActivityUtils
 import dev.ragnarok.filegallery.activity.EnterPinActivity
 import dev.ragnarok.filegallery.activity.FileManagerSelectActivity
+import dev.ragnarok.filegallery.api.adapters.AbsAdapter.Companion.asJsonObject
+import dev.ragnarok.filegallery.api.adapters.AbsAdapter.Companion.has
 import dev.ragnarok.filegallery.listener.BackPressCallback
 import dev.ragnarok.filegallery.listener.CanBackPressedCallback
 import dev.ragnarok.filegallery.listener.OnSectionResumeCallback
@@ -62,7 +63,12 @@ import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.settings.backup.SettingsBackup
 import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.Utils.getAppVersionName
 import dev.ragnarok.filegallery.util.rxutils.RxUtils
+import dev.ragnarok.filegallery.util.serializeble.json.Json
+import dev.ragnarok.filegallery.util.serializeble.json.JsonObjectBuilder
+import dev.ragnarok.filegallery.util.serializeble.json.jsonObject
+import dev.ragnarok.filegallery.util.serializeble.json.put
 import dev.ragnarok.filegallery.view.MySearchView
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import io.reactivex.rxjava3.core.Single
@@ -130,11 +136,15 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                     result.data?.getStringExtra(Extra.PATH),
                     "file_gallery_settings_backup.json"
                 )
-                val bytes =
-                    GsonBuilder().setPrettyPrinting().create().toJson(SettingsBackup().doBackup())
-                        .toByteArray(
-                            StandardCharsets.UTF_8
-                        )
+                val root = JsonObjectBuilder()
+                val app = JsonObjectBuilder()
+                app.put("version", getAppVersionName(requireActivity()))
+                root.put("app", app.build())
+                val settings = SettingsBackup().doBackup()
+                root.put("settings", settings)
+                val bytes = Json { prettyPrint = true }.printJsonElement(root.build()).toByteArray(
+                    StandardCharsets.UTF_8
+                )
                 val out = FileOutputStream(file)
                 out.write(bytes)
                 out.flush()
@@ -161,24 +171,19 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
     ) { result: ActivityResult ->
         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
             try {
-                val jbld = StringBuilder()
                 val file =
                     File(
                         result.data?.getStringExtra(Extra.PATH) ?: return@registerForActivityResult
                     )
                 if (file.exists()) {
-                    val dataFromServerStream = FileInputStream(file)
-                    val d = BufferedReader(
-                        InputStreamReader(
-                            dataFromServerStream,
-                            StandardCharsets.UTF_8
-                        )
-                    )
-                    while (d.ready()) jbld.append(d.readLine())
-                    d.close()
-                    val obj =
-                        JsonParser.parseString(jbld.toString()).asJsonObject
-                    SettingsBackup().doRestore(obj)
+                    val objApp = kJson.parseToJsonElement(FileInputStream(file)).jsonObject
+                    if (objApp.has("settings")) {
+                        SettingsBackup().doRestore(objApp["settings"]?.asJsonObject)
+                        CreateCustomToast(requireActivity()).setDuration(Toast.LENGTH_LONG)
+                            .showToastSuccessBottom(
+                                R.string.need_restart
+                            )
+                    }
                 }
                 CreateCustomToast(requireActivity())
                     .showToast(R.string.success)

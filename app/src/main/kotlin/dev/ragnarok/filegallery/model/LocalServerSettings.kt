@@ -1,17 +1,19 @@
 package dev.ragnarok.filegallery.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 class LocalServerSettings {
-    @SerializedName("url")
+    @SerialName("url")
     var url: String? = null
 
-    @SerializedName("password")
+    @SerialName("password")
     var password: String? = null
 
-    @SerializedName("enabled")
+    @SerialName("enabled")
     var enabled = false
 
-    @SerializedName("enabled_audio_local_sync")
+    @SerialName("enabled_audio_local_sync")
     var enabled_audio_local_sync = false
 }
