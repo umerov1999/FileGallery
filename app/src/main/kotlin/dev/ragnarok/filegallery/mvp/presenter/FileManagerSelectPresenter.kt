@@ -162,7 +162,7 @@ class FileManagerSelectPresenter(
                 view?.restoreScroll(k)
             }
         }, {
-            view?.onError(it)
+            view?.showThrowable(it)
             isLoading = false
             view?.resolveLoading(isLoading)
         }))

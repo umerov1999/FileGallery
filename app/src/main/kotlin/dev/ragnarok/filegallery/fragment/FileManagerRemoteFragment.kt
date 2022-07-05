@@ -3,13 +3,13 @@ package dev.ragnarok.filegallery.fragment
 import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.app.Activity
-import android.graphics.Color
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import dev.ragnarok.filegallery.Constants
 import dev.ragnarok.filegallery.Extra
 import dev.ragnarok.filegallery.R
@@ -37,10 +36,10 @@ import dev.ragnarok.filegallery.mvp.view.IFileManagerRemoteView
 import dev.ragnarok.filegallery.place.PlaceFactory
 import dev.ragnarok.filegallery.settings.CurrentTheme
 import dev.ragnarok.filegallery.settings.Settings
-import dev.ragnarok.filegallery.util.CustomToast
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.util.ViewUtils
 import dev.ragnarok.filegallery.util.rxutils.RxUtils
+import dev.ragnarok.filegallery.util.toast.CustomToast
 import dev.ragnarok.filegallery.view.MySearchView
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import io.reactivex.rxjava3.core.Completable
@@ -140,19 +139,16 @@ class FileManagerRemoteFragment :
             val curr = MusicPlaybackController.currentAudio
             if (curr != null) {
                 PlaceFactory.getPlayerPlace().tryOpenWith(requireActivity())
-            } else CustomToast.CreateCustomToast(requireActivity())
-                .showToastError(R.string.null_audio)
+            } else customToast?.showToastError(R.string.null_audio)
             false
         }
         Goto.setOnClickListener {
             val curr = MusicPlaybackController.currentAudio
             if (curr != null) {
                 if (presenter?.scrollTo(curr.id, curr.ownerId) != true) {
-                    CustomToast.CreateCustomToast(requireActivity())
-                        .showToastError(R.string.audio_not_found)
+                    customToast?.showToastError(R.string.audio_not_found)
                 }
-            } else CustomToast.CreateCustomToast(requireActivity())
-                .showToastError(R.string.null_audio)
+            } else customToast?.showToastError(R.string.null_audio)
         }
         return root
     }
@@ -225,18 +221,9 @@ class FileManagerRemoteFragment :
         }
     }
 
-    override fun onError(throwable: Throwable) {
-        mRecyclerView?.let {
-            Utils.ColoredSnack(it, throwable.stackTraceToString(), Snackbar.LENGTH_LONG, Color.RED)
-                .show()
-        }
-    }
-
     override fun showMessage(@StringRes res: Int) {
-        mRecyclerView?.let {
-            Utils.ThemedSnack(it, res, Snackbar.LENGTH_LONG)
-                .show()
-        }
+        CustomToast.createCustomToast(requireActivity(), mRecyclerView)
+            ?.setDuration(Toast.LENGTH_LONG)?.showToast(res)
     }
 
     private val requestPhotoUpdate = registerForActivityResult(

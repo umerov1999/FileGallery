@@ -15,19 +15,19 @@ import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.activity.ActivityFeatures
 import dev.ragnarok.filegallery.activity.ActivityUtils.supportToolbarFor
 import dev.ragnarok.filegallery.adapter.TagOwnerAdapter
+import dev.ragnarok.filegallery.fragment.base.BaseMvpFragment
 import dev.ragnarok.filegallery.listener.OnSectionResumeCallback
 import dev.ragnarok.filegallery.model.FileItem
 import dev.ragnarok.filegallery.model.SectionItem
 import dev.ragnarok.filegallery.model.tags.TagOwner
-import dev.ragnarok.filegallery.mvp.compat.AbsMvpFragment
 import dev.ragnarok.filegallery.mvp.core.IPresenterFactory
 import dev.ragnarok.filegallery.mvp.presenter.TagOwnerPresenter
 import dev.ragnarok.filegallery.mvp.view.ITagOwnerView
 import dev.ragnarok.filegallery.place.PlaceFactory
-import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.toast.CustomToast
 
 
-class TagOwnerFragment : AbsMvpFragment<TagOwnerPresenter, ITagOwnerView>(), ITagOwnerView,
+class TagOwnerFragment : BaseMvpFragment<TagOwnerPresenter, ITagOwnerView>(), ITagOwnerView,
     TagOwnerAdapter.ClickListener {
     private var mAdapter: TagOwnerAdapter? = null
     private var mAdd: FloatingActionButton? = null
@@ -93,10 +93,6 @@ class TagOwnerFragment : AbsMvpFragment<TagOwnerPresenter, ITagOwnerView>(), ITa
         mAdapter?.notifyDataSetChanged()
     }
 
-    override fun showError(error: Throwable) {
-        Utils.showErrorInAdapter(requireActivity(), error)
-    }
-
     override fun notifyAdd(index: Int) {
         mAdapter?.notifyItemInserted(index)
     }
@@ -105,8 +101,9 @@ class TagOwnerFragment : AbsMvpFragment<TagOwnerPresenter, ITagOwnerView>(), ITa
         mAdapter?.notifyItemRemoved(index)
     }
 
-    override fun close(owner: TagOwner, item: FileItem) {
-
+    override fun successAdd(owner: TagOwner, item: FileItem) {
+        CustomToast.createCustomToast(requireActivity(), view)
+            ?.showToastSuccessBottom(getString(R.string.success_add, item.file_name, owner.name))
     }
 
     override fun onTagOwnerClick(index: Int, owner: TagOwner) {

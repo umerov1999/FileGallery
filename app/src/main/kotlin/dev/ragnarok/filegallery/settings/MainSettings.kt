@@ -14,7 +14,6 @@ import dev.ragnarok.filegallery.settings.theme.ThemeOverlay
 import dev.ragnarok.filegallery.view.pager.Transformers_Types
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import java.io.File
 
@@ -127,7 +126,7 @@ internal class MainSettings(context: Context) : IMainSettings {
         return if (ret == null) {
             LocalServerSettings()
         } else {
-            kJson.decodeFromString(ret)
+            kJson.decodeFromString(LocalServerSettings.serializer(), ret)
         }
     }
 
@@ -143,7 +142,7 @@ internal class MainSettings(context: Context) : IMainSettings {
         return if (ret == null) {
             PlayerCoverBackgroundSettings().set_default()
         } else {
-            kJson.decodeFromString(ret)
+            kJson.decodeFromString(PlayerCoverBackgroundSettings.serializer(), ret)
         }
     }
 
@@ -157,7 +156,7 @@ internal class MainSettings(context: Context) : IMainSettings {
         return if (ret == null) {
             SlidrSettings().set_default()
         } else {
-            kJson.decodeFromString(ret)
+            kJson.decodeFromString(SlidrSettings.serializer(), ret)
         }
     }
 

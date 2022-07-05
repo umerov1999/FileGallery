@@ -13,6 +13,7 @@ import android.os.IBinder
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.ColorInt
@@ -27,8 +28,6 @@ import androidx.fragment.app.FragmentContainerView
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.activity.EnterPinActivity.Companion.getClass
 import dev.ragnarok.filegallery.fragment.*
@@ -56,6 +55,7 @@ import dev.ragnarok.filegallery.util.Logger
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.util.ViewUtils.keyboardHide
 import dev.ragnarok.filegallery.util.rxutils.RxUtils
+import dev.ragnarok.filegallery.util.toast.CustomToast
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.io.File
 
@@ -140,7 +140,11 @@ class MainActivity : AppCompatActivity(), OnSectionResumeCallback, AppStyleable,
                         RxUtils.dummy()
                     ) { t: Throwable? ->
                         if (Settings.get().main().isDeveloper_mode()) {
-                            Utils.showErrorInAdapter(this, t)
+                            CustomToast.createCustomToast(
+                                this,
+                                mViewFragment,
+                                mBottomNavigation
+                            )?.showToastThrowable(t)
                         }
                     })
             }
@@ -150,7 +154,8 @@ class MainActivity : AppCompatActivity(), OnSectionResumeCallback, AppStyleable,
                     RxUtils.dummy()
                 ) { t: Throwable? ->
                     if (Settings.get().main().isDeveloper_mode()) {
-                        Utils.showErrorInAdapter(this, t)
+                        CustomToast.createCustomToast(this, mViewFragment, mBottomNavigation)
+                            ?.showToastThrowable(t)
                     }
                 })
         }
@@ -211,12 +216,8 @@ class MainActivity : AppCompatActivity(), OnSectionResumeCallback, AppStyleable,
             }
             mLastBackPressedTime = System.currentTimeMillis()
             mViewFragment?.let {
-                val bar: Snackbar = Snackbar.make(
-                    it,
-                    getString(R.string.click_back_to_exit),
-                    BaseTransientBottomBar.LENGTH_SHORT
-                ).setAnchorView(mBottomNavigation)
-                bar.setOnClickListener { bar.dismiss() }.show()
+                CustomToast.createCustomToast(this, mViewFragment, mBottomNavigation)
+                    ?.setDuration(Toast.LENGTH_SHORT)?.showToast(R.string.click_back_to_exit)
             }
         } else {
             super.onBackPressed()
@@ -447,14 +448,9 @@ class MainActivity : AppCompatActivity(), OnSectionResumeCallback, AppStyleable,
             }
             SectionItem.LOCAL_SERVER -> {
                 if (!Settings.get().main().getLocalServer().enabled) {
-                    mViewFragment?.let {
-                        Utils.ColoredSnack(
-                            it,
-                            R.string.local_server_need_enable,
-                            BaseTransientBottomBar.LENGTH_SHORT,
-                            Color.RED
-                        ).setAnchorView(mBottomNavigation).show()
-                    }
+                    CustomToast.createCustomToast(this, mViewFragment, mBottomNavigation)
+                        ?.setDuration(Toast.LENGTH_SHORT)
+                        ?.showToastError(R.string.local_server_need_enable)
                     openPlace(getPreferencesPlace())
                 } else {
                     openPlace(getLocalMediaServerPlace())

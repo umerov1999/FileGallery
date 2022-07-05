@@ -2,7 +2,6 @@ package dev.ragnarok.filegallery.adapter
 
 import android.animation.Animator
 import android.animation.ObjectAnimator
-import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
@@ -12,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.FragmentActivity
@@ -38,9 +38,10 @@ import dev.ragnarok.filegallery.place.PlaceFactory.getPlayerPlace
 import dev.ragnarok.filegallery.settings.CurrentTheme.getColorPrimary
 import dev.ragnarok.filegallery.settings.CurrentTheme.getColorSecondary
 import dev.ragnarok.filegallery.settings.Settings.get
-import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.DownloadWorkUtils.doDownloadAudio
 import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.toast.CustomSnackbars
+import dev.ragnarok.filegallery.util.toast.CustomToast.Companion.createCustomToast
 import dev.ragnarok.filegallery.view.WeakViewAnimatorAdapter
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import io.reactivex.rxjava3.core.Single
@@ -86,7 +87,9 @@ class AudioLocalServerRecyclerAdapter(
         audioListDisposable = doBitrate(url).fromIOToMain()
             .subscribe(
                 {
-                    CreateCustomToast(mContext).showToast(
+                    createCustomToast(
+                        mContext, null
+                    )?.showToast(
                         mContext.resources.getString(
                             R.string.bitrate,
                             it,
@@ -94,7 +97,10 @@ class AudioLocalServerRecyclerAdapter(
                         )
                     )
                 }
-            ) { e: Throwable? -> Utils.showErrorInAdapter(mContext as Activity, e) }
+            ) { e: Throwable? ->
+                createCustomToast(mContext, null)?.setDuration(Toast.LENGTH_LONG)
+                    ?.showToastThrowable(e)
+            }
     }
 
     @get:DrawableRes
@@ -209,22 +215,26 @@ class AudioLocalServerRecyclerAdapter(
                             updateDownloadState(holder, audio)
                             when (doDownloadAudio(mContext, audio, false)) {
                                 0 -> {
-                                    CreateCustomToast(mContext).showToastBottom(R.string.saved_audio)
+                                    createCustomToast(
+                                        mContext, view
+                                    )?.showToast(R.string.saved_audio)
                                 }
                                 1 -> {
-                                    Utils.ThemedSnack(
-                                        view,
-                                        R.string.audio_force_download,
-                                        BaseTransientBottomBar.LENGTH_LONG
-                                    ).setAction(
-                                        R.string.button_yes
-                                    ) { doDownloadAudio(mContext, audio, true) }
-                                        .show()
+                                    CustomSnackbars.createCustomSnackbars(view)
+                                        ?.setDurationSnack(BaseTransientBottomBar.LENGTH_LONG)
+                                        ?.themedSnack(
+                                            R.string.audio_force_download
+                                        )?.setAction(
+                                            R.string.button_yes
+                                        ) { doDownloadAudio(mContext, audio, true) }
+                                        ?.show()
                                 }
                                 else -> {
                                     audio.downloadIndicator = false
                                     updateDownloadState(holder, audio)
-                                    CreateCustomToast(mContext).showToastBottom(R.string.error_audio)
+                                    createCustomToast(
+                                        mContext, view
+                                    )?.showToastError(R.string.error_audio)
                                 }
                             }
                         }
@@ -248,11 +258,15 @@ class AudioLocalServerRecyclerAdapter(
                             }
                             audioListDisposable = mAudioInteractor.update_time(hash)
                                 .fromIOToMain().subscribe(
-                                    { CreateCustomToast(mContext).showToast(R.string.success) }) { t: Throwable? ->
-                                    Utils.showErrorInAdapter(
-                                        mContext as Activity,
-                                        t
-                                    )
+                                    {
+                                        createCustomToast(
+                                            mContext, view
+                                        )?.showToast(R.string.success)
+                                    }) { t: Throwable? ->
+                                    createCustomToast(
+                                        mContext,
+                                        view
+                                    )?.setDuration(Toast.LENGTH_LONG)?.showToastThrowable(t)
                                 }
                         }
                         AudioLocalServerOption.edit_item_audio -> {
@@ -280,23 +294,26 @@ class AudioLocalServerRecyclerAdapter(
                                                             .trim { it <= ' ' })
                                                         .fromIOToMain()
                                                         .subscribe({
-                                                            CreateCustomToast(mContext).showToast(
+                                                            createCustomToast(
+                                                                mContext, view
+                                                            )?.showToast(
                                                                 R.string.success
                                                             )
                                                         }) { o: Throwable? ->
-                                                            Utils.showErrorInAdapter(
-                                                                mContext as Activity,
-                                                                o
-                                                            )
+                                                            createCustomToast(
+                                                                mContext,
+                                                                view
+                                                            )?.setDuration(Toast.LENGTH_LONG)
+                                                                ?.showToastThrowable(o)
                                                         }
                                             }
                                             .setNegativeButton(R.string.button_cancel, null)
                                             .show()
                                     }) { t: Throwable? ->
-                                    Utils.showErrorInAdapter(
-                                        mContext as Activity,
-                                        t
-                                    )
+                                    createCustomToast(
+                                        mContext,
+                                        view
+                                    )?.setDuration(Toast.LENGTH_LONG)?.showToastThrowable(t)
                                 }
                         }
                         AudioLocalServerOption.delete_item_audio -> MaterialAlertDialogBuilder(
@@ -312,11 +329,15 @@ class AudioLocalServerRecyclerAdapter(
                                 }
                                 audioListDisposable = mAudioInteractor.delete_media(hash1)
                                     .fromIOToMain().subscribe(
-                                        { CreateCustomToast(mContext).showToast(R.string.success) }) { o: Throwable? ->
-                                        Utils.showErrorInAdapter(
-                                            mContext as Activity,
-                                            o
-                                        )
+                                        {
+                                            createCustomToast(
+                                                mContext, view
+                                            )?.showToast(R.string.success)
+                                        }) { o: Throwable? ->
+                                        createCustomToast(
+                                            mContext,
+                                            view
+                                        )?.setDuration(Toast.LENGTH_LONG)?.showToastThrowable(o)
                                     }
                             }
                             .setNegativeButton(R.string.button_cancel, null)
@@ -391,23 +412,25 @@ class AudioLocalServerRecyclerAdapter(
             updateDownloadState(holder, audio)
             when (doDownloadAudio(mContext, audio, false)) {
                 0 -> {
-                    CreateCustomToast(mContext).showToastBottom(R.string.saved_audio)
+                    createCustomToast(
+                        mContext, holder.Track
+                    )?.showToast(R.string.saved_audio)
                 }
                 1 -> {
-                    v?.let {
-                        Utils.ThemedSnack(
-                            it,
+                    CustomSnackbars.createCustomSnackbars(v)
+                        ?.setDurationSnack(BaseTransientBottomBar.LENGTH_LONG)
+                        ?.themedSnack(
                             R.string.audio_force_download,
-                            BaseTransientBottomBar.LENGTH_LONG
-                        ).setAction(
+                        )?.setAction(
                             R.string.button_yes
-                        ) { doDownloadAudio(mContext, audio, true) }.show()
-                    }
+                        ) { doDownloadAudio(mContext, audio, true) }?.show()
                 }
                 else -> {
                     audio.downloadIndicator = false
                     updateDownloadState(holder, audio)
-                    CreateCustomToast(mContext).showToastBottom(R.string.error_audio)
+                    createCustomToast(
+                        mContext, holder.Track
+                    )?.showToastError(R.string.error_audio)
                 }
             }
             true

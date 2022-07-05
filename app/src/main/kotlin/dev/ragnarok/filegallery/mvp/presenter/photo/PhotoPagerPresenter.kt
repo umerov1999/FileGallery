@@ -28,12 +28,10 @@ import dev.ragnarok.filegallery.settings.CurrentTheme.getColorPrimary
 import dev.ragnarok.filegallery.settings.CurrentTheme.getColorSecondary
 import dev.ragnarok.filegallery.settings.Settings.get
 import dev.ragnarok.filegallery.util.AssertUtils
-import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.DownloadWorkUtils.doDownloadPhoto
 import dev.ragnarok.filegallery.util.qr.*
 import java.io.File
 import java.util.*
-
 
 open class PhotoPagerPresenter internal constructor(
     initialData: ArrayList<Photo>,
@@ -237,14 +235,14 @@ open class PhotoPagerPresenter internal constructor(
                             ) as ClipboardManager?
                             val clip = ClipData.newPlainText("response", data)
                             clipboard?.setPrimaryClip(clip)
-                            CreateCustomToast(context).showToast(R.string.copied_to_clipboard)
+                            view?.customToast?.showToast(R.string.copied_to_clipboard)
                         }
                         .setCancelable(true)
                         .show()
                 }
 
                 override fun onBitmapFailed(e: Exception, errorDrawable: Drawable?) {
-                    CreateCustomToast(context).showToastError(e.localizedMessage)
+                    view?.customToast?.showToastThrowable(e)
                 }
 
                 override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}

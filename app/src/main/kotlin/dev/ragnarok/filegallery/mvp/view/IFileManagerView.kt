@@ -11,7 +11,6 @@ interface IFileManagerView : IMvpView, IErrorView {
     fun displayData(items: ArrayList<FileItem>)
     fun resolveEmptyText(visible: Boolean)
     fun resolveLoading(visible: Boolean)
-    fun onError(throwable: Throwable)
     fun notifyAllChanged()
     fun updatePathString(file: String)
     fun restoreScroll(scroll: Parcelable)

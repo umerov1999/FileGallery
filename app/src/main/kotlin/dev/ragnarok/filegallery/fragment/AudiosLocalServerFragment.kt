@@ -22,7 +22,6 @@ import dev.ragnarok.filegallery.mvp.core.IPresenterFactory
 import dev.ragnarok.filegallery.mvp.presenter.AudiosLocalServerPresenter
 import dev.ragnarok.filegallery.mvp.view.IAudiosLocalServerView
 import dev.ragnarok.filegallery.place.PlaceFactory.getPlayerPlace
-import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.ViewUtils
 import dev.ragnarok.filegallery.view.MySearchView
 import dev.ragnarok.filegallery.view.MySearchView.OnAdditionalButtonClickListener
@@ -78,7 +77,7 @@ class AudiosLocalServerFragment :
             val curr = MusicPlaybackController.currentAudio
             if (curr != null) {
                 getPlayerPlace().tryOpenWith(requireActivity())
-            } else CreateCustomToast(requireActivity()).showToastError(R.string.null_audio)
+            } else customToast?.showToastError(R.string.null_audio)
             false
         }
         Goto.setOnClickListener {
@@ -88,8 +87,8 @@ class AudiosLocalServerFragment :
                     presenter?.getAudioPos(curr) ?: -1
                 if (index >= 0) {
                     recyclerView.scrollToPosition(index)
-                } else CreateCustomToast(requireActivity()).showToast(R.string.audio_not_found)
-            } else CreateCustomToast(requireActivity()).showToastError(R.string.null_audio)
+                } else customToast?.showToast(R.string.audio_not_found)
+            } else customToast?.showToastError(R.string.null_audio)
         }
         mAudioRecyclerAdapter = AudioLocalServerRecyclerAdapter(requireActivity(), emptyList())
         mAudioRecyclerAdapter?.setClickListener(this)

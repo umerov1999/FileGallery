@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="dev.ragnarok.filegallery"
     android:installLocation="auto">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -118,7 +117,9 @@
 
         <service
             android:name="dev.ragnarok.filegallery.media.music.MusicPlaybackService"
-            android:exported="false">
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>

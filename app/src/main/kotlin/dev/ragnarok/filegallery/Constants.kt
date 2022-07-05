@@ -7,6 +7,7 @@ import java.util.*
 
 object Constants {
     const val PICASSO_TAG = "picasso_tag"
+    const val EXPORT_SETTINGS_FORMAT = 1
 
     val IS_DEBUG: Boolean = DEBUG
     const val PIN_DIGITS_COUNT = 4

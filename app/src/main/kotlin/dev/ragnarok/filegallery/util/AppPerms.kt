@@ -8,11 +8,13 @@ import android.net.Uri
 import android.os.Environment
 import android.os.Process
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.PermissionChecker
 import androidx.fragment.app.Fragment
 import dev.ragnarok.filegallery.R
+import dev.ragnarok.filegallery.util.toast.CustomToast
 
 object AppPerms {
     fun hasReadWriteStoragePermission(context: Context): Boolean {
@@ -50,7 +52,9 @@ object AppPerms {
             if (Utils.checkValues(result.values)) {
                 granted.invoke()
             } else {
-                Utils.showRedTopToast(requireActivity(), R.string.not_permitted)
+                CustomToast.createCustomToast(requireActivity(), view)?.setDuration(
+                    Toast.LENGTH_LONG
+                )?.showToastError(R.string.not_permitted)
             }
         }
         return object : DoRequestPermissions {
@@ -70,7 +74,9 @@ object AppPerms {
             if (Utils.checkValues(result.values)) {
                 granted.invoke()
             } else {
-                Utils.showRedTopToast(this, R.string.not_permitted)
+                CustomToast.createCustomToast(this, null)?.setDuration(
+                    Toast.LENGTH_LONG
+                )?.showToastError(R.string.not_permitted)
             }
         }
         return object : DoRequestPermissions {
@@ -91,7 +97,9 @@ object AppPerms {
             if (Utils.checkValues(result.values)) {
                 granted.invoke()
             } else {
-                Utils.showRedTopToast(this, R.string.not_permitted)
+                CustomToast.createCustomToast(this, null)?.setDuration(
+                    Toast.LENGTH_LONG
+                )?.showToastError(R.string.not_permitted)
                 denied.invoke()
             }
         }
@@ -113,7 +121,9 @@ object AppPerms {
             if (Utils.checkValues(result.values)) {
                 granted.invoke()
             } else {
-                Utils.showRedTopToast(requireActivity(), R.string.not_permitted)
+                CustomToast.createCustomToast(requireActivity(), view)?.setDuration(
+                    Toast.LENGTH_LONG
+                )?.showToastError(R.string.not_permitted)
                 denied.invoke()
             }
         }

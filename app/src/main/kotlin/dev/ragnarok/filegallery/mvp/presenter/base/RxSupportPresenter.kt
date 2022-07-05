@@ -46,7 +46,7 @@ abstract class RxSupportPresenter<V : IMvpView>(savedInstanceState: Bundle?) :
         throwable ?: return
         val lThrowable = Utils.getCauseIfRuntime(throwable)
         if (Constants.IS_DEBUG) {
-            lThrowable?.printStackTrace()
+            lThrowable.printStackTrace()
         }
         if (get().main().isDeveloper_mode()) {
             view.showThrowable(lThrowable)

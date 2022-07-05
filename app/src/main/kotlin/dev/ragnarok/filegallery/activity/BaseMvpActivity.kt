@@ -10,11 +10,10 @@ import dev.ragnarok.filegallery.Includes.provideApplicationContext
 import dev.ragnarok.filegallery.mvp.compat.AbsMvpActivity
 import dev.ragnarok.filegallery.mvp.core.AbsPresenter
 import dev.ragnarok.filegallery.mvp.core.IMvpView
-import dev.ragnarok.filegallery.util.CustomToast
-import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.ErrorLocalizer.localizeThrowable
-import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.util.ViewUtils
+import dev.ragnarok.filegallery.util.toast.AbsCustomToast
+import dev.ragnarok.filegallery.util.toast.CustomToast
 
 abstract class BaseMvpActivity<P : AbsPresenter<V>, V : IMvpView> : AbsMvpActivity<P, V>(),
     IMvpView {
@@ -26,9 +25,7 @@ abstract class BaseMvpActivity<P : AbsPresenter<V>, V : IMvpView> : AbsMvpActivi
     }
 
     override fun showError(errorText: String?) {
-        if (!isFinishing) {
-            Utils.showRedTopToast(this, errorText)
-        }
+        customToast?.showToastError(errorText)
     }
 
     override fun showThrowable(throwable: Throwable?) {
@@ -37,10 +34,10 @@ abstract class BaseMvpActivity<P : AbsPresenter<V>, V : IMvpView> : AbsMvpActivi
         }
     }
 
-    override val customToast: CustomToast
+    override val customToast: AbsCustomToast?
         get() = if (!isFinishing) {
-            CreateCustomToast(this)
-        } else CreateCustomToast(null)
+            CustomToast.createCustomToast(this, null)
+        } else null
 
     override fun showError(@StringRes titleTes: Int, vararg params: Any?) {
         if (!isFinishing) {

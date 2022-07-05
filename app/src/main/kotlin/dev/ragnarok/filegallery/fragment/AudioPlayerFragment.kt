@@ -22,7 +22,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.squareup.picasso3.BitmapTarget
 import com.squareup.picasso3.Picasso
@@ -38,10 +37,11 @@ import dev.ragnarok.filegallery.picasso.transforms.BlurTransformation
 import dev.ragnarok.filegallery.settings.CurrentTheme
 import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.toMainThread
-import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.DownloadWorkUtils.TrackIsDownloaded
 import dev.ragnarok.filegallery.util.DownloadWorkUtils.doDownloadAudio
 import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.toast.CustomSnackbars
+import dev.ragnarok.filegallery.util.toast.CustomToast.Companion.createCustomToast
 import dev.ragnarok.filegallery.view.CustomSeekBar
 import dev.ragnarok.filegallery.view.media.*
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieShapeableImageView
@@ -95,21 +95,8 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
     private val requestEqualizer = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) {
-        view?.let { it1 ->
-            Snackbar.make(it1, R.string.equalizer_closed, Snackbar.LENGTH_LONG)
-                .setBackgroundTint(CurrentTheme.getColorPrimary(requireActivity()))
-                .setAnchorView(mPlayPauseButton).setActionTextColor(
-                    if (Utils.isColorDark(
-                            CurrentTheme.getColorPrimary(requireActivity())
-                        )
-                    ) Color.parseColor("#ffffff") else Color.parseColor("#000000")
-                )
-                .setTextColor(
-                    if (Utils.isColorDark(CurrentTheme.getColorPrimary(requireActivity()))) Color.parseColor(
-                        "#ffffff"
-                    ) else Color.parseColor("#000000")
-                ).show()
-        }
+        CustomSnackbars.createCustomSnackbars(view, mPlayPauseButton)
+            ?.setDurationSnack(Snackbar.LENGTH_LONG)?.themedSnack(R.string.equalizer_closed)?.show()
     }
 
     /**
@@ -231,7 +218,10 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
                             if (MusicPlaybackController.trackName != null) MusicPlaybackController.trackName else ""
                         val clip = ClipData.newPlainText("response", "$Artist - $Name")
                         clipboard?.setPrimaryClip(clip)
-                        CreateCustomToast(requireActivity()).showToast(R.string.copied_to_clipboard)
+                        createCustomToast(
+                            requireActivity(),
+                            view
+                        )?.showToast(R.string.copied_to_clipboard)
                     }
                 }
             }
@@ -316,33 +306,23 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
             false
         )) {
             0 -> {
-                CreateCustomToast(requireActivity()).showToastBottom(R.string.saved_audio)
+                createCustomToast(requireActivity(), view)?.showToast(R.string.saved_audio)
                 ivSave?.setImageResource(R.drawable.succ)
             }
             1 -> {
-                Snackbar.make(v, R.string.audio_force_download, Snackbar.LENGTH_LONG).setAction(
-                    R.string.button_yes
-                ) {
-                    doDownloadAudio(
-                        requireActivity(),
-                        audio,
-                        true
-                    )
-                }
-                    .setBackgroundTint(CurrentTheme.getColorPrimary(requireActivity()))
-                    .setAnchorView(mPlayPauseButton).setActionTextColor(
-                        if (Utils.isColorDark(
-                                CurrentTheme.getColorPrimary(requireActivity())
-                            )
-                        ) Color.parseColor("#ffffff") else Color.parseColor("#000000")
-                    )
-                    .setTextColor(
-                        if (Utils.isColorDark(CurrentTheme.getColorPrimary(requireActivity()))) Color.parseColor(
-                            "#ffffff"
-                        ) else Color.parseColor("#000000")
-                    ).show()
+                CustomSnackbars.createCustomSnackbars(v, mPlayPauseButton)
+                    ?.setDurationSnack(Snackbar.LENGTH_LONG)
+                    ?.themedSnack(R.string.audio_force_download)?.setAction(
+                        R.string.button_yes
+                    ) {
+                        doDownloadAudio(
+                            requireActivity(),
+                            audio,
+                            true
+                        )
+                    }?.show()
             }
-            else -> CreateCustomToast(requireActivity()).showToastBottom(R.string.error_audio)
+            else -> createCustomToast(requireActivity(), view)?.showToast(R.string.error_audio)
         }
     }
 
@@ -517,9 +497,10 @@ class AudioPlayerFragment : BottomSheetDialogFragment(), CustomSeekBar.CustomSee
             requestEqualizer.launch(effects)
         } catch (ignored: ActivityNotFoundException) {
             view?.let {
-                Snackbar.make(it, R.string.no_system_equalizer, BaseTransientBottomBar.LENGTH_LONG)
-                    .setTextColor(Color.WHITE).setBackgroundTint(Color.parseColor("#eeff0000"))
-                    .setActionTextColor(Color.WHITE).show()
+                CustomSnackbars.createCustomSnackbars(view, mPlayPauseButton)
+                    ?.setDurationSnack(Snackbar.LENGTH_LONG)
+                    ?.coloredSnack(R.string.no_system_equalizer, Color.parseColor("#eeff0000"))
+                    ?.show()
             }
         }
     }

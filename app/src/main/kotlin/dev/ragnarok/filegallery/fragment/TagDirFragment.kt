@@ -17,6 +17,7 @@ import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.activity.ActivityFeatures
 import dev.ragnarok.filegallery.activity.ActivityUtils.supportToolbarFor
 import dev.ragnarok.filegallery.adapter.TagDirAdapter
+import dev.ragnarok.filegallery.fragment.base.BaseMvpFragment
 import dev.ragnarok.filegallery.listener.OnSectionResumeCallback
 import dev.ragnarok.filegallery.media.music.MusicPlaybackService
 import dev.ragnarok.filegallery.model.Audio
@@ -24,18 +25,16 @@ import dev.ragnarok.filegallery.model.FileType
 import dev.ragnarok.filegallery.model.SectionItem
 import dev.ragnarok.filegallery.model.Video
 import dev.ragnarok.filegallery.model.tags.TagDir
-import dev.ragnarok.filegallery.mvp.compat.AbsMvpFragment
 import dev.ragnarok.filegallery.mvp.core.IPresenterFactory
 import dev.ragnarok.filegallery.mvp.presenter.TagDirPresenter
 import dev.ragnarok.filegallery.mvp.view.ITagDirView
 import dev.ragnarok.filegallery.place.PlaceFactory
 import dev.ragnarok.filegallery.settings.Settings
-import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.view.MySearchView
 import java.io.File
 
 
-class TagDirFragment : AbsMvpFragment<TagDirPresenter, ITagDirView>(), ITagDirView,
+class TagDirFragment : BaseMvpFragment<TagDirPresenter, ITagDirView>(), ITagDirView,
     TagDirAdapter.ClickListener {
     private var mAdapter: TagDirAdapter? = null
     private var mLayoutManager: StaggeredGridLayoutManager? = null
@@ -120,10 +119,6 @@ class TagDirFragment : AbsMvpFragment<TagDirPresenter, ITagDirView>(), ITagDirVi
 
     override fun notifyChanges() {
         mAdapter?.notifyDataSetChanged()
-    }
-
-    override fun showError(error: Throwable) {
-        Utils.showErrorInAdapter(requireActivity(), error)
     }
 
     override fun notifyRemove(index: Int) {

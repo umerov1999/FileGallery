@@ -26,6 +26,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textview.MaterialTextView
 import com.squareup.picasso3.BitmapSafeResize.isOverflowCanvas
@@ -44,6 +45,8 @@ import dev.ragnarok.filegallery.activity.ActivityUtils
 import dev.ragnarok.filegallery.activity.EnterPinActivity
 import dev.ragnarok.filegallery.activity.FileManagerSelectActivity
 import dev.ragnarok.filegallery.api.adapters.AbsAdapter.Companion.asJsonObject
+import dev.ragnarok.filegallery.api.adapters.AbsAdapter.Companion.asJsonObjectSafe
+import dev.ragnarok.filegallery.api.adapters.AbsAdapter.Companion.asPrimitiveSafe
 import dev.ragnarok.filegallery.api.adapters.AbsAdapter.Companion.has
 import dev.ragnarok.filegallery.listener.BackPressCallback
 import dev.ragnarok.filegallery.listener.CanBackPressedCallback
@@ -61,14 +64,13 @@ import dev.ragnarok.filegallery.settings.CurrentTheme.getColorSecondary
 import dev.ragnarok.filegallery.settings.NightMode
 import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.settings.backup.SettingsBackup
-import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.util.Utils.getAppVersionName
 import dev.ragnarok.filegallery.util.rxutils.RxUtils
-import dev.ragnarok.filegallery.util.serializeble.json.Json
-import dev.ragnarok.filegallery.util.serializeble.json.JsonObjectBuilder
-import dev.ragnarok.filegallery.util.serializeble.json.jsonObject
-import dev.ragnarok.filegallery.util.serializeble.json.put
+import dev.ragnarok.filegallery.util.serializeble.json.*
+import dev.ragnarok.filegallery.util.serializeble.prefs.Preferences
+import dev.ragnarok.filegallery.util.toast.CustomSnackbars
+import dev.ragnarok.filegallery.util.toast.CustomToast.Companion.createCustomToast
 import dev.ragnarok.filegallery.view.MySearchView
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import io.reactivex.rxjava3.core.Single
@@ -139,6 +141,7 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 val root = JsonObjectBuilder()
                 val app = JsonObjectBuilder()
                 app.put("version", getAppVersionName(requireActivity()))
+                app.put("settings_format", Constants.EXPORT_SETTINGS_FORMAT)
                 root.put("app", app.build())
                 val settings = SettingsBackup().doBackup()
                 root.put("settings", settings)
@@ -154,14 +157,13 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                         Uri.fromFile(file)
                     )
                 )
-                CreateCustomToast(requireActivity()).showToast(
+                createCustomToast(requireActivity(), view)?.showToast(
                     R.string.success,
                     file.absolutePath
                 )
 
             } catch (e: Exception) {
-                CreateCustomToast(requireActivity())
-                    .showToastError(e.localizedMessage)
+                createCustomToast(requireActivity(), view)?.showToastThrowable(e)
             }
         }
     }
@@ -177,19 +179,22 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                     )
                 if (file.exists()) {
                     val objApp = kJson.parseToJsonElement(FileInputStream(file)).jsonObject
+                    if (objApp["app"]?.asJsonObjectSafe?.get("settings_format")?.asPrimitiveSafe?.intOrNull != Constants.EXPORT_SETTINGS_FORMAT) {
+                        createCustomToast(requireActivity(), view)?.setDuration(Toast.LENGTH_LONG)
+                            ?.showToastError(R.string.wrong_settings_format)
+                        return@registerForActivityResult
+                    }
                     if (objApp.has("settings")) {
                         SettingsBackup().doRestore(objApp["settings"]?.asJsonObject)
-                        CreateCustomToast(requireActivity()).setDuration(Toast.LENGTH_LONG)
-                            .showToastSuccessBottom(
+                        createCustomToast(requireActivity(), null)?.setDuration(Toast.LENGTH_LONG)
+                            ?.showToastSuccessBottom(
                                 R.string.need_restart
                             )
                     }
                 }
-                CreateCustomToast(requireActivity())
-                    .showToast(R.string.success)
+                createCustomToast(requireActivity(), view)?.showToast(R.string.success)
             } catch (e: Exception) {
-                CreateCustomToast(requireActivity())
-                    .showToastError(e.localizedMessage)
+                createCustomToast(requireActivity(), view)?.showToastThrowable(e)
             }
         }
     }
@@ -728,6 +733,29 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 true
             }
         }
+        pref("reset_settings") {
+            titleRes = R.string.reset_settings
+            onClick {
+                CustomSnackbars.createCustomSnackbars(view)
+                    ?.setDurationSnack(Snackbar.LENGTH_LONG)
+                    ?.themedSnack(R.string.reset_settings)
+                    ?.setAction(
+                        R.string.button_yes
+                    ) {
+                        val preferences =
+                            Preferences(PreferenceScreen.getPreferences(provideApplicationContext()))
+                        SettingsBackup.AppPreferencesList().let {
+                            preferences.encode(
+                                SettingsBackup.AppPreferencesList.serializer(),
+                                "",
+                                it
+                            )
+                        }
+                        requireActivity().finish()
+                    }?.show()
+                true
+            }
+        }
         pref("version") {
             iconRes = R.drawable.app_info_settings
             titleRes = R.string.app_name
@@ -924,16 +952,22 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 Includes.networkInterfaces.localServerApi().rebootPC("win")
                     .fromIOToMain()
                     .subscribe({
-                        CreateCustomToast(requireActivity()).showToastSuccessBottom(R.string.success)
-                    }, { Utils.showErrorInAdapter(requireActivity(), it) })
+                        createCustomToast(
+                            requireActivity(),
+                            view
+                        )?.showToastSuccessBottom(R.string.success)
+                    }, { createCustomToast(requireActivity(), view)?.showToastThrowable(it) })
             }
 
             view.findViewById<MaterialButton>(R.id.reboot_pc_linux).setOnClickListener {
                 Includes.networkInterfaces.localServerApi().rebootPC("linux")
                     .fromIOToMain()
                     .subscribe({
-                        CreateCustomToast(requireActivity()).showToastSuccessBottom(R.string.success)
-                    }, { Utils.showErrorInAdapter(requireActivity(), it) })
+                        createCustomToast(
+                            requireActivity(),
+                            view
+                        )?.showToastSuccessBottom(R.string.success)
+                    }, { createCustomToast(requireActivity(), view)?.showToastThrowable(it) })
             }
 
             return MaterialAlertDialogBuilder(requireActivity())
@@ -1192,10 +1226,10 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                         }
                     }
                 }
-                if (notify) CreateCustomToast(context).showToast(R.string.success)
+                if (notify) createCustomToast(context, null)?.showToast(R.string.success)
             } catch (e: Exception) {
                 e.printStackTrace()
-                if (notify) CreateCustomToast(context).showToastError(e.localizedMessage)
+                if (notify) createCustomToast(context, null)?.showToastThrowable(e)
             }
         }
 
@@ -1225,10 +1259,10 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                         }
                     }
                 }
-                if (notify) CreateCustomToast(context).showToast(R.string.success)
+                if (notify) createCustomToast(context, null)?.showToast(R.string.success)
             } catch (e: Exception) {
                 e.printStackTrace()
-                if (notify) CreateCustomToast(context).showToastError(e.localizedMessage)
+                if (notify) createCustomToast(context, null)?.showToastThrowable(e)
             }
         }
     }

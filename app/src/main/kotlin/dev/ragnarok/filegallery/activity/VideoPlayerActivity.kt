@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -37,6 +38,7 @@ import dev.ragnarok.filegallery.settings.Settings.get
 import dev.ragnarok.filegallery.settings.theme.ThemesController.currentStyle
 import dev.ragnarok.filegallery.util.Logger
 import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.toast.CustomToast
 import dev.ragnarok.filegallery.view.ExpandableSurfaceView
 import dev.ragnarok.filegallery.view.VideoControllerView
 
@@ -300,7 +302,8 @@ class VideoPlayerActivity : AppCompatActivity(), SurfaceHolder.Callback,
             requestedOrientation =
                 if (isLandscape) ActivityInfo.SCREEN_ORIENTATION_PORTRAIT else ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         } catch (e: Exception) {
-            Utils.showRedTopToast(this, R.string.not_supported)
+            CustomToast.createCustomToast(this, mSurfaceView)?.setDuration(Toast.LENGTH_LONG)
+                ?.showToastError(R.string.not_supported)
         }
     }
 

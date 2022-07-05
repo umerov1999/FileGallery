@@ -21,6 +21,7 @@ import dev.ragnarok.filegallery.model.Video
 import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.settings.theme.ThemesController
+import dev.ragnarok.filegallery.util.toast.CustomToast
 import okhttp3.Request
 import java.io.BufferedInputStream
 import java.io.File
@@ -163,7 +164,7 @@ object DownloadWorkUtils {
                     )
                 )
             }
-            CustomToast.CreateCustomToast(context).showToastError(R.string.exist_audio)
+            CustomToast.createCustomToast(context, null)?.showToastError(R.string.exist_audio)
             return true
         }
         return false
@@ -213,7 +214,8 @@ object DownloadWorkUtils {
                 toDefaultInternalDownloader(context, url, result_filename)
             }
         } catch (e: Exception) {
-            CustomToast.CreateCustomToast(context).showToastError("Video Error: " + e.message)
+            CustomToast.createCustomToast(context, null)
+                ?.showToastError("Video Error: " + e.message)
             return
         }
     }
@@ -230,7 +232,8 @@ object DownloadWorkUtils {
                 toDefaultInternalDownloader(context, url, result_filename)
             }
         } catch (e: Exception) {
-            CustomToast.CreateCustomToast(context).showToastError("Photo Error: " + e.message)
+            CustomToast.createCustomToast(context, null)
+                ?.showToastError("Photo Error: " + e.message)
             return
         }
     }
@@ -269,7 +272,8 @@ object DownloadWorkUtils {
             downloadWork.setInputData(data.build())
             WorkManager.getInstance(context).enqueue(downloadWork.build())
         } catch (e: Exception) {
-            CustomToast.CreateCustomToast(context).showToastError("Audio Error: " + e.message)
+            CustomToast.createCustomToast(context, null)
+                ?.showToastError("Audio Error: " + e.message)
             return 2
         }
         return 0
@@ -422,8 +426,8 @@ object DownloadWorkUtils {
                 }
                 Utils.inMainThread(object : Utils.SafeCall {
                     override fun call() {
-                        CustomToast.CreateCustomToast(applicationContext)
-                            .showToastError(R.string.error_with_message, e.localizedMessage)
+                        CustomToast.createCustomToast(applicationContext, null)
+                            ?.showToastError(R.string.error_with_message, e.localizedMessage)
                     }
                 })
                 return false
@@ -504,8 +508,8 @@ object DownloadWorkUtils {
                 )
                 Utils.inMainThread(object : Utils.SafeCall {
                     override fun call() {
-                        CustomToast.CreateCustomToast(applicationContext)
-                            .showToastBottom(R.string.saved)
+                        CustomToast.createCustomToast(applicationContext, null)
+                            ?.showToastInfo(R.string.saved)
                     }
                 })
             }
@@ -573,8 +577,8 @@ object DownloadWorkUtils {
                 MusicPlaybackController.tracksExist.addAudio(file_v.buildFilename())
                 Utils.inMainThread(object : Utils.SafeCall {
                     override fun call() {
-                        CustomToast.CreateCustomToast(applicationContext)
-                            .showToastBottom(R.string.saved)
+                        CustomToast.createCustomToast(applicationContext, null)
+                            ?.showToastInfo(R.string.saved)
                     }
                 })
             }

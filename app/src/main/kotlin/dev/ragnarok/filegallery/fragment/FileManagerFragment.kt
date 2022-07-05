@@ -5,7 +5,6 @@ import android.animation.ObjectAnimator
 import android.app.Activity.RESULT_OK
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
@@ -13,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import dev.ragnarok.filegallery.Constants
 import dev.ragnarok.filegallery.Extra
 import dev.ragnarok.filegallery.R
@@ -45,7 +44,6 @@ import dev.ragnarok.filegallery.place.PlaceFactory.getPhotoLocalPlace
 import dev.ragnarok.filegallery.place.PlaceFactory.getPlayerPlace
 import dev.ragnarok.filegallery.settings.CurrentTheme
 import dev.ragnarok.filegallery.settings.Settings
-import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.util.ViewUtils
 import dev.ragnarok.filegallery.util.rxutils.RxUtils
@@ -195,19 +193,17 @@ class FileManagerFragment : BaseMvpFragment<FileManagerPresenter, IFileManagerVi
             val curr = MusicPlaybackController.currentAudio
             if (curr != null) {
                 getPlayerPlace().tryOpenWith(requireActivity())
-            } else CreateCustomToast(requireActivity())
-                .showToastError(R.string.null_audio)
+            } else customToast
+                ?.showToastError(R.string.null_audio)
             false
         }
         Goto.setOnClickListener {
             val curr = MusicPlaybackController.currentAudio
             if (curr != null && curr.isLocal) {
                 if (presenter?.scrollTo(Uri.parse(curr.url).toFile().absolutePath) != true) {
-                    CreateCustomToast(requireActivity())
-                        .showToastError(R.string.audio_not_found)
+                    customToast?.showToastError(R.string.audio_not_found)
                 }
-            } else CreateCustomToast(requireActivity())
-                .showToastError(R.string.null_audio)
+            } else customToast?.showToastError(R.string.null_audio)
         }
         return root
     }
@@ -396,18 +392,8 @@ class FileManagerFragment : BaseMvpFragment<FileManagerPresenter, IFileManagerVi
         }
     }
 
-    override fun onError(throwable: Throwable) {
-        mRecyclerView?.let {
-            Utils.ColoredSnack(it, throwable.stackTraceToString(), Snackbar.LENGTH_LONG, Color.RED)
-                .show()
-        }
-    }
-
     override fun showMessage(@StringRes res: Int) {
-        mRecyclerView?.let {
-            Utils.ThemedSnack(it, res, Snackbar.LENGTH_LONG)
-                .show()
-        }
+        customToast?.setAnchorView(mRecyclerView)?.setDuration(Toast.LENGTH_LONG)?.showToast(res)
     }
 
     override fun updateSelectedMode(show: Boolean) {

@@ -1,6 +1,5 @@
 package dev.ragnarok.filegallery.adapter
 
-import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
@@ -8,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -24,9 +24,9 @@ import dev.ragnarok.filegallery.model.Video
 import dev.ragnarok.filegallery.model.menu.options.VideoLocalServerOption
 import dev.ragnarok.filegallery.nonNullNoEmpty
 import dev.ragnarok.filegallery.picasso.PicassoInstance.Companion.with
-import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.DownloadWorkUtils.doDownloadVideo
 import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.toast.CustomToast.Companion.createCustomToast
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.regex.Pattern
 
@@ -133,13 +133,12 @@ class LocalServerVideosAdapter(private val context: Context, private var data: L
                                 listDisposable = mVideoInteractor.update_time(hash)
                                     .fromIOToMain().subscribe(
                                         {
-                                            CreateCustomToast(
-                                                context
-                                            ).showToast(R.string.success)
+                                            createCustomToast(
+                                                context, holder.card
+                                            )?.showToast(R.string.success)
                                         }) { t: Throwable? ->
-                                        Utils.showErrorInAdapter(
-                                            context as Activity, t
-                                        )
+                                        createCustomToast(context, holder.card)
+                                            ?.setDuration(Toast.LENGTH_LONG)?.showToastThrowable(t)
                                     }
                             }
                             VideoLocalServerOption.edit_item_video -> {
@@ -168,21 +167,23 @@ class LocalServerVideosAdapter(private val context: Context, private var data: L
                                                                 .trim { it <= ' ' })
                                                             .fromIOToMain()
                                                             .subscribe({
-                                                                CreateCustomToast(
-                                                                    context
-                                                                ).showToast(R.string.success)
+                                                                createCustomToast(
+                                                                    context, holder.card
+                                                                )?.showToast(R.string.success)
                                                             }) { o: Throwable? ->
-                                                                Utils.showErrorInAdapter(
-                                                                    context as Activity, o
+                                                                createCustomToast(
+                                                                    context,
+                                                                    holder.card
                                                                 )
+                                                                    ?.setDuration(Toast.LENGTH_LONG)
+                                                                    ?.showToastThrowable(o)
                                                             }
                                                 }
                                                 .setNegativeButton(R.string.button_cancel, null)
                                                 .show()
                                         }) { t: Throwable? ->
-                                        Utils.showErrorInAdapter(
-                                            context as Activity, t
-                                        )
+                                        createCustomToast(context, holder.card)
+                                            ?.setDuration(Toast.LENGTH_LONG)?.showToastThrowable(t)
                                     }
                             }
                             VideoLocalServerOption.delete_item_video -> MaterialAlertDialogBuilder(
@@ -199,13 +200,13 @@ class LocalServerVideosAdapter(private val context: Context, private var data: L
                                     listDisposable = mVideoInteractor.delete_media(hash1)
                                         .fromIOToMain().subscribe(
                                             {
-                                                CreateCustomToast(
-                                                    context
-                                                ).showToast(R.string.success)
+                                                createCustomToast(
+                                                    context, holder.card
+                                                )?.showToast(R.string.success)
                                             }) { o: Throwable? ->
-                                            Utils.showErrorInAdapter(
-                                                context as Activity, o
-                                            )
+                                            createCustomToast(context, holder.card)
+                                                ?.setDuration(Toast.LENGTH_LONG)
+                                                ?.showToastThrowable(o)
                                         }
                                 }
                                 .setNegativeButton(R.string.button_cancel, null)

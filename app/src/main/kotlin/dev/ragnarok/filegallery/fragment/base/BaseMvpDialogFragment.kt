@@ -4,7 +4,6 @@ import android.graphics.Color
 import androidx.annotation.StringRes
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import dev.ragnarok.filegallery.Includes.provideApplicationContext
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.mvp.compat.AbsMvpDialogFragment
@@ -12,18 +11,18 @@ import dev.ragnarok.filegallery.mvp.core.AbsPresenter
 import dev.ragnarok.filegallery.mvp.core.IMvpView
 import dev.ragnarok.filegallery.mvp.view.IErrorView
 import dev.ragnarok.filegallery.mvp.view.IToastView
-import dev.ragnarok.filegallery.util.CustomToast
-import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.ErrorLocalizer
-import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.toast.AbsCustomToast
+import dev.ragnarok.filegallery.util.toast.CustomSnackbars
+import dev.ragnarok.filegallery.util.toast.CustomToast
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 
 abstract class BaseMvpDialogFragment<P : AbsPresenter<V>, V : IMvpView> :
     AbsMvpDialogFragment<P, V>(), IMvpView, IErrorView, IToastView {
 
     override fun showError(errorText: String?) {
-        if (isAdded) {
-            Utils.showRedTopToast(requireActivity(), errorText)
-        }
+        customToast?.showToastError(errorText)
     }
 
     override fun showError(@StringRes titleTes: Int, vararg params: Any?) {
@@ -34,40 +33,42 @@ abstract class BaseMvpDialogFragment<P : AbsPresenter<V>, V : IMvpView> :
 
     override fun showThrowable(throwable: Throwable?) {
         if (isAdded) {
-            view?.let {
-                Snackbar.make(
-                    it,
+            CustomSnackbars.createCustomSnackbars(view)?.let {
+                val snack = it.setDurationSnack(BaseTransientBottomBar.LENGTH_LONG).coloredSnack(
                     ErrorLocalizer.localizeThrowable(provideApplicationContext(), throwable),
-                    BaseTransientBottomBar.LENGTH_LONG
-                ).setTextColor(
-                    Color.WHITE
-                ).setBackgroundTint(Color.parseColor("#eeff0000"))
-                    .setAction(R.string.more_info) {
-                        val Text = StringBuilder()
+                    Color.parseColor("#eeff0000")
+                )
+                if (throwable !is SocketTimeoutException && throwable !is UnknownHostException) {
+                    snack.setAction(R.string.more_info) {
+                        val text = StringBuilder()
+                        text.append(
+                            ErrorLocalizer.localizeThrowable(
+                                provideApplicationContext(),
+                                throwable
+                            )
+                        )
+                        text.append("\r\n")
                         for (stackTraceElement in (throwable ?: return@setAction).stackTrace) {
-                            Text.append("    ")
-                            Text.append(stackTraceElement)
-                            Text.append("\r\n")
+                            text.append("    ")
+                            text.append(stackTraceElement)
+                            text.append("\r\n")
                         }
                         MaterialAlertDialogBuilder(requireActivity())
                             .setIcon(R.drawable.ic_error)
-                            .setMessage(Text)
+                            .setMessage(text)
                             .setTitle(R.string.more_info)
                             .setPositiveButton(R.string.button_ok, null)
                             .setCancelable(true)
                             .show()
-                    }.setActionTextColor(Color.WHITE).show()
-            } ?: showError(
-                ErrorLocalizer.localizeThrowable(
-                    provideApplicationContext(),
-                    throwable
-                )
-            )
+                    }
+                }
+                snack.show()
+            } ?: showError(ErrorLocalizer.localizeThrowable(provideApplicationContext(), throwable))
         }
     }
 
-    override val customToast: CustomToast
+    override val customToast: AbsCustomToast?
         get() = if (isAdded) {
-            CreateCustomToast(requireActivity())
-        } else CreateCustomToast(null)
+            CustomToast.createCustomToast(requireActivity(), view)
+        } else null
 }

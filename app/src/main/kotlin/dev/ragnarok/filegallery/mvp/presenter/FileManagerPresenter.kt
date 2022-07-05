@@ -131,7 +131,7 @@ class FileManagerPresenter(
                     view?.displayData(fileListSearch)
                     view?.updatePathString(q ?: return@subscribe)
                 }, {
-                    view?.onError(it)
+                    view?.showThrowable(it)
                     isLoading = false
                     view?.resolveLoading(isLoading)
                 }))
@@ -220,7 +220,7 @@ class FileManagerPresenter(
                         loadFiles(back = false, caches = false)
                     }
                 }, {
-                    view?.onError(it)
+                    view?.showThrowable(it)
                     isLoading = false
                     view?.resolveLoading(isLoading)
                     loadFiles(back = false, caches = false)
@@ -251,7 +251,7 @@ class FileManagerPresenter(
                 view?.restoreScroll(k)
             }
         }, {
-            view?.onError(it)
+            view?.showThrowable(it)
             isLoading = false
             view?.resolveLoading(isLoading)
         }))
@@ -424,7 +424,7 @@ class FileManagerPresenter(
             view?.showMessage(R.string.success)
             isLoading = false
             loadFiles(back = false, caches = false)
-        }, { view?.onError(it) })
+        }, { view?.showThrowable(it) })
     }
 
     fun fireToggleDirTag(item: FileItem) {
@@ -440,7 +440,7 @@ class FileManagerPresenter(
                             val list = if (q == null) fileList else fileListSearch
                             view?.notifyItemChanged(list.indexOf(item))
                         }, {
-                            view?.onError(it)
+                            view?.showThrowable(it)
                         })
                 )
             }
@@ -453,7 +453,7 @@ class FileManagerPresenter(
                         val list = if (q == null) fileList else fileListSearch
                         view?.notifyItemChanged(list.indexOf(item))
                     }, {
-                        view?.onError(it)
+                        view?.showThrowable(it)
                     })
             )
         }
@@ -471,7 +471,7 @@ class FileManagerPresenter(
                                 val list = if (q == null) fileList else fileListSearch
                                 view?.notifyItemChanged(list.indexOf(item))
                             }, {
-                                view?.onError(it)
+                                view?.showThrowable(it)
                             })
                     )
                 }
@@ -484,7 +484,7 @@ class FileManagerPresenter(
                             val list = if (q == null) fileList else fileListSearch
                             view?.notifyItemChanged(list.indexOf(item))
                         }, {
-                            view?.onError(it)
+                            view?.showThrowable(it)
                         })
                 )
             }
@@ -611,7 +611,7 @@ class FileManagerPresenter(
                 view?.showMessage(R.string.success)
                 loadFiles(back = false, caches = false)
             }, {
-                view?.onError(it)
+                view?.showThrowable(it)
             })
     }
 

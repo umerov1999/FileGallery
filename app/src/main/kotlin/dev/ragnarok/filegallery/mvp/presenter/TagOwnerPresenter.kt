@@ -35,7 +35,7 @@ class TagOwnerPresenter(savedInstanceState: Bundle?) :
                 .fromIOToMain()
                 .subscribe(
                     {
-                        view?.close(owner, item)
+                        view?.successAdd(owner, item)
                     }, { t: Throwable -> onActualDataGetError(t) })
         )
     }
@@ -67,7 +67,7 @@ class TagOwnerPresenter(savedInstanceState: Bundle?) :
     }
 
     private fun onActualDataGetError(t: Throwable) {
-        view?.showError(t)
+        view?.customToast?.showToastThrowable(t)
     }
 
     private fun onActualDataReceived(data: List<TagOwner>) {

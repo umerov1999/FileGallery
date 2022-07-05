@@ -44,9 +44,9 @@ import dev.ragnarok.filegallery.place.PlaceFactory
 import dev.ragnarok.filegallery.place.PlaceProvider
 import dev.ragnarok.filegallery.settings.CurrentTheme
 import dev.ragnarok.filegallery.settings.Settings
-import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.Utils
 import dev.ragnarok.filegallery.util.rxutils.RxUtils
+import dev.ragnarok.filegallery.util.toast.CustomToast.Companion.createCustomToast
 import dev.ragnarok.filegallery.view.TouchImageView
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import dev.ragnarok.filegallery.view.pager.WeakPicassoLoadCallback
@@ -470,7 +470,10 @@ class PhotoPagerActivity : BaseMvpActivity<PhotoPagerPresenter, IPhotoPagerView>
         private fun loadImage(image: Photo) {
             if (image.photo_url.isNullOrEmpty()) {
                 PicassoInstance.with().cancelRequest(photo)
-                CreateCustomToast(this@PhotoPagerActivity).showToastError(R.string.empty_url)
+                createCustomToast(
+                    this@PhotoPagerActivity,
+                    mViewPager
+                )?.showToastError(R.string.empty_url)
                 return
             }
             mLoadingNow = true

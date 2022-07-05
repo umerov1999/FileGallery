@@ -1,6 +1,5 @@
 package dev.ragnarok.filegallery.adapter
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -12,6 +11,7 @@ import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.net.toFile
 import androidx.fragment.app.FragmentActivity
@@ -36,8 +36,8 @@ import dev.ragnarok.filegallery.place.PlaceFactory.getPlayerPlace
 import dev.ragnarok.filegallery.settings.CurrentTheme
 import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.toMainThread
-import dev.ragnarok.filegallery.util.CustomToast.Companion.CreateCustomToast
 import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.toast.CustomToast
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
@@ -204,9 +204,9 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
         audioListDisposable = doLocalBitrate(url).fromIOToMain()
             .subscribe(
                 { (first, second) ->
-                    CreateCustomToast(
-                        context
-                    ).showToast(
+                    CustomToast.createCustomToast(
+                        context, null
+                    )?.showToast(
                         context.resources.getString(
                             R.string.bitrate,
                             first,
@@ -215,10 +215,8 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
                     )
                 }
             ) { e: Throwable? ->
-                Utils.showErrorInAdapter(
-                    context as Activity,
-                    e
-                )
+                CustomToast.createCustomToast(context, null)?.setDuration(Toast.LENGTH_LONG)
+                    ?.showToastThrowable(e)
             }
     }
 

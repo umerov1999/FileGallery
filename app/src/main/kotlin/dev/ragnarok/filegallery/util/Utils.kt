@@ -1,7 +1,6 @@
 package dev.ragnarok.filegallery.util
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.PendingIntent
 import android.content.Context
 import android.content.pm.PackageManager
@@ -10,28 +9,19 @@ import android.content.res.Configuration
 import android.graphics.*
 import android.os.Build
 import android.view.Display
-import android.view.Gravity
-import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.ColorInt
-import androidx.annotation.StringRes
 import androidx.core.graphics.ColorUtils
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import dev.ragnarok.filegallery.BuildConfig
 import dev.ragnarok.filegallery.Constants
 import dev.ragnarok.filegallery.Includes.provideMainThreadScheduler
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.media.exo.OkHttpDataSource
 import dev.ragnarok.filegallery.module.rlottie.RLottieDrawable
-import dev.ragnarok.filegallery.settings.CurrentTheme.getColorPrimary
 import dev.ragnarok.filegallery.settings.Settings.get
-import dev.ragnarok.filegallery.util.ErrorLocalizer.localizeThrowable
 import dev.ragnarok.filegallery.view.natives.rlottie.RLottieImageView
 import dev.ragnarok.filegallery.view.pager.*
 import io.reactivex.rxjava3.core.Completable
@@ -52,7 +42,7 @@ object Utils {
         return orig ?: ""
     }
 
-    fun getCauseIfRuntime(throwable: Throwable?): Throwable? {
+    fun getCauseIfRuntime(throwable: Throwable): Throwable {
         var target = throwable
         while (target is RuntimeException) {
             if (target.cause == null) {
@@ -341,68 +331,6 @@ object Utils {
         }
     }
 
-    @Suppress("DEPRECATION")
-    fun showRedTopToast(activity: Context, text: String?) {
-        val view = View.inflate(activity, R.layout.toast_error, null)
-        (view.findViewById<View>(R.id.text) as TextView).text = text
-        val toast = Toast.makeText(activity, text, Toast.LENGTH_SHORT)
-        toast.view = view
-        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.TOP, 0, 15)
-        toast.show()
-    }
-
-    @Suppress("DEPRECATION")
-    fun showRedTopToast(activity: Context, @StringRes text: Int, vararg params: Any?) {
-        val view = View.inflate(activity, R.layout.toast_error, null)
-        (view.findViewById<View>(R.id.text) as TextView).text =
-            activity.getString(text, *params)
-        val toast = Toast.makeText(activity, text, Toast.LENGTH_SHORT)
-        toast.view = view
-        toast.setGravity(Gravity.CENTER_HORIZONTAL or Gravity.TOP, 0, 15)
-        toast.show()
-    }
-
-    fun ThemedSnack(
-        view: View,
-        @StringRes resId: Int,
-        @BaseTransientBottomBar.Duration duration: Int
-    ): Snackbar {
-        return ThemedSnack(view, view.resources.getText(resId), duration)
-    }
-
-    fun ThemedSnack(
-        view: View,
-        text: CharSequence,
-        @BaseTransientBottomBar.Duration duration: Int
-    ): Snackbar {
-        val color = getColorPrimary(view.context)
-        val text_color =
-            if (isColorDark(color)) Color.parseColor("#ffffff") else Color.parseColor("#000000")
-        return Snackbar.make(view, text, duration).setBackgroundTint(color)
-            .setActionTextColor(text_color).setTextColor(text_color)
-    }
-
-    fun ColoredSnack(
-        view: View,
-        @StringRes resId: Int,
-        @BaseTransientBottomBar.Duration duration: Int,
-        @ColorInt color: Int
-    ): Snackbar {
-        return ColoredSnack(view, view.resources.getText(resId), duration, color)
-    }
-
-    fun ColoredSnack(
-        view: View,
-        text: CharSequence,
-        @BaseTransientBottomBar.Duration duration: Int,
-        @ColorInt color: Int
-    ): Snackbar {
-        val text_color =
-            if (isColorDark(color)) Color.parseColor("#ffffff") else Color.parseColor("#000000")
-        return Snackbar.make(view, text, duration).setBackgroundTint(color)
-            .setActionTextColor(text_color).setTextColor(text_color)
-    }
-
     fun getExoPlayerFactory(userAgent: String?): OkHttpDataSource.Factory {
         val builder: OkHttpClient.Builder = OkHttpClient.Builder()
             .readTimeout(60, TimeUnit.SECONDS)
@@ -413,18 +341,6 @@ object Utils {
 
     fun makeMediaItem(url: String?): MediaItem {
         return MediaItem.Builder().setUri(url).build()
-    }
-
-    fun showErrorInAdapter(context: Activity?, throwable: Throwable?) {
-        var throwableData = throwable
-        if (context == null || context.isFinishing || context.isDestroyed) {
-            return
-        }
-        throwableData = getCauseIfRuntime(throwableData)
-        if (Constants.IS_DEBUG) {
-            throwableData?.printStackTrace()
-        }
-        showRedTopToast(context, localizeThrowable(context.applicationContext, throwableData))
     }
 
     fun createPageTransform(@Transformers_Types type: Int): ViewPager2.PageTransformer? {

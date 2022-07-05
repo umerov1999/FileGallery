@@ -80,6 +80,7 @@ class MusicPlaybackService : Service() {
             return
         }
         try {
+            notification.visibility = Notification.VISIBILITY_PUBLIC
             if (inForeground) {
                 mManager.notify(id, notification)
                 return

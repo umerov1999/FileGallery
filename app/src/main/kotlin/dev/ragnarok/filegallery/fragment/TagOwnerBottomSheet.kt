@@ -15,16 +15,15 @@ import com.google.android.material.textfield.TextInputEditText
 import dev.ragnarok.filegallery.Extra
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.adapter.TagOwnerAdapter
+import dev.ragnarok.filegallery.fragment.base.BaseMvpBottomSheetDialogFragment
 import dev.ragnarok.filegallery.model.FileItem
 import dev.ragnarok.filegallery.model.tags.TagOwner
-import dev.ragnarok.filegallery.mvp.compat.AbsMvpBottomSheetDialogFragment
 import dev.ragnarok.filegallery.mvp.core.IPresenterFactory
 import dev.ragnarok.filegallery.mvp.presenter.TagOwnerPresenter
 import dev.ragnarok.filegallery.mvp.view.ITagOwnerView
-import dev.ragnarok.filegallery.util.CustomToast
-import dev.ragnarok.filegallery.util.Utils
+import dev.ragnarok.filegallery.util.toast.CustomToast
 
-class TagOwnerBottomSheet : AbsMvpBottomSheetDialogFragment<TagOwnerPresenter, ITagOwnerView>(),
+class TagOwnerBottomSheet : BaseMvpBottomSheetDialogFragment<TagOwnerPresenter, ITagOwnerView>(),
     ITagOwnerView,
     TagOwnerAdapter.ClickListener {
     private var mAdapter: TagOwnerAdapter? = null
@@ -83,10 +82,6 @@ class TagOwnerBottomSheet : AbsMvpBottomSheetDialogFragment<TagOwnerPresenter, I
         mAdapter?.notifyDataSetChanged()
     }
 
-    override fun showError(error: Throwable) {
-        Utils.showErrorInAdapter(requireActivity(), error)
-    }
-
     override fun notifyAdd(index: Int) {
         mAdapter?.notifyItemInserted(index)
     }
@@ -95,9 +90,9 @@ class TagOwnerBottomSheet : AbsMvpBottomSheetDialogFragment<TagOwnerPresenter, I
         mAdapter?.notifyItemRemoved(index)
     }
 
-    override fun close(owner: TagOwner, item: FileItem) {
-        CustomToast.CreateCustomToast(requireActivity())
-            .showToastSuccessBottom(getString(R.string.success_add, item.file_name, owner.name))
+    override fun successAdd(owner: TagOwner, item: FileItem) {
+        CustomToast.createCustomToast(requireActivity(), view)
+            ?.showToastSuccessBottom(getString(R.string.success_add, item.file_name, owner.name))
         dismiss()
     }
 

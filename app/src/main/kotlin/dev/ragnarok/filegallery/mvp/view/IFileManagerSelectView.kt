@@ -9,7 +9,6 @@ interface IFileManagerSelectView : IMvpView, IErrorView {
     fun displayData(items: ArrayList<FileItemSelect>)
     fun resolveEmptyText(visible: Boolean)
     fun resolveLoading(visible: Boolean)
-    fun onError(throwable: Throwable)
     fun notifyAllChanged()
     fun updatePathString(file: String)
     fun restoreScroll(scroll: Parcelable)

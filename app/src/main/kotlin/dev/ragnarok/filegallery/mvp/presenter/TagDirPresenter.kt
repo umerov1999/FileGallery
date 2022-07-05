@@ -171,7 +171,7 @@ class TagDirPresenter(private val owner_id: Int, savedInstanceState: Bundle?) :
     }
 
     private fun onActualDataGetError(t: Throwable) {
-        view?.showError(t)
+        view?.showThrowable(t)
     }
 
     private fun onActualDataReceived(data: List<TagDir>) {

@@ -1,7 +1,7 @@
 package dev.ragnarok.filegallery.mvp.view
 
-import dev.ragnarok.filegallery.util.CustomToast
+import dev.ragnarok.filegallery.util.toast.AbsCustomToast
 
 interface IToastView {
-    val customToast: CustomToast?
+    val customToast: AbsCustomToast?
 }
