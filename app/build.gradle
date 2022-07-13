@@ -6,6 +6,9 @@ plugins {
 
 android {
     namespace "dev.ragnarok.filegallery"
+    configurations {
+        compile.exclude module: 'support-v4'
+    }
     packagingOptions {
         exclude("META-INF/notice.txt")
         exclude("META-INF/license.txt")

@@ -13,12 +13,14 @@ import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.app.NotificationCompat
 import dev.ragnarok.filegallery.R
 import dev.ragnarok.filegallery.activity.MainActivity
+import dev.ragnarok.filegallery.settings.Settings
 import dev.ragnarok.filegallery.util.AppNotificationChannels
 import dev.ragnarok.filegallery.util.Utils
 
 class NotificationHelper(private val mService: MusicPlaybackService) {
     private val mNotificationManager: NotificationManager?
     private var mNotificationBuilder: NotificationCompat.Builder? = null
+    private val onGoing = Settings.get().main().isOngoing_player_notification
 
     @Suppress("DEPRECATION")
     fun buildNotification(
@@ -84,15 +86,18 @@ class NotificationHelper(private val mService: MusicPlaybackService) {
         else
             mNotificationBuilder?.priority = Notification.PRIORITY_MAX
         if (isPlaying) {
-            mNotificationBuilder?.setOngoing(true)
+            if (onGoing) {
+                mNotificationBuilder?.setOngoing(true)
+            }
             mService.goForeground(
                 FILE_GALLERY_MUSIC_SERVICE,
                 mNotificationBuilder?.build(),
                 mNotificationManager
             )
-        } else {
+        } else if (onGoing) {
             mNotificationBuilder?.setOngoing(false)
         }
+        mNotificationBuilder?.setVisibility(Notification.VISIBILITY_PUBLIC)
     }
 
     fun killNotification() {

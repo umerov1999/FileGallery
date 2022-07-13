@@ -66,6 +66,7 @@ interface ISettings {
         fun getPlayer_cover_transform(): Int
         fun isDeleteDisabled(): Boolean
         val isValidate_tls: Boolean
+        val isOngoing_player_notification: Boolean
     }
 
     interface ISecuritySettings {

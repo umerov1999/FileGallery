@@ -14,7 +14,6 @@ import dev.ragnarok.filegallery.settings.theme.ThemeOverlay
 import dev.ragnarok.filegallery.view.pager.Transformers_Types
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.subjects.PublishSubject
-import kotlinx.serialization.encodeToString
 import java.io.File
 
 internal class MainSettings(context: Context) : IMainSettings {
@@ -132,7 +131,10 @@ internal class MainSettings(context: Context) : IMainSettings {
 
     override fun setLocalServer(settings: LocalServerSettings) {
         getPreferences(app).edit()
-            .putString("local_media_server", kJson.encodeToString(settings)).apply()
+            .putString(
+                "local_media_server",
+                kJson.encodeToString(LocalServerSettings.serializer(), settings)
+            ).apply()
         localServerPublisher.onNext(settings)
     }
 
@@ -148,7 +150,10 @@ internal class MainSettings(context: Context) : IMainSettings {
 
     override fun setPlayerCoverBackgroundSettings(settings: PlayerCoverBackgroundSettings) {
         getPreferences(app).edit()
-            .putString("player_background_settings_json", kJson.encodeToString(settings)).apply()
+            .putString(
+                "player_background_settings_json",
+                kJson.encodeToString(PlayerCoverBackgroundSettings.serializer(), settings)
+            ).apply()
     }
 
     override fun getSlidrSettings(): SlidrSettings {
@@ -162,7 +167,10 @@ internal class MainSettings(context: Context) : IMainSettings {
 
     override fun setSlidrSettings(settings: SlidrSettings) {
         getPreferences(app).edit()
-            .putString("slidr_settings_json", kJson.encodeToString(settings)).apply()
+            .putString(
+                "slidr_settings_json",
+                kJson.encodeToString(SlidrSettings.serializer(), settings)
+            ).apply()
     }
 
     override fun getMusicLifecycle(): Int {
@@ -280,6 +288,9 @@ internal class MainSettings(context: Context) : IMainSettings {
         return getPreferences(app)
             .getStringSet("audio_ext", setOf("mp3", "ogg", "flac", "opus"))!!
     }
+
+    override val isOngoing_player_notification: Boolean
+        get() = getPreferences(app).getBoolean("ongoing_player_notification", false)
 
     @Transformers_Types
     override fun getViewpager_page_transform(): Int {

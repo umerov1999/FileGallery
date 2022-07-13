@@ -55,6 +55,7 @@ class SettingsBackup {
         var enable_dirs_files_count: Boolean? = null
         var viewpager_page_transform: String? = null
         var player_cover_transform: String? = null
+        var ongoing_player_notification: Boolean? = null
     }
 
     fun doBackup(): JsonObject {

@@ -149,6 +149,8 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                     StandardCharsets.UTF_8
                 )
                 val out = FileOutputStream(file)
+                val bom = byteArrayOf(0xEF.toByte(), 0xBB.toByte(), 0xBF.toByte())
+                out.write(bom)
                 out.write(bytes)
                 out.flush()
                 provideApplicationContext().sendBroadcast(
@@ -440,6 +442,10 @@ class PreferencesFragment : AbsPreferencesFragment(), PreferencesAdapter.OnScree
                 onCheckedChange {
                     requireActivity().recreate()
                 }
+            }
+
+            switch("ongoing_player_notification") {
+                titleRes = R.string.ongoing_player_notification
             }
 
             switch("use_long_click_download") {
