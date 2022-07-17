@@ -17,4 +17,5 @@ object Extra {
     const val STACK_TRACE = "stack_trace"
     const val SELECT = "select"
     const val IS_OUT_OF_MEMORY = "is_out_of_memory"
+    const val METHOD = "method"
 }

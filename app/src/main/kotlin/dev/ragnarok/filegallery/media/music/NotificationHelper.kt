@@ -202,6 +202,7 @@ class NotificationHelper(private val mService: MusicPlaybackService) {
         private const val ACTION_PREV = 3
         private const val SWIPE_DISMISS_ACTION = 4
 
+        const val NOTIFICATION_UPLOAD = 73
         const val NOTIFICATION_DOWNLOADING = 74
         const val NOTIFICATION_DOWNLOAD = 75
         const val NOTIFICATION_DOWNLOAD_MANAGER = 76

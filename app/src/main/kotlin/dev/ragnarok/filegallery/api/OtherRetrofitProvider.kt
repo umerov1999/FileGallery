@@ -11,6 +11,7 @@ import dev.ragnarok.filegallery.util.serializeble.retrofit.rxjava3.RxJava3CallAd
 import io.reactivex.rxjava3.core.Single
 import okhttp3.FormBody
 import okhttp3.Interceptor
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
@@ -36,6 +37,9 @@ class OtherRetrofitProvider @SuppressLint("CheckResult") constructor(private val
                         .build()
                 chain.proceed(request)
             }).addInterceptor(Interceptor { chain: Interceptor.Chain ->
+                if (chain.request().body is MultipartBody) {
+                    return@Interceptor chain.proceed(chain.request())
+                }
                 val original = chain.request()
                 val formBuilder = FormBody.Builder()
                 val body = original.body

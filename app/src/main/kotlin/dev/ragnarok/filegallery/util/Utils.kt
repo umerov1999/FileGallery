@@ -27,6 +27,8 @@ import dev.ragnarok.filegallery.view.pager.*
 import io.reactivex.rxjava3.core.Completable
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import java.io.Closeable
+import java.io.IOException
 import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.abs
@@ -109,6 +111,15 @@ object Utils {
             }
         }
         return null
+    }
+
+    fun safelyClose(closeable: Closeable?) {
+        if (closeable != null) {
+            try {
+                closeable.close()
+            } catch (ignored: IOException) {
+            }
+        }
     }
 
     fun safeCountOf(collection: Collection<*>?): Int {

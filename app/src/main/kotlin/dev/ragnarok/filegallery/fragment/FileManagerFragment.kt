@@ -297,6 +297,14 @@ class FileManagerFragment : BaseMvpFragment<FileManagerPresenter, IFileManagerVi
             .show()
     }
 
+    override fun onRemotePlay(audio: FileItem) {
+        audio.file_path?.let {
+            presenter?.fireFileForRemotePlaySelected(
+                it
+            )
+        }
+    }
+
     override fun onBackPressed(): Boolean {
         if (presenter?.canLoadUp() == true) {
             mLayoutManager?.onSaveInstanceState()?.let { presenter?.backupDirectoryScroll(it) }

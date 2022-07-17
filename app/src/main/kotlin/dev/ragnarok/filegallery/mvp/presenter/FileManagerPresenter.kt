@@ -1,5 +1,6 @@
 package dev.ragnarok.filegallery.mvp.presenter
 
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.os.Parcelable
@@ -13,6 +14,10 @@ import dev.ragnarok.filegallery.module.parcel.ParcelNative
 import dev.ragnarok.filegallery.mvp.presenter.base.RxSupportPresenter
 import dev.ragnarok.filegallery.mvp.view.IFileManagerView
 import dev.ragnarok.filegallery.settings.Settings
+import dev.ragnarok.filegallery.upload.IUploadManager
+import dev.ragnarok.filegallery.upload.UploadDestination
+import dev.ragnarok.filegallery.upload.UploadDestination.Companion.forRemotePlay
+import dev.ragnarok.filegallery.upload.UploadIntent
 import dev.ragnarok.filegallery.util.Objects.safeEquals
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
@@ -30,6 +35,8 @@ class FileManagerPresenter(
     private var isLoading = false
     private val basePath = path.absolutePath
     private val directoryScrollPositions = HashMap<String, Parcelable>()
+    private val remotePlay: UploadDestination = forRemotePlay()
+    private val uploadManager: IUploadManager = Includes.uploadManager
 
     private var selectedOwner: TagOwner? = null
 
@@ -613,6 +620,13 @@ class FileManagerPresenter(
             }, {
                 view?.showThrowable(it)
             })
+    }
+
+    fun fireFileForRemotePlaySelected(audioPath: String) {
+        val intent = UploadIntent(remotePlay)
+            .setAutoCommit(true)
+            .setFileUri(Uri.parse(audioPath))
+        uploadManager.enqueue(listOf(intent))
     }
 
     @FileType

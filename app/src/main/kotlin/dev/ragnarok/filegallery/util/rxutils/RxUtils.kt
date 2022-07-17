@@ -1,8 +1,10 @@
 package dev.ragnarok.filegallery.util.rxutils
 
 import dev.ragnarok.filegallery.Constants
+import dev.ragnarok.filegallery.util.Utils
 import io.reactivex.rxjava3.functions.Action
 import io.reactivex.rxjava3.functions.Consumer
+import java.io.Closeable
 
 object RxUtils {
     private val DUMMMY_ACTION_0 = Action {}
@@ -16,5 +18,9 @@ object RxUtils {
                 (t as Throwable).printStackTrace()
             }
         }
+    }
+
+    fun safelyCloseAction(closeable: Closeable?): Action {
+        return Action { Utils.safelyClose(closeable) }
     }
 }

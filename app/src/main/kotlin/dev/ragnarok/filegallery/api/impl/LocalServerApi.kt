@@ -1,10 +1,12 @@
 package dev.ragnarok.filegallery.api.impl
 
 import dev.ragnarok.filegallery.api.ILocalServerServiceProvider
+import dev.ragnarok.filegallery.api.PercentagePublisher
 import dev.ragnarok.filegallery.api.interfaces.ILocalServerApi
 import dev.ragnarok.filegallery.api.model.Items
 import dev.ragnarok.filegallery.api.model.response.BaseResponse
 import dev.ragnarok.filegallery.api.services.ILocalServerService
+import dev.ragnarok.filegallery.api.util.ProgressRequestBody
 import dev.ragnarok.filegallery.model.Audio
 import dev.ragnarok.filegallery.model.FileRemote
 import dev.ragnarok.filegallery.model.Photo
@@ -14,6 +16,9 @@ import dev.ragnarok.filegallery.util.Utils.firstNonEmptyString
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.exceptions.Exceptions
 import io.reactivex.rxjava3.functions.Function
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import java.io.InputStream
 
 internal class LocalServerApi(private val service: ILocalServerServiceProvider) : ILocalServerApi {
     override fun getVideos(offset: Int?, count: Int?, reverse: Boolean): Single<List<Video>> {
@@ -153,6 +158,14 @@ internal class LocalServerApi(private val service: ILocalServerServiceProvider) 
     }
 
     companion object {
+        private fun wrapPercentageListener(listener: PercentagePublisher?): ProgressRequestBody.UploadCallbacks {
+            return object : ProgressRequestBody.UploadCallbacks {
+                override fun onProgressUpdate(percentage: Int) {
+                    listener?.onProgressChanged(percentage)
+                }
+            }
+        }
+
         inline fun <reified T> extractResponseWithErrorHandling(): Function<BaseResponse<Items<T>>, List<T>> {
             return Function { response: BaseResponse<Items<T>> ->
                 if (response.error != null) {
@@ -206,5 +219,20 @@ internal class LocalServerApi(private val service: ILocalServerServiceProvider) 
                 response.response ?: throw NullPointerException("response")
             }
         }
+    }
+
+    override fun remotePlayAudioRx(
+        server: String?,
+        filename: String?,
+        `is`: InputStream,
+        listener: PercentagePublisher?
+    ): Single<BaseResponse<Int>> {
+        val body = ProgressRequestBody(
+            `is`, wrapPercentageListener(listener),
+            "*/*".toMediaTypeOrNull()
+        )
+        val part: MultipartBody.Part = MultipartBody.Part.createFormData("audio", filename, body)
+        return service.provideLocalServerService()
+            .flatMap { it.remotePlayAudioRx(server, part) }
     }
 }

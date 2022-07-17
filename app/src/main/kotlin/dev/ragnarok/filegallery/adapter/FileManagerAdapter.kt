@@ -291,6 +291,16 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
                 false
             )
         )
+        if (Settings.get().main().getLocalServer().enabled) {
+            menus.add(
+                OptionRequest(
+                    AudioLocalOption.play_via_local_server,
+                    context.getString(R.string.play_remote),
+                    R.drawable.remote_cloud,
+                    false
+                )
+            )
+        }
         menus.add(
             OptionRequest(
                 AudioLocalOption.add_dir_tag_item,
@@ -317,6 +327,9 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
             object : ModalBottomSheetDialogFragment.Listener {
                 override fun onModalOptionSelected(option: Option) {
                     when (option.id) {
+                        AudioLocalOption.play_via_local_server -> {
+                            clickListener?.onRemotePlay(audio)
+                        }
                         AudioLocalOption.add_dir_tag_item -> {
                             clickListener?.onDirTag(audio)
                         }
@@ -630,6 +643,7 @@ class FileManagerAdapter(private var context: Context, private var data: List<Fi
         fun onDirTag(item: FileItem)
         fun onToggleDirTag(item: FileItem)
         fun onDelete(item: FileItem)
+        fun onRemotePlay(audio: FileItem)
     }
 
     class FileHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

@@ -7,9 +7,8 @@ import dev.ragnarok.filegallery.model.FileRemote
 import dev.ragnarok.filegallery.model.Photo
 import dev.ragnarok.filegallery.model.Video
 import io.reactivex.rxjava3.core.Single
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.POST
+import okhttp3.MultipartBody
+import retrofit2.http.*
 
 interface ILocalServerService {
     @FormUrlEncoded
@@ -109,5 +108,12 @@ interface ILocalServerService {
     @POST("rebootPC")
     fun rebootPC(
         @Field("type") type: String?
+    ): Single<BaseResponse<Int>>
+
+    @Multipart
+    @POST
+    fun remotePlayAudioRx(
+        @Url server: String?,
+        @Part file: MultipartBody.Part
     ): Single<BaseResponse<Int>>
 }
